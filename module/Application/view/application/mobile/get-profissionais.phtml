@@ -1,0 +1,30 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: 400005
+ * Date: 11/03/2019
+ * Time: 12:02
+ */ ?>
+<ons-row id="prof_found">
+    <ons-col style="padding: 0 10px">
+        <ons-card modifier="material">
+            <div class="title">
+                <h2 class="card__title" style="text-align: center;">Profissionais encontrados</h2>
+            </div>
+            <div class="content">
+                <ons-row>
+                    <ons-list style="width: 100%">
+                        <ons-lazy-repeat>
+                            <?php foreach ($this->id as $id): ?>
+                                <ons-list-item expandable>
+                                    <?= $id; ?>
+                                    <div class="expandable-content">Expandable content</div>
+                                </ons-list-item>
+                            <?php endforeach; ?>
+                        </ons-lazy-repeat>
+                    </ons-list>
+                </ons-row>
+            </div>
+        </ons-card>
+    </ons-col>
+</ons-row>

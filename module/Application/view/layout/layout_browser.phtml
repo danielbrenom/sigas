@@ -1,0 +1,87 @@
+<?= $this->doctype() ?>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <?= $this->headTitle('SIGAS')->setSeparator(' - ')->setAutoEscape(false) ?>
+
+    <?= $this->headMeta()
+        ->appendName('viewport', 'width=device-width, initial-scale=1.0')
+        ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
+    ?>
+
+    <!-- Le styles -->
+    <?= $this->headLink(['rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'])
+        ->prependStylesheet($this->basePath('layout_browser/css/materialize.css'))
+        ->prependStylesheet(['rel' => 'stylesheet', 'href' => 'https://use.fontawesome.com/releases/v5.5.0/css/all.css',
+            'integrity' => 'sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU', 'crossorigin' => 'anonymous'])
+        ->prependStylesheet($this->basePath('layout_browser/css/bootstrap.css'))
+    ?>
+
+    <!-- Scripts -->
+    <?= $this->headScript()
+        ->prependFile($this->basePath('layout_browser/js/materialize.js'))
+        ->prependFile($this->basePath('layout_browser/js/bootstrap.js'))
+        ->prependFile($this->basePath('layout_browser/js/jquery-3.1.0.min.js'))
+    ?>
+</head>
+<body cz-shortcut-listen="true">
+<nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><div id="logo-container" class="brand-logo">SIGAS</div>
+        <ul class="right hide-on-med-and-down">
+            <li><a href="<?= $this->url('application_browser') ?>">Home</a></li>
+            <li><a href="<?= $this->url('application_browser', ['action' => 'history']) ?>">Histórico</a></li>
+            <li><a href="<?= $this->url('application_browser', ['action' => 'profile']) ?>">Perfil</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="section">
+        <?= $this->content; ?>
+    </div>
+    <br><br>
+</div>
+
+<footer class="page-footer orange" style="position: sticky; width: 100%; bottom: 0">
+    <div class="container">
+        <div class="row">
+            <div class="col l6 s12">
+                <h5 class="white-text">SIGAS</h5>
+                <p class="grey-text text-lighten-4">SIGAS - Sistema Integrado de Gerenciamento e Agendamento da Saúde</p>
+            </div>
+            <div class="col l3 s12">
+                <h5 class="white-text">Settings</h5>
+                <ul>
+                    <li><a class="white-text" href="#!">Link 1</a></li>
+                    <li><a class="white-text" href="#!">Link 2</a></li>
+                    <li><a class="white-text" href="#!">Link 3</a></li>
+                    <li><a class="white-text" href="#!">Link 4</a></li>
+                </ul>
+            </div>
+            <div class="col l3 s12">
+                <h5 class="white-text">Connect</h5>
+                <ul>
+                    <li><a class="white-text" href="#!">Link 1</a></li>
+                    <li><a class="white-text" href="#!">Link 2</a></li>
+                    <li><a class="white-text" href="#!">Link 3</a></li>
+                    <li><a class="white-text" href="#!">Link 4</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer-copyright">
+        <div class="container">
+            Copyright GDevelopment, 2019<br/>
+            Made with <a class="orange-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+        </div>
+    </div>
+</footer>
+
+
+<div class="sidenav-overlay"></div>
+<div class="drag-target"></div>
+</body>
+
+
+</html>
