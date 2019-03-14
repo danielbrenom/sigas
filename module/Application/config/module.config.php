@@ -8,8 +8,10 @@
 namespace Application;
 
 use Application\Controller\Factory\IndexControllerFactory;
+use Application\Controller\Factory\MobileControllerFactory;
 use Application\Controller\MobileController;
 use Application\Controller\Plugin\Factory\HtmlRenderFactory;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
@@ -49,11 +51,30 @@ return [
             ]
         ],
     ],
+    'doctrine' => [
+        'driver' => [
+            __NAMESPACE__ . '_entities' => [
+                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'cache' => 'array',
+                'paths' => [__DIR__ . '/../src/Entity']
+            ],
+            'orm_default' => [
+                'drivers' => [
+                    __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_entities']
+            ],
+            'orm_crawler_chain' => [
+                'class' => MappingDriverChain::class,
+                'drivers' => [
+                    __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_entities'
+                ]
+            ],
+        ]
+    ],
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => IndexControllerFactory::class,
             Controller\BrowserController::class => InvokableFactory::class,
-            MobileController::class => InvokableFactory::class
+            MobileController::class => MobileControllerFactory::class
         ],
     ],
     'controller_plugins' => [
