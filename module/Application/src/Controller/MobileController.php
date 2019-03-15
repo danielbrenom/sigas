@@ -9,9 +9,11 @@
 namespace Application\Controller;
 
 
-use Application\Entity\UserEspeciality;
+use Application\Entity\Sis\User;
+use Application\Entity\Sis\UserEspeciality;
 use Doctrine\ORM\EntityManager;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
 class MobileController extends AbstractActionController
@@ -29,28 +31,35 @@ class MobileController extends AbstractActionController
     }
 
     public function homeAction(){
-        $esp = $this->entityManager->getRepository(UserEspeciality::class)
-        ->createQueryBuilder('e')
-        ->where('e.id != 0')
-        ->getQuery()->getResult(2);
-        return new ViewModel([
-            "especialities" => $esp
-        ]);
+        return new ViewModel();
     }
 
     public function getProfissionaisAction()
     {
-        $elements = [];
-        for ($i = 0; $i <= 20; $i++){
-            $elements[] = "A{$i}";
-        }
-        $view = new ViewModel(
-            [
-                "id" => $elements
-            ]
-        );
+        $params = $this->getRequest()->getQuery()->toArray();
+        $prof = $this->entityManager->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->addSelect('info')
+            ->leftJoin('u.user_information', 'info')
+            ->where('u.id_especialidade = :sId')
+            ->setParameter('sId', $params['esp'])
+            ->getQuery()->getResult(2);
+        $view = new ViewModel([
+            "profissionais" => $prof
+        ]);
         $view->setTerminal(true);
         return $view;
+    }
+
+    public function getEspecialidadesAction()
+    {
+        $esp = $this->entityManager->getRepository(UserEspeciality::class)
+            ->createQueryBuilder('e')
+            ->where('e.id != 1')
+            ->getQuery()->getResult(2);
+        return new JsonModel([
+            $esp
+        ]);
     }
 
 }

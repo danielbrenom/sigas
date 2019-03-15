@@ -13,12 +13,27 @@
             </div>
             <div class="content">
                 <ons-row>
-                    <ons-list style="width: 100%">
+                    <ons-list style="width: 100%" modifier="inset">
                         <ons-lazy-repeat>
-                            <?php foreach ($this->id as $id): ?>
-                                <ons-list-item expandable>
-                                    <?= $id; ?>
-                                    <div class="expandable-content">Expandable content</div>
+                            <?php foreach ($this->profissionais as $p): ?>
+                                <ons-list-item expandable modifier="longdivider">
+                                    <?= $p['user_information']['user_name'] ?>
+                                    <div class="expandable-content">
+                                        <ons-row>
+                                            <ons-col width="100%">
+                                                <p></p>
+                                                <p>Endereço: <?= $p['user_information']['user_addr'] ?></p>
+                                                <ons-row>
+                                                    <ons-col width="35%"></ons-col>
+                                                    <ons-col width="65%" style="text-align: right">
+                                                        <ons-button onclick="fn.viewDetails()" ripple modifier="material" class="right-align">
+                                                            Mais informações
+                                                        </ons-button>
+                                                    </ons-col>
+                                                </ons-row>
+                                            </ons-col>
+                                        </ons-row>
+                                    </div>
                                 </ons-list-item>
                             <?php endforeach; ?>
                         </ons-lazy-repeat>

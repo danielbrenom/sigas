@@ -1,17 +1,32 @@
-<ons-page>
-    <ons-toolbar>
-        <div class="center">SIGAS</div>
-    </ons-toolbar>
+<ons-navigator swipeable id="mainNavigator" page="mainPage.html"></ons-navigator>
 
-    <ons-tabbar swipeable position="bottom">
-        <ons-tab page="tab1.html" label="Inicio" icon="fa-medkit" active>
-        </ons-tab>
-        <ons-tab page="tab2.html" label="Histórico" icon="fa-history">
-        </ons-tab>
-        <ons-tab page="tab3.html" label="Perfil" icon="fa-user-circle">
-        </ons-tab>
-    </ons-tabbar>
-</ons-page>
+<template id="mainPage.html">
+    <ons-page id="mainPage">
+        <ons-toolbar>
+            <div class="center">SIGAS</div>
+        </ons-toolbar>
+        <ons-tabbar swipeable position="bottom">
+            <ons-tab page="tab1.html" label="Inicio" icon="fa-medkit" active>
+            </ons-tab>
+            <ons-tab page="tab2.html" label="Histórico" icon="fa-history">
+            </ons-tab>
+            <ons-tab page="tab3.html" label="Perfil" icon="fa-user-circle">
+            </ons-tab>
+        </ons-tabbar>
+    </ons-page>
+</template>
+
+<template id="detailsPage.html">
+    <ons-page id="detailsPage">
+        <ons-toolbar>
+            <div class="left"><ons-back-button>Busca</ons-back-button></div>
+            <div class="center">Informações</div>
+        </ons-toolbar>
+        <ons-row id="fInformacoes">
+
+        </ons-row>
+    </ons-page>
+</template>
 
 <template id="tab1.html">
     <ons-page id="Tab1">
@@ -27,11 +42,8 @@
                                 <ons-icon icon="md-search" style="font-size: 20pt"></ons-icon>
                             </ons-col>
                             <ons-col width="90%">
-                                <ons-select id="fSelectEsp" modifier="material" style="width: 100%;">
+                                <ons-select id="fSelectEsp" onchange="fn.selectP()" modifier="material" style="width: 100%;">
                                     <option value="">Selecione uma especialidade</option>
-                                    <option value="0">Clinica</option>
-                                    <option value="1">Cirurgião Dentista</option>
-
                                 </ons-select>
                             </ons-col>
                         </ons-row>
@@ -63,16 +75,37 @@
         //     $('ons-toolbar .center')
         //         .innerHTML = event.tabItem.getAttribute('label');
         // });
-        console.log(ons.isReady())
-        $("#fSelectEsp").change(function () {
-            $.get("/mobile/get-profissionais", {esp: $(this).val()}, function (data) {
+        if (ons.isReady()) {
+            $.get("/mobile/get-especialidades", {}, function (data) {
+                $.each(data[0], function (key, value) {
+                    $("#fSelectEsp select").append('<option value="'+value.id+'">'+value.desc_especialidade+'</option>');
+                })
+            });
+            // $("#fSelectEsp").change(function () {
+            //     console.log("Called")
+            //     console.log($("#Tab1 .page__content"))
+            //     $.get("/mobile/get-profissionais", {esp: $(this).val()}, function (data) {
+            //         if ($("#Tab1 .page__content #prof_found").length)
+            //             $("#Tab1 .page__content #prof_found").remove();
+            //         $("#Tab1 .page__content").append(data);
+            //     })
+            // });
+        }
+
+
+        fn = {};
+
+        fn.viewDetails = function (){
+            $('#mainNavigator')[0].pushPage('detailsPage.html', {data: {id : "A"}});
+        };
+
+        fn.selectP = function(){
+            $.get("/mobile/get-profissionais", {esp: $("#fSelectEsp").val()}, function (data) {
                 if ($("#Tab1 .page__content #prof_found").length)
                     $("#Tab1 .page__content #prof_found").remove();
                 $("#Tab1 .page__content").append(data);
             })
-        });
-
-        fn = {};
+        };
 
         fn.open = function () {
             $("#menu")[0].open();
