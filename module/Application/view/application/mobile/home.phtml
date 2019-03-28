@@ -16,15 +16,50 @@
     </ons-page>
 </template>
 
+<template id="professionalsPage.html">
+    <ons-page id="professionalsPage">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Busca</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row id="fResultados">
+
+        </ons-row>
+    </ons-page>
+</template>
+
 <template id="detailsPage.html">
     <ons-page id="detailsPage">
-        <ons-toolbar>
-            <div class="left"><ons-back-button>Busca</ons-back-button></div>
-            <div class="center">Informações</div>
+        <ons-toolbar modifier="noshadow" style="background-color: aliceblue !important;">
+            <div class="left">
+                <ons-back-button>Busca</ons-back-button>
+            </div>
+            <div class="center"></div>
         </ons-toolbar>
         <ons-row id="fInformacoes">
 
         </ons-row>
+        <ons-bottom-toolbar onclick="fn.checkDates(0)">
+            <ons-row>
+                <ons class="col"></ons>
+                <ons class="col" style="padding-top: 10px">SOLICITAR CONSULTA</ons>
+                <ons class="col"></ons>
+
+            </ons-row>
+        </ons-bottom-toolbar>
+    </ons-page>
+</template>
+
+<template id="checkDatePage.html">
+    <ons-page id="checkDate">
+        <ons-toolbar modifier="noshadow" style="background-color: aliceblue !important;">
+            <div class="left">
+                <ons-back-button>Informações</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
     </ons-page>
 </template>
 
@@ -38,13 +73,11 @@
                     </div>
                     <div class="content">
                         <ons-row>
-                            <ons-col width="10%">
-                                <ons-icon icon="md-search" style="font-size: 20pt"></ons-icon>
-                            </ons-col>
-                            <ons-col width="90%">
-                                <ons-select id="fSelectEsp" onchange="fn.selectP()" modifier="material" style="width: 100%;">
-                                    <option value="">Selecione uma especialidade</option>
-                                </ons-select>
+                            <ons-col width="100%">
+                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fSelectEsp">
+                                    <ons-lazy-repeat>
+                                    </ons-lazy-repeat>
+                                </ons-list>
                             </ons-col>
                         </ons-row>
                     </div>
@@ -69,6 +102,7 @@
     </ons-page>
 </template>
 
+
 <script>
     $(function () {
         // $(document)[0].addEventListener('prechange', function(event) {
@@ -78,8 +112,8 @@
         if (ons.isReady()) {
             $.get("/mobile/get-especialidades", {}, function (data) {
                 $.each(data[0], function (key, value) {
-                    $("#fSelectEsp select").append('<option value="'+value.id+'">'+value.desc_especialidade+'</option>');
-                })
+                    $("#fSelectEsp ons-lazy-repeat").append('<ons-list-item modifier="chevron longdivider" onclick="fn.selectP('+value.id+')" tappable>' + value.desc_especialidade + '</ons-list-item>');
+                });
             });
             // $("#fSelectEsp").change(function () {
             //     console.log("Called")
@@ -95,16 +129,55 @@
 
         fn = {};
 
-        fn.viewDetails = function (){
-            $('#mainNavigator')[0].pushPage('detailsPage.html', {data: {id : "A"}});
+        fn.alert = function(){
+            console.log("Called", $("#alert"));
+            let dialog = $('#alert');
+
+            if (dialog) {
+                dialog.show();
+            } else {
+                ons.createElement('dialog.html', { append: true })
+                    .then(function(dialog) {
+                        dialog.show();
+                    });
+            }
         };
 
-        fn.selectP = function(){
-            $.get("/mobile/get-profissionais", {esp: $("#fSelectEsp").val()}, function (data) {
-                if ($("#Tab1 .page__content #prof_found").length)
-                    $("#Tab1 .page__content #prof_found").remove();
-                $("#Tab1 .page__content").append(data);
-            })
+        fn.hideDialog = function(id) {
+            document
+                .getElementById(id)
+                .hide();
+        };
+
+        fn.viewDetails = function (id) {
+            let html;
+            $.get('/mobile/get-profissional-info', {id_user: id}, function (data) {
+                html = data;
+            }).then(function () {
+                $('#mainNavigator')[0].pushPage('detailsPage.html', {data: {id: "A"}}).then(function () {
+                    $('#fInformacoes').empty();
+                    $('#fInformacoes').append(html);
+                });
+            });
+        };
+
+        fn.checkDates = function(id){
+          $("#mainNavigator")[0].pushPage('checkDatePage.html');
+        };
+
+        fn.selectP = function (id) {
+            let html;
+            $.get("/mobile/get-profissionais", {esp: id}, function (data) {
+                html = data;
+                // if ($("#Tab1 .page__content #prof_found").length)
+                //     $("#Tab1 .page__content #prof_found").remove();
+                // $("#Tab1 .page__content").append(data);
+            }).then(function () {
+                $('#mainNavigator')[0].pushPage('professionalsPage.html').then(function () {
+                    $('#fResultados').empty();
+                    $('#fResultados').append(html);
+                })
+            });
         };
 
         fn.open = function () {

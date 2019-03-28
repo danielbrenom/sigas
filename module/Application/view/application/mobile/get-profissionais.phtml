@@ -4,7 +4,7 @@
  * User: 400005
  * Date: 11/03/2019
  * Time: 12:02
- */ ?>
+ */?>
 <ons-row id="prof_found">
     <ons-col style="padding: 0 10px">
         <ons-card modifier="material">
@@ -16,24 +16,8 @@
                     <ons-list style="width: 100%" modifier="inset">
                         <ons-lazy-repeat>
                             <?php foreach ($this->profissionais as $p): ?>
-                                <ons-list-item expandable modifier="longdivider">
+                                <ons-list-item modifier="chevron longdivider" onclick="fn.viewDetails(<?=$p['id']?>)" tappable>
                                     <?= $p['user_information']['user_name'] ?>
-                                    <div class="expandable-content">
-                                        <ons-row>
-                                            <ons-col width="100%">
-                                                <p></p>
-                                                <p>Endereço: <?= $p['user_information']['user_addr'] ?></p>
-                                                <ons-row>
-                                                    <ons-col width="35%"></ons-col>
-                                                    <ons-col width="65%" style="text-align: right">
-                                                        <ons-button onclick="fn.viewDetails()" ripple modifier="material" class="right-align">
-                                                            Mais informações
-                                                        </ons-button>
-                                                    </ons-col>
-                                                </ons-row>
-                                            </ons-col>
-                                        </ons-row>
-                                    </div>
                                 </ons-list-item>
                             <?php endforeach; ?>
                         </ons-lazy-repeat>

@@ -30,8 +30,28 @@ class MobileController extends AbstractActionController
         $this->entityManager = $entityManager;
     }
 
-    public function homeAction(){
+    public function homeAction()
+    {
         return new ViewModel();
+    }
+
+    public function getProfissionalInfoAction()
+    {
+        $params = $this->getRequest()->getQuery()->toArray();
+        $prof = $this->entityManager->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->addSelect('info')
+            ->addSelect('esp')
+            ->leftJoin('u.user_information', 'info')
+            ->leftJoin('u.user_especiality', 'esp')
+            ->where('u.id = :sId')
+            ->setParameter('sId', $params['id_user'])
+            ->getQuery()->getResult(2);
+        $view = new ViewModel([
+            "prof" => $prof
+        ]);
+        $view->setTerminal(true);
+        return $view;
     }
 
     public function getProfissionaisAction()
