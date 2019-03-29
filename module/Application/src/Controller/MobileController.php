@@ -10,8 +10,13 @@ namespace Application\Controller;
 
 
 use Application\Entity\Sis\User;
+use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
+use DateInterval;
+use DateTime;
+use DateTimeZone;
 use Doctrine\ORM\EntityManager;
+use Exception;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -79,6 +84,33 @@ class MobileController extends AbstractActionController
             ->getQuery()->getResult(2);
         return new JsonModel([
             $esp
+        ]);
+    }
+
+    public function getScheduleAction()
+    {
+        $params = $this->getRequest()->getQuery()->toArray();
+        $params['id_professional'] = 2;
+        try {
+            $resultados = $this->entityManager->getRepository(UserAppointment::class)
+                ->createQueryBuilder('a')
+                ->where('a.id_user_ps = :sId')
+                ->setParameter("sId", $params['id_professional'])
+                ->getQuery()->getResult(2);
+            $resp = [];
+            foreach ($resultados as $appointment) {
+                $data = (new DateTime($appointment['solicited_for'], new DateTimeZone("America/Belem")))->format('Y-m-d');
+                $resp[] = [
+                    "title" => "A",
+                    "start" => $data,
+                    "end" => $data
+                ];
+            }
+        } catch (Exception $e) {
+            $resp = $e->getMessage();
+        }
+        return new JsonModel([
+            $resp[0]
         ]);
     }
 
