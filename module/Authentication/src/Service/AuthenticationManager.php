@@ -30,6 +30,13 @@ class AuthenticationManager
         $this->sessionManager = $sessionManager;
     }
 
+    /**
+     * @param $email
+     * @param $password
+     * @param null $rememberMe
+     * @return \Zend\Authentication\Result
+     * @throws \Exception
+     */
     public function login($email, $password, $rememberMe = null)
     {
         if ($this->authService->getIdentity() !== null) {

@@ -11,6 +11,7 @@ namespace Application\Entity\Sis;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @deprecated Classe não mais utilizada
  * @ORM\Entity
  * @ORM\Table(name="sis_user")
  */

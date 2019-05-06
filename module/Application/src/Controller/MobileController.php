@@ -9,7 +9,7 @@
 namespace Application\Controller;
 
 
-use Application\Entity\Sis\User;
+use Application\Entity\Seg\User;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
 use Authentication\Service\AuthenticationManager;
@@ -54,7 +54,7 @@ class MobileController extends AbstractActionController
             ->addSelect('info')
             ->addSelect('esp')
             ->leftJoin('u.user_information', 'info')
-            ->leftJoin('u.user_especiality', 'esp')
+            ->leftJoin('info.user_especiality', 'esp')
             ->where('u.id = :sId')
             ->setParameter('sId', $params['id_user'])
             ->getQuery()->getResult(2);
@@ -72,7 +72,7 @@ class MobileController extends AbstractActionController
             ->createQueryBuilder('u')
             ->addSelect('info')
             ->leftJoin('u.user_information', 'info')
-            ->where('u.id_especialidade = :sId')
+            ->where('info.user_especiality = :sId')
             ->setParameter('sId', $params['esp'])
             ->getQuery()->getResult(2);
         $view = new ViewModel([

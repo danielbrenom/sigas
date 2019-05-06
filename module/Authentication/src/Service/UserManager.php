@@ -3,8 +3,12 @@
 
 namespace Authentication\Service;
 
+use Application\Debug\UtilsFile;
+use Application\Entity\Sis\UserInfoPessoal;
 use Authentication\Entity\Seg\User;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Zend\Crypt\Password\Bcrypt;
 
 class UserManager
@@ -44,22 +48,43 @@ class UserManager
         }
     }
 
-    public function createUser($user, $password)
+    /**
+     * @param $user
+     * @param $password
+     * @return bool
+     * @throws \Exception
+     */
+    public function createUser($email, $password)
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($user);
+        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($email);
         /**  @TODO: Criar usuário e também suas informações
-         *   Inserir as informações na tabela de seg usuario, sis usuario e info usuario
+         *   Inserir as informações na tabela de seg usuario e info usuario
          * */
-
-        if ($user === null) {
-            $newUser = new User();
-            $newUser->setEmail($user);
-            $bcrypt = new Bcrypt();
-            $newUser->setUserPassword($bcrypt->create($password));
-            $newUser->setCreationDate(date('Y-m-d H:i:s'));
-            $this->entityManager->persist($newUser);
-            $this->entityManager->flush();
-            return true;
+        //UtilsFile::printvardie($user);
+        try {
+            if ($user === null) {
+                $newUser = new User();
+                $newUser->setEmail($email);
+                $bcrypt = new Bcrypt();
+                $newUser->setUserPassword($bcrypt->create($password));
+                $newUser->setCreationDate(date('Y-m-d H:i:s'));
+                $this->entityManager->persist($newUser);
+                $this->entityManager->flush();
+                $lastId = $newUser->getIdUser();
+                $userPersonalInfo = new UserInfoPessoal();
+                $userPersonalInfo->setId($lastId);
+                $userPersonalInfo->setUserEmail($email);
+                $userPersonalInfo->setUserCpf(" ");
+                $userPersonalInfo->setUserRg(" ");
+                $userPersonalInfo->setUserAddr(" ");
+                $this->entityManager->persist($userPersonalInfo);
+                $this->entityManager->flush();
+                return true;
+            }
+        } catch (OptimisticLockException $e) {
+            throw new \Exception($e->getMessage());
+        } catch (ORMException $e) {
+            throw new \Exception($e->getMessage());
         }
 
         throw new \Exception("Este email já foi utilizado", -1);

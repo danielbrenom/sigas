@@ -18,10 +18,14 @@ class UserInfoPessoal
 {
     /**
      * @ORM\Id
-     * @ORM\GeneratedValue
      * @ORM\Column(name="id_user")
      */
     protected $id;
+
+    /**
+     * @ORM\Column(name="id_especialidade")
+     */
+    protected $id_especialidade;
 
     /**
      * @ORM\Column(name="user_name")
@@ -64,4 +68,188 @@ class UserInfoPessoal
      * @ORM\Column(name="user_ctt_res")
      */
     protected $user_ctt_res;
+
+    /**
+     * @ORM\OneToOne(targetEntity="UserEspeciality")
+     * @ORM\JoinColumn(name="id_especialidade", referencedColumnName="id_especialidade")
+     */
+    protected $user_especiality;
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserName()
+    {
+        return $this->user_name;
+    }
+
+    /**
+     * @param mixed $user_name
+     */
+    public function setUserName($user_name)
+    {
+        $this->user_name = $user_name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserCpf()
+    {
+        return $this->user_cpf;
+    }
+
+    /**
+     * @param mixed $user_cpf
+     */
+    public function setUserCpf($user_cpf)
+    {
+        $this->user_cpf = $user_cpf;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserRg()
+    {
+        return $this->user_rg;
+    }
+
+    /**
+     * @param mixed $user_rg
+     */
+    public function setUserRg($user_rg)
+    {
+        $this->user_rg = $user_rg;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserConsReg()
+    {
+        return $this->user_cons_reg;
+    }
+
+    /**
+     * @param mixed $user_cons_reg
+     */
+    public function setUserConsReg($user_cons_reg)
+    {
+        $this->user_cons_reg = $user_cons_reg;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserAddr()
+    {
+        return $this->user_addr;
+    }
+
+    /**
+     * @param mixed $user_addr
+     */
+    public function setUserAddr($user_addr)
+    {
+        $this->user_addr = $user_addr;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserEmail()
+    {
+        return $this->user_email;
+    }
+
+    /**
+     * @param mixed $user_email
+     */
+    public function setUserEmail($user_email)
+    {
+        $this->user_email = $user_email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserBirthdate()
+    {
+        return $this->user_birthdate;
+    }
+
+    /**
+     * @param mixed $user_birthdate
+     */
+    public function setUserBirthdate($user_birthdate)
+    {
+        $this->user_birthdate = $user_birthdate;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserHealthcare()
+    {
+        return $this->user_healthcare;
+    }
+
+    /**
+     * @param mixed $user_healthcare
+     */
+    public function setUserHealthcare($user_healthcare)
+    {
+        $this->user_healthcare = $user_healthcare;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserCttPhone()
+    {
+        return $this->user_ctt_phone;
+    }
+
+    /**
+     * @param mixed $user_ctt_phone
+     */
+    public function setUserCttPhone($user_ctt_phone)
+    {
+        $this->user_ctt_phone = $user_ctt_phone;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserCttRes()
+    {
+        return $this->user_ctt_res;
+    }
+
+    /**
+     * @param mixed $user_ctt_res
+     */
+    public function setUserCttRes($user_ctt_res)
+    {
+        $this->user_ctt_res = $user_ctt_res;
+    }
+
+
 }

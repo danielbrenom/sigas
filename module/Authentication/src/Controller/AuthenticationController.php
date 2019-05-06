@@ -118,7 +118,7 @@ class AuthenticationController extends AbstractActionController
                     'deepMxCheck' => true
                 ]);
                 $data = $this->params()->fromPost();
-                UtilsFile::printvar($data);
+                //UtilsFile::printvardie($data);
                 if (!$emailValidator->isValid($data['fEmail'])) {
                     throw new Exception("Email inválido");
                 }
@@ -128,7 +128,10 @@ class AuthenticationController extends AbstractActionController
                 $this->redirect()->toRoute('home');
             }
         } catch (Exception $e) {
-
+            return new JsonModel(
+                ["code" => $e->getCode(),
+                    "message" => $e->getMessage()]
+            );
         }
         return $this->getResponse();
     }

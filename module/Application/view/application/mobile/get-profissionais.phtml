@@ -20,6 +20,11 @@
                                     <?= $p['user_information']['user_name'] ?>
                                 </ons-list-item>
                             <?php endforeach; ?>
+                            <?php if (!count($this->profissionais)): ?>
+                                <ons-list-item modifier="longdivider">
+                                    Não foram encontrados profissionais da especialidade desejada.
+                                </ons-list-item>
+                            <?php endif; ?>
                         </ons-lazy-repeat>
                     </ons-list>
                 </ons-row>

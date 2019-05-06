@@ -158,6 +158,19 @@
     </ons-page>
 </template>
 
+<template id="editInfoForm.html">
+    <ons-page id="editInfoForm">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Perfil</ons-back-button>
+            </div>
+            <div class="center">
+                Editar informações
+            </div>
+        </ons-toolbar>
+    </ons-page>
+</template>
+
 
 <script>
     $(function () {
@@ -294,7 +307,11 @@
                     })
                 }
             })
-        }
+        };
+
+        fn.editInfo = function () {
+            $('#mainNavigator')[0].pushPage('editInfoForm.html');
+        };
     });
 
 </script>

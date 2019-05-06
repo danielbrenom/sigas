@@ -14,14 +14,16 @@
             <div class="profile_info_wrapper">
                 <div class="profile_info_numbers">
                     <div>
-                        <div><?= $this->user['user_information']['user_name'] ?></div>
+                        <div><?= $this->user['user_information']['user_name'] === null ?
+                                "Não informado" :
+                                $this->user['user_information']['user_name'] ?></div>
                     </div>
                 </div>
             </div>
             <div class="profile_info_wrapper">
                 <div class="logoff">
                     <a href="<?= $this->url('logout') ?>">
-                        <ons-toolbar-button style="float: right">
+                        <ons-toolbar-button style="float: right; ">
                             <ons-icon icon="ion-log-out"></ons-icon>
                         </ons-toolbar-button>
                     </a>
@@ -31,14 +33,21 @@
     </div>
 
     <ons-card>
-        <div class="title">Dados Pessoais</div>
+        <div class="title">Dados Pessoais
+            <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo()">
+                <ons-icon icon="ion-edit"></ons-icon>
+            </ons-toolbar-button>
+        </div>
+
         <div class="content">
             <div class="profile_wrapper">
                 <div class="profile_info_wrapper">
                     <div class="profile_info_numbers">
                         <div>
                             <div class="profile_info_text">Nome</div>
-                            <div><?= $this->user['user_information']['user_name'] ?></div>
+                            <div><?= $this->user['user_information']['user_name'] === null ?
+                                    "Não informado" :
+                                    $this->user['user_information']['user_name'] ?></div>
                         </div>
                         <div>
                             <div class="profile_info_text">CPF</div>
