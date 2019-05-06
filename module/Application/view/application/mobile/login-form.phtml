@@ -1,0 +1,45 @@
+<form action="<?= $this->url('login') ?>" method="post" enctype="multipart/form-data">
+    <ons-card modifier="material">
+        <div class="title">
+            <h2 class="card__title" style="text-align: center;">Entre no SIGAS para ter acesso a todas as funções</h2>
+        </div>
+        <div class="content">
+            <ons-row>
+                <ons-col width="100%">
+                    <div style="text-align: center; margin-top: 30px;">
+                        <ons-if plataform="ios other">
+                            <p>
+                                <ons-input style="width: 80%" modifier="material" id="username" name="fEmail"
+                                           placeholder="Email"
+                                           float required></ons-input>
+                            </p>
+                            <p>
+                                <ons-input style="width: 80%" id="password" modifier="material" name="fPass"
+                                           type="password"
+                                           placeholder="Senha" float required></ons-input>
+                            </p>
+                        </ons-if>
+
+                        <label class="checkbox checkbox--material" hidden>
+                            <input type="checkbox" class="checkbox__input checkbox--material__input" name="fRem">
+                            <div class="checkbox__checkmark checkbox--material__checkmark"></div>
+                            Lembrar de min
+                        </label>
+                        <p style="margin-top: 30px;">
+                            <button type="submit" class="button">Login</button>
+                        </p>
+                    </div>
+                </ons-col>
+            </ons-row>
+            <ons-row>
+                <ons-col width="100%">
+                    <div style="text-align: center">
+                        <p>Ainda não possui cadastro?</p>
+                        <ons-button onclick="fn.singupForm()">Cadastre-se aqui!</ons-button>
+                    </div>
+                </ons-col>
+            </ons-row>
+        </div>
+    </ons-card>
+
+</form>

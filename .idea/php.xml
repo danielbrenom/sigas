@@ -49,6 +49,9 @@
       <path value="$PROJECT_DIR$/vendor/zendframework/zend-hydrator" />
       <path value="$PROJECT_DIR$/vendor/zendframework/zend-authentication" />
       <path value="$PROJECT_DIR$/vendor/zendframework/zend-session" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-math" />
+      <path value="$PROJECT_DIR$/vendor/paragonie/random_compat" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-crypt" />
     </include_path>
   </component>
 </project>

@@ -38,7 +38,6 @@
             <div class="center"></div>
         </ons-toolbar>
         <ons-row id="fInformacoes">
-
         </ons-row>
         <ons-bottom-toolbar onclick="fn.checkDates(0)">
             <ons-row>
@@ -103,9 +102,59 @@
 
 <template id="tab3.html">
     <ons-page id="Tab3">
-        <p style="text-align: center;">
-            This is the third page.
-        </p>
+        <div id="form-area">
+        </div>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                fn.profileHandler($(this));
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="singupForm.html">
+    <ons-page id="singup">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Login</ons-back-button>
+            </div>
+            <div class="center">
+                Cadastro
+            </div>
+        </ons-toolbar>
+        <ons-card>
+            <form action="<?= $this->url('singup') ?>" method="post" enctype="multipart/form-data">
+                <ons-row>
+                    <ons-col width="100%">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="md-email" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 80%" modifier="material" id="username" name="fEmail"
+                                       placeholder="Email" type="email"
+                                       float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 80%" id="password" modifier="material" name="fPass" type="password"
+                                       placeholder="Senha" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <button type="submit" class="button">Cadastrar</button>
+                            </div>
+                        </ons-list-item>
+                    </ons-col>
+                </ons-row>
+            </form>
+        </ons-card>
+        <style>
+            .list-item__center, .list-item__right {
+                background-image: none;
+            }
+        </style>
     </ons-page>
 </template>
 
@@ -122,17 +171,7 @@
                     $("#fSelectEsp ons-lazy-repeat").append('<ons-list-item modifier="chevron longdivider" onclick="fn.selectP(' + value.id + ')" tappable>' + value.desc_especialidade + '</ons-list-item>');
                 });
             });
-            // $("#fSelectEsp").change(function () {
-            //     console.log("Called")
-            //     console.log($("#Tab1 .page__content"))
-            //     $.get("/mobile/get-profissionais", {esp: $(this).val()}, function (data) {
-            //         if ($("#Tab1 .page__content #prof_found").length)
-            //             $("#Tab1 .page__content #prof_found").remove();
-            //         $("#Tab1 .page__content").append(data);
-            //     })
-            // });
         }
-
 
         fn = {};
 
@@ -170,13 +209,11 @@
 
         fn.checkDates = function (id) {
             $("#mainNavigator")[0].pushPage('checkDatePage.html').then(function () {
-                console.log("Render int");
                 // $("#calendarArea").fullCalendar({
                 //     monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
                 // });
-                console.log($("#callendarArea"));
                 try {
-                    var calendar = new FullCalendar.Calendar($("#callendarArea")[0], {
+                    let calendar = new FullCalendar.Calendar($("#callendarArea")[0], {
                         plugins: ['dayGrid', 'bootstrap', 'interaction'],
                         locale: 'pt-br',
                         themeSystem: "bootstrap",
@@ -187,7 +224,7 @@
                         },
                         height: 600,
                         dateClick: function (info) {
-                            alert("Date:"+info.dateStr);
+                            alert("Date:" + info.dateStr);
                         },
                         timeZone: "America/Belem",
                         eventSources: [
@@ -198,7 +235,7 @@
                                     id_professional: id
                                 },
                                 failure: function (e) {
-                                    console.log("erro"+e.toString());
+                                    console.log("erro" + e.toString());
                                 }
                             }
                         ]
@@ -208,8 +245,6 @@
                     console.log(e.message);
                     console.log(e.stack)
                 }
-
-                console.log("Render end");
             });
         };
 
@@ -238,9 +273,28 @@
             content.load(page).then(menu.close.bind(menu));
         };
 
-        fn.loadCalendar = function () {
-
+        fn.singupForm = function () {
+            $('#mainNavigator')[0].pushPage('singupForm.html');
         };
+
+        fn.profileHandler = function (page) {
+            let html;
+            $.get('/user-state', {}, function (data) {
+                if (data.state) {
+                    $.get('/mobile/user-profile', {}, function (response) {
+                        html = response;
+                    }).then(function () {
+                        page.find('#form-area').empty().append(html);
+                    })
+                } else {
+                    $.get('/mobile/login-form', {}, function (response) {
+                        html = response;
+                    }).then(function () {
+                        page.find('#form-area').empty().append(html);
+                    })
+                }
+            })
+        }
     });
 
 </script>

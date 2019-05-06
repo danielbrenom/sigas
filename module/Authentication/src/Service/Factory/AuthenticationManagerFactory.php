@@ -1,30 +1,27 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: 400005
- * Date: 14/03/2019
- * Time: 12:00
- */
-
-namespace Application\Controller\Factory;
 
 
-use Application\Controller\MobileController;
+namespace Authentication\Service\Factory;
+
+
 use Authentication\Service\AuthenticationManager;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use Zend\Authentication\AuthenticationService;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
+use Zend\Session\SessionManager;
 
-class MobileControllerFactory implements FactoryInterface
+class AuthenticationManagerFactory implements FactoryInterface
 {
 
     /**
      * Create an object
-     * @param  ContainerInterface $container
-     * @param  string $requestedName
-     * @param  null|array $options
+     *
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param null|array $options
      * @return object
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
@@ -33,8 +30,7 @@ class MobileControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $entityManager = $container->get('doctrine.entitymanager.orm_crawler');
-        $authManager = $container->get(AuthenticationManager::class);
-        return new MobileController($entityManager, $authManager);
+        return new AuthenticationManager($container->get(AuthenticationService::class),
+            $container->get(SessionManager::class));
     }
 }

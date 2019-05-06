@@ -1,0 +1,218 @@
+<!--<ons-toolbar>-->
+<!--    <div class="right">-->
+<!--        <ons-toolbar-button>-->
+<!--            <ons-icon icon="ion-log-out"></ons-icon>-->
+<!--        </ons-toolbar-button>-->
+<!--    </div>-->
+<!--</ons-toolbar>-->
+<div class="content" style="width: 100%">
+    <div style="padding: 14px 6px 14px 16px; background-color: aliceblue !important;">
+        <div class="profile_wrapper">
+            <div class="profile_image_wrapper">
+                <img src="assets/img/profile-image-08.png">
+            </div>
+            <div class="profile_info_wrapper">
+                <div class="profile_info_numbers">
+                    <div>
+                        <div><?= $this->user['user_information']['user_name'] ?></div>
+                    </div>
+                </div>
+            </div>
+            <div class="profile_info_wrapper">
+                <div class="logoff">
+                    <a href="<?= $this->url('logout') ?>">
+                        <ons-toolbar-button style="float: right">
+                            <ons-icon icon="ion-log-out"></ons-icon>
+                        </ons-toolbar-button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ons-card>
+        <div class="title">Dados Pessoais</div>
+        <div class="content">
+            <div class="profile_wrapper">
+                <div class="profile_info_wrapper">
+                    <div class="profile_info_numbers">
+                        <div>
+                            <div class="profile_info_text">Nome</div>
+                            <div><?= $this->user['user_information']['user_name'] ?></div>
+                        </div>
+                        <div>
+                            <div class="profile_info_text">CPF</div>
+                            <div><?= $this->user['user_information']['user_cpf'] ?></div>
+                        </div>
+                        <div>
+                            <div class="profile_info_text">Endereço</div>
+                            <div><?= $this->user['user_information']['user_addr'] ?></div>
+                        </div>
+                        <div>
+                            <div class="profile_info_text">Número do Plano de Saúde</div>
+                            <div><?= $this->user['user_information']['user_healthcare'] ?></div>
+                        </div>
+                        <div>
+                            <div class="profile_info_text">Números de contato</div>
+                            <div>Telefone Celular:<?= $this->user['user_information']['user_ctt_phone'] ?></div>
+                            <div>Telefone Residencial:<?= $this->user['user_information']['user_ctt_res'] ?></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ons-card>
+    <ons-card>
+        <div class="title">Prescrições disponíveis</div>
+    </ons-card>
+</div>
+
+<style type="text/css">
+    .profile_wrapper {
+        display: inline-flex;
+        width: 100%;
+    }
+
+    .profile_image_wrapper {
+        margin-right: 10px;
+        width: 35%;
+        position: relative;
+    }
+
+    .profile_image_wrapper img {
+        width: 100%;
+        border-radius: 50%;
+        border: 1px solid black;
+    }
+
+    .profile_info_wrapper {
+        width: 100%;
+        text-align: center;
+    }
+
+    .profile_extra_wrapper {
+        margin: 5px 0 0 0;
+        font-size: 14px;
+    }
+
+    .profile_info_numbers {
+        font-size: 14px;
+        display: inline-flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .profile_info_numbers div {
+        text-align: left;
+        margin: 0 7% 1% 7%;
+    }
+
+    .profile_info_text {
+        opacity: 0.5;
+        margin-top: -5px;
+    }
+
+    .profile_info_button {
+        height: 25px;
+        background: transparent;
+        border: 1px solid #e0e0e0;
+        border-radius: 7px;
+        color: black;
+        line-height: 13px;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+
+    .profile_info_button.button--material {
+        min-height: 25px;
+        line-height: 25px !important;
+    }
+
+    .profile_button_bar {
+        text-align: center;
+        font-size: 26px;
+        height: 50px;
+        line-height: 40px;
+        border-top: 1px solid rgba(187, 187, 187, 0.51)
+    }
+
+    .profile_button_bar ons-col {
+        width: 25%;
+    }
+
+    .post {
+        margin: 0px;
+        padding: 0px 0px 15px;
+        font-size: 14px;
+        border-bottom: 1px solid rgba(175, 175, 175, 0.43);
+        border-radius: 0;
+    }
+
+    .post_title {
+        padding-left: 10px;
+    }
+
+    .post-caption {
+        padding-left: 10px;
+    }
+
+    .post-like-info {
+        margin-bottom: 5px;
+        padding-left: 10px;
+    }
+
+    .post-image {
+        width: 100%;
+    }
+
+    .post-time {
+        font-size: 10px;
+        opacity: 0.7;
+        margin-top: 5px;
+        padding-left: 10px;
+    }
+
+    .post-like {
+        opacity: 0;
+        width: 100%;
+        position: absolute;
+        top: 25%;
+        color: white;
+        transition: opacity 0.4s;
+    }
+
+    .post-button-bar {
+        height: 40px;
+        padding-left: 0px;
+    }
+
+    .post-button {
+        font-size: 26px;
+        color: #1f1f21;
+        line-height: 26px;
+    }
+
+    .corner-button {
+        color: black;
+        font-size: 25px;
+        padding-right: 0;
+    }
+
+    .like {
+        color: red;
+    }
+
+    .list-item__thumbnail {
+        border-radius: 50%;
+    }
+
+    .grid_wrapper {
+        width: 33%;
+        margin-left: 0.25%;
+        margin-right: 0.25%;
+    }
+
+    .grid_thumbnail {
+        width: 100%;
+    }
+</style>

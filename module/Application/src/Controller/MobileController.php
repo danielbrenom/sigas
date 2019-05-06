@@ -12,6 +12,7 @@ namespace Application\Controller;
 use Application\Entity\Sis\User;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
+use Authentication\Service\AuthenticationManager;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
@@ -26,13 +27,18 @@ class MobileController extends AbstractActionController
 
     /** @var $entityManager EntityManager */
     protected $entityManager;
+    /** @var $authManager AuthenticationManager */
+    protected $authManager;
 
     /**
      * MobileController constructor.
+     * @param $entityManager
+     * @param $authManager
      */
-    public function __construct($entityManager)
+    public function __construct($entityManager, $authManager)
     {
         $this->entityManager = $entityManager;
+        $this->authManager = $authManager;
     }
 
     public function homeAction()
@@ -112,6 +118,30 @@ class MobileController extends AbstractActionController
         return new JsonModel([
             $resp[0]
         ]);
+    }
+
+    public function loginFormAction()
+    {
+        $view = new ViewModel();
+        $view->setTerminal(true);
+        return $view;
+    }
+
+    public function userProfileAction()
+    {
+        $activeUser = $this->authManager->getActiveUser();
+        $userInfo = $this->entityManager->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->addSelect('info')
+            ->leftJoin('u.user_information', 'info')
+            ->where('u.id = :sId')
+            ->setParameter('sId', $activeUser['user_id'])
+            ->getQuery()->getResult(2);
+        $view = new ViewModel([
+            'user' => $userInfo[0]
+        ]);
+        $view->setTerminal(true);
+        return $view;
     }
 
 }

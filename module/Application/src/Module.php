@@ -7,7 +7,7 @@
 
 namespace Application;
 
-use Application\Models\UtilsFile;
+//use Application\Models\UtilsFile;
 use Mobile_Detect;
 use Zend\ModuleManager\ModuleManager;
 use Zend\Mvc\MvcEvent;

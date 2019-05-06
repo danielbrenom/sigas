@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 return [
     'router' => [
@@ -54,7 +55,7 @@ return [
     'doctrine' => [
         'driver' => [
             __NAMESPACE__ . '_entities' => [
-                'class' => 'Doctrine\ORM\Mapping\Driver\AnnotationDriver',
+                'class' => AnnotationDriver::class,
                 'cache' => 'array',
                 'paths' => [__DIR__ . '/../src/Entity']
             ],
