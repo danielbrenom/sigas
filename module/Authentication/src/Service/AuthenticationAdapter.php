@@ -4,6 +4,7 @@
 namespace Authentication\Service;
 
 
+use Application\Debug\UtilsFile;
 use Authentication\Entity\Seg\User;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Doctrine\ORM\EntityManager;
@@ -55,6 +56,7 @@ class AuthenticationAdapter implements AdapterInterface
          * @var $user User
          */
         $user = $this->entityManager->getRepository(User::class)->findOneByEmail($this->email);
+
         if ($user === null) {
             return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, ['Email inválido']);
         }
@@ -64,7 +66,7 @@ class AuthenticationAdapter implements AdapterInterface
         if ($bcrypt->verify($this->password, $passwordHash)) {
             return new Result(Result::SUCCESS, $this->email, ['Autenticado']);
         }
-        return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['Email inválido']);
+        return new Result(Result::FAILURE_CREDENTIAL_INVALID, null, ['Senha incorreta']);
     }
 
     public function getUserIdentity()

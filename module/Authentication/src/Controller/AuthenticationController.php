@@ -71,7 +71,7 @@ class AuthenticationController extends AbstractActionController
             if ($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();
                 //UtilsFile::printvardie($data);
-//                $this->userManager->createAdminUserIfNotExists();
+                //$this->userManager->createAdminUserIfNotExists();
                 $result = $this->authManager->login($data['fEmail'], $data['fPass']);
                 if ($result->getCode() === Result::SUCCESS) {
                     $redirectUrl = $this->params()->fromPost('redirect_url', '');
@@ -86,6 +86,7 @@ class AuthenticationController extends AbstractActionController
                     $this->redirect()->toUrl($redirectUrl);
                 } else {
                     $isLoginError = true;
+                    //UtilsFile::printvardie($result->getMessages());
                     throw new Exception($result->getMessages()[0]);
                 }
             } else {

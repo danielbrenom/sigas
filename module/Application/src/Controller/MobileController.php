@@ -57,7 +57,7 @@ class MobileController extends AbstractActionController
             ->leftJoin('info.user_especiality', 'esp')
             ->where('u.id = :sId')
             ->setParameter('sId', $params['id_user'])
-            ->getQuery()->getResult(2);
+            ->getQuery()->getResult(3);
         $view = new ViewModel([
             "prof" => $prof
         ]);
@@ -72,7 +72,7 @@ class MobileController extends AbstractActionController
             ->createQueryBuilder('u')
             ->addSelect('info')
             ->leftJoin('u.user_information', 'info')
-            ->where('info.user_especiality = :sId')
+            ->where('info.id_especialidade = :sId')
             ->setParameter('sId', $params['esp'])
             ->getQuery()->getResult(2);
         $view = new ViewModel([

@@ -168,6 +168,40 @@
                 Editar informações
             </div>
         </ons-toolbar>
+
+        <ons-card>
+            <form action="<?= $this->url('login') ?>" method="post" enctype="multipart/form-data">
+                <ons-row>
+                    <ons-col width="100%">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-user" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="username" name="fName"
+                                       placeholder="Nome completo" type="text"
+                                       float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="cpf" modifier="material" name="fCpf" type="text"
+                                       placeholder="CPF" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <button type="submit" class="button">Salvar</button>
+                            </div>
+                        </ons-list-item>
+                    </ons-col>
+                </ons-row>
+            </form>
+        </ons-card>
+        <style>
+            .list-item__center, .list-item__right {
+                background-image: none;
+            }
+        </style>
     </ons-page>
 </template>
 

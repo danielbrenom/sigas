@@ -6,7 +6,7 @@
  * Time: 09:22
  */
 $infos = $this->prof[0];
-//\Application\Models\UtilsFile::printvar($infos);
+//\Application\Debug\UtilsFile::printvar($infos);
 ?>
 <div class="content" style="width: 100%">
     <div style="padding: 14px 6px 14px 16px; background-color: aliceblue !important;">
@@ -17,13 +17,13 @@ $infos = $this->prof[0];
             <div class="profile_info_wrapper">
                 <div class="profile_info_numbers">
                     <div>
-                        <div><?=$infos['user_information']['user_name']?></div>
+                        <div><?= $infos['info_user_name'] ?></div>
                     </div>
                     <div>
-                        <div><?=$infos['user_especiality']['desc_especialidade']?></div>
+                        <div><?= $infos['esp_desc_especialidade'] ?></div>
                     </div>
                     <div>
-                        <div><?=$infos['user_information']['user_addr']?></div>
+                        <div><?= $infos['info_user_addr'] ?></div>
                     </div>
                 </div>
             </div>
