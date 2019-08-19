@@ -63,6 +63,7 @@ class UserManager
         //UtilsFile::printvardie($user);
         try {
             if ($user === null) {
+                $this->entityManager->beginTransaction();
                 $newUser = new User();
                 $newUser->setEmail($email);
                 $bcrypt = new Bcrypt();
@@ -74,16 +75,20 @@ class UserManager
                 $userPersonalInfo = new UserInfoPessoal();
                 $userPersonalInfo->setId($lastId);
                 $userPersonalInfo->setUserEmail($email);
+                $userPersonalInfo->setIdEspecialidade(1);
                 $userPersonalInfo->setUserCpf(" ");
                 $userPersonalInfo->setUserRg(" ");
                 $userPersonalInfo->setUserAddr(" ");
                 $this->entityManager->persist($userPersonalInfo);
                 $this->entityManager->flush();
+                $this->entityManager->commit();
                 return true;
             }
         } catch (OptimisticLockException $e) {
+            $this->entityManager->rollback();
             throw new \Exception($e->getMessage());
         } catch (ORMException $e) {
+            $this->entityManager->rollback();
             throw new \Exception($e->getMessage());
         }
 

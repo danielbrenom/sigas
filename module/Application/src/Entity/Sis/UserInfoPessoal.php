@@ -251,5 +251,22 @@ class UserInfoPessoal
         $this->user_ctt_res = $user_ctt_res;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getIdEspecialidade()
+    {
+        return $this->id_especialidade;
+    }
+
+    /**
+     * @param mixed $id_especialidade
+     */
+    public function setIdEspecialidade($id_especialidade)
+    {
+        $this->id_especialidade = $id_especialidade;
+    }
+
+
 
 }

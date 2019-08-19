@@ -43,7 +43,9 @@ class MobileController extends AbstractActionController
 
     public function homeAction()
     {
-        return new ViewModel();
+        return new ViewModel([
+            "userstate" => $this->authManager->userState()
+        ]);
     }
 
     public function getProfissionalInfoAction()

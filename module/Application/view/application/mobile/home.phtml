@@ -5,13 +5,20 @@
         <ons-toolbar>
             <div class="center">SIGAS</div>
         </ons-toolbar>
-        <ons-tabbar swipeable position="bottom">
-            <ons-tab page="tab1.html" label="Inicio" icon="fa-medkit" active>
-            </ons-tab>
-            <ons-tab page="tab2.html" label="Histórico" icon="fa-history">
-            </ons-tab>
-            <ons-tab page="tab3.html" label="Perfil" icon="fa-user-circle">
-            </ons-tab>
+        <ons-tabbar swipeable position="bottom" id="mainTabbar">
+            <?php if ($this->userstate): ?>
+                <ons-tab page="tab1.html" label="Inicio" icon="fa-medkit" active>
+                </ons-tab>
+                <ons-tab page="tab2.html" label="Histórico" icon="fa-history">
+                </ons-tab>
+                <ons-tab page="tab3.html" label="Perfil" icon="fa-user-circle">
+                </ons-tab>
+            <?php else: ?>
+                <ons-tab page="tab1.html" label="Inicio" icon="fa-medkit" active>
+                </ons-tab>
+                <ons-tab page="tab3.html" label="Login" icon="fa-user-circle">
+                </ons-tab>
+            <?php endif; ?>
         </ons-tabbar>
     </ons-page>
 </template>
@@ -42,7 +49,7 @@
         <ons-bottom-toolbar onclick="fn.checkDates(0)">
             <ons-row>
                 <ons class="col"></ons>
-                <ons class="col" style="padding-top: 10px">SOLICITAR CONSULTA</ons>
+                <ons class="col" style="padding-top: 10px">SOLICITAR PROCEDIMENTO</ons>
                 <ons class="col"></ons>
 
             </ons-row>
@@ -298,65 +305,83 @@
         };
 
         fn.checkDates = function (id) {
-            $("#mainNavigator")[0].pushPage('checkDatePage.html').then(function () {
-                // $("#calendarArea").fullCalendar({
-                //     monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-                // });
-                let formatter = new Intl.DateTimeFormat('pt-BR');
-                try {
-                    let calendar = new FullCalendar.Calendar($("#callendarArea")[0], {
-                        plugins: ['dayGrid', 'bootstrap', 'interaction', 'moment', 'momentTimezone'],
-                        locale: 'pt-BR',
-                        themeSystem: "bootstrap",
-                        header: {
-                            left: 'prev,next',
-                            center: '',
-                            right: 'title'
-                        },
-                        fullday: false,
-                        height: 600,
-                        dateClick: function (info) {
-                            swal({
-                                title: "Confirmação",
-                                text: 'Continuar escolha para data ' + fn.formattDate(info.date) + '?',
-                                buttons: {
-                                    no: {
-                                        text: "Não",
-                                        value: false
-                                    },
-                                    yes: {
-                                        text: "Sim",
-                                        value: true,
-                                        className: 'btn-success'
-                                    }
-                                }
-                            }).then(r => {
-                                if (r) {
-                                    fn.finishAppointment(info);
-                                }
-                            })
-                            //alert("Date:" + info.date.toUTCString());
-                        },
-                        timeZone: "UTC",
-                        eventSources: [
-                            {
-                                url: '/mobile/get-schedule',
-                                method: 'GET',
-                                extraParams: {
-                                    id_professional: id
+            let state;
+            $.get('/user-state', {}, function (response) {
+                state = response.state;
+            }).then(function () {
+                if (state) {
+                    $("#mainNavigator")[0].pushPage('checkDatePage.html').then(function () {
+                        // $("#calendarArea").fullCalendar({
+                        //     monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+                        // });
+                        let formatter = new Intl.DateTimeFormat('pt-BR');
+                        try {
+                            let calendar = new FullCalendar.Calendar($("#callendarArea")[0], {
+                                plugins: ['dayGrid', 'bootstrap', 'interaction', 'moment', 'momentTimezone'],
+                                locale: 'pt-BR',
+                                themeSystem: "bootstrap",
+                                header: {
+                                    left: 'prev,next',
+                                    center: '',
+                                    right: 'title'
                                 },
-                                failure: function (e) {
-                                    console.log("erro" + e.toString());
-                                }
-                            }
-                        ]
+                                fullday: false,
+                                height: 600,
+                                dateClick: function (info) {
+                                    swal({
+                                        title: "Confirmação",
+                                        text: 'Continuar escolha para data ' + fn.formattDate(info.date) + '?',
+                                        buttons: {
+                                            no: {
+                                                text: "Não",
+                                                value: false
+                                            },
+                                            yes: {
+                                                text: "Sim",
+                                                value: true,
+                                                className: 'btn-success'
+                                            }
+                                        }
+                                    }).then(r => {
+                                        if (r) {
+                                            fn.finishAppointment(info);
+                                        }
+                                    })
+                                    //alert("Date:" + info.date.toUTCString());
+                                },
+                                timeZone: "UTC",
+                                eventSources: [
+                                    {
+                                        url: '/mobile/get-schedule',
+                                        method: 'GET',
+                                        extraParams: {
+                                            id_professional: id
+                                        },
+                                        failure: function (e) {
+                                            console.log("erro" + e.toString());
+                                        }
+                                    }
+                                ]
+                            });
+                            calendar.render();
+                        } catch (e) {
+                            console.log(e.message);
+                            console.log(e.stack)
+                        }
                     });
-                    calendar.render();
-                } catch (e) {
-                    console.log(e.message);
-                    console.log(e.stack)
+                } else {
+                    swal({
+                        title: "Atenção",
+                        text: "Você deve estar logado para solicitar um procedimento.",
+                        icon: "warning",
+                        buttons: false,
+                        timer: 4000
+                    }).then(() => {
+                        $('#mainNavigator')[0].resetToPage('mainPage.html')
+                    })
                 }
-            });
+            })
+
         };
 
         fn.selectP = function (id) {
