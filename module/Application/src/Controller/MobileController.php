@@ -9,9 +9,12 @@
 namespace Application\Controller;
 
 
+use Application\Debug\UtilsFile;
 use Application\Entity\Seg\User;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
+use Application\Entity\Sis\UserHistoric;
+use Application\Entity\Sis\UserInfoPessoal;
 use Authentication\Service\AuthenticationManager;
 use DateInterval;
 use DateTime;
@@ -74,7 +77,7 @@ class MobileController extends AbstractActionController
             ->createQueryBuilder('u')
             ->addSelect('info')
             ->leftJoin('u.user_information', 'info')
-            ->where('info.id_especialidade = :sId')
+            ->where('info.user_especiality = :sId')
             ->setParameter('sId', $params['esp'])
             ->getQuery()->getResult(2);
         $view = new ViewModel([
@@ -144,6 +147,36 @@ class MobileController extends AbstractActionController
         ]);
         $view->setTerminal(true);
         return $view;
+    }
+
+    public function saveAppointAction(){
+        $params = $this->params()->fromPost();
+        $vData = [
+            "datareq" => UtilsFile::formataDataToBdSemHora($params['fDataReq']),
+            "horareq" => $params['fHoraReq'],
+            "proc" => $params['fProcdReq'],
+            "user_req" => $this->authManager->getActiveUser()['user_id'],
+            "prof_req" => $params['fIdProf']
+        ];
+        UtilsFile::printvar($params, $vData);
+        try {
+            $this->entityManager->beginTransaction();
+            //Primeiro deve criar o appointment para depois criar o registro no historico
+            $userAppoint = new UserAppointment();
+            $userAppoint->setIdUserPs($vData['prof_req']);
+            $userAppoint->setCreatedOn(date("Y-m-d H:i:s"));
+            $userAppoint->setSolicitedFor(date("Y-m-d H:i:s", strtotime("{$vData['datareq']} {$vData['horareq']}")));
+            //$userAppoint->setIdEspeciality();
+//            $this->entityManager->getRepository(UserInfoPessoal::class)->createQueryBuilder('u')->addSelect('esp')->leftJoin('u.user_especiality', 'esp')->where('u.id = :sId')->setParameter('sId',$vData['prof_req'])->getQuery()->getResult(3)[0]
+            UtilsFile::printvardie($userAppoint, $this->entityManager->getRepository(UserInfoPessoal::class)->findOneBy(['id'=>$vData['prof_req']])
+               );
+            $userHistoric = new UserHistoric();
+            $userHistoric->setUserId($vData['user_req']);
+            $userHistoric->setIdTypeRegistry(1);
+        }catch (Exception $e){
+            $this->entityManager->rollback();
+            UtilsFile::printvardie($e->getMessage());
+        }
     }
 
 }

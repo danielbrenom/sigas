@@ -61,12 +61,12 @@ class AuthenticationController extends AbstractActionController
 
     public function loginAction()
     {
-        $redirectUrl = $this->params()->fromQuery('r', '');
-        if (strlen($redirectUrl) > 2048) {
-            throw new Exception("Redirecionamento inválido");
-        }
-        $isLoginError = false;
         try {
+            $redirectUrl = $this->params()->fromQuery('r', '');
+            if (strlen($redirectUrl) > 2048) {
+                throw new Exception("Redirecionamento inválido");
+            }
+            $isLoginError = false;
             $error = '';
             if ($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();

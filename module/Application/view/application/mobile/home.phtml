@@ -89,32 +89,45 @@
                 <ons-card>
                     <div class="title">Preencha as informações para agendamento:</div>
                     <ons-list>
-                        <ons-list-header>Data desejada:</ons-list-header>
-                        <ons-list-item class="input-items">
-                            <div>
-                                <input type="text" class="text-input" id="req-date" disabled>
+                        <form action="/mobile/save-appoint" method="post" enctype="multipart/form-data" id="form-appoint">
+                            <ons-list-header>Data desejada:</ons-list-header>
+                            <ons-list-item class="input-items">
+                                <div>
+                                    <input type="text" class="text-input" name="fDataReq" id="req-date" readonly>
+                                </div>
+                            </ons-list-item>
+                            <ons-list-header>Procedimento desejado:</ons-list-header>
+                            <ons-list-item class="input-items">
+                                <div>
+                                    <select class="select-input select-input--material" name="fProcdReq" id="req-procd">
+                                        <option value="0">Option 1</option>
+                                        <option value="1">Option 2</option>
+                                        <option value="2">Option 3</option>
+                                    </select>
+                                </div>
+                            </ons-list-item>
+                            <ons-list-header>Horário desejado:</ons-list-header>
+                            <ons-list-item class="input-items">
+                                <div>
+                                    <input type="time" class="text-input text-input--material" name="fHoraReq"
+                                           id="req-date">
+                                </div>
+                            </ons-list-item>
+                            <div class="form-params" style="display: none">
+                                <input type="text" id="idProf" name="fIdProf">
                             </div>
-                        </ons-list-item>
-                        <ons-list-header>Procedimento desejado:</ons-list-header>
-                        <ons-list-item class="input-items">
-                            <div>
-                                <select class="select-input select-input--material" id="req-procd">
-                                    <option>Option 1</option>
-                                    <option>Option 2</option>
-                                    <option>Option 3</option>
-                                </select>
-                            </div>
-                        </ons-list-item>
-                        <ons-list-header>Horário desejado:</ons-list-header>
-                        <ons-list-item class="input-items">
-                            <div>
-                                <input type="time" class="text-input text-input--material" id="req-date">
-                            </div>
-                        </ons-list-item>
+                        </form>
                     </ons-list>
                 </ons-card>
             </ons-col>
         </ons-row>
+        <ons-bottom-toolbar onclick="fn.sendAppointment()">
+            <ons-row>
+                <ons class="col"></ons>
+                <ons class="col" style="padding-top: 10px">FINALIZAR SOLICITAÇÃO</ons>
+                <ons class="col"></ons>
+            </ons-row>
+        </ons-bottom-toolbar>
     </ons-page>
 </template>
 
@@ -439,7 +452,12 @@
         fn.finishAppointment = function (info) {
             $("#mainNavigator")[0].pushPage('finishAppoint.html').then(() => {
                 $("#req-date").val(fn.formattDate(info.date));
+                $("#idProf").val($("#profid").val());
             });
+        };
+
+        fn.sendAppointment = function (data) {
+            $("#form-appoint").submit();
         };
 
         fn.formattDate = function (date) {

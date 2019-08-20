@@ -4,6 +4,7 @@
 namespace Authentication\Service;
 
 use Application\Debug\UtilsFile;
+use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserInfoPessoal;
 use Authentication\Entity\Seg\User;
 use Doctrine\ORM\EntityManager;
@@ -72,10 +73,13 @@ class UserManager
                 $this->entityManager->persist($newUser);
                 $this->entityManager->flush();
                 $lastId = $newUser->getIdUser();
+                /** @var UserEspeciality $userEspec */
+                $userEspec = $this->entityManager->getRepository(UserEspeciality::class)->find(1);
                 $userPersonalInfo = new UserInfoPessoal();
                 $userPersonalInfo->setId($lastId);
                 $userPersonalInfo->setUserEmail($email);
-                $userPersonalInfo->setIdEspecialidade(1);
+                //$userPersonalInfo->setIdEspecialidade(1);
+                $userPersonalInfo->setUserEspeciality($userEspec);
                 $userPersonalInfo->setUserCpf(" ");
                 $userPersonalInfo->setUserRg(" ");
                 $userPersonalInfo->setUserAddr(" ");

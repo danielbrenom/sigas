@@ -51,4 +51,12 @@ class User
      * @ORM\JoinColumn(name="id_user", referencedColumnName="id_user")
      */
     protected $user_information;
+
+    /**
+     * @ORM\OneToOne(targetEntity="UserHistoric", inversedBy="user_id")
+     * @ORM\JoinColumn(name="user_historic", referencedColumnName="id_user")
+     */
+    protected $user_historic;
+
+
 }

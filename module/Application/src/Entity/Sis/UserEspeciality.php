@@ -28,6 +28,11 @@ class UserEspeciality
     protected $desc_especialidade;
 
     /**
+     * @ORM\OneToOne(targetEntity="UserInfoPessoal", mappedBy="user_especiality")
+     */
+    protected $espec_user;
+
+    /**
      * @return mixed
      */
     public function getId()

@@ -23,11 +23,6 @@ class UserInfoPessoal
     protected $id;
 
     /**
-     * @ORM\Column(name="id_especialidade")
-     */
-    protected $id_especialidade;
-
-    /**
      * @ORM\Column(name="user_name")
      */
     protected $user_name;
@@ -70,7 +65,7 @@ class UserInfoPessoal
     protected $user_ctt_res;
 
     /**
-     * @ORM\OneToOne(targetEntity="UserEspeciality")
+     * @ORM\OneToOne(targetEntity="UserEspeciality", inversedBy="espec_user", cascade={"persist"})
      * @ORM\JoinColumn(name="id_especialidade", referencedColumnName="id_especialidade")
      */
     protected $user_especiality;
@@ -252,21 +247,20 @@ class UserInfoPessoal
     }
 
     /**
-     * @return mixed
+     * @return UserEspeciality
      */
-    public function getIdEspecialidade()
+    public function getUserEspeciality()
     {
-        return $this->id_especialidade;
+        return $this->user_especiality;
     }
 
     /**
-     * @param mixed $id_especialidade
+     * @param UserEspeciality $user_especiality
      */
-    public function setIdEspecialidade($id_especialidade)
+    public function setUserEspeciality($user_especiality)
     {
-        $this->id_especialidade = $id_especialidade;
+        $this->user_especiality = $user_especiality;
     }
-
 
 
 }

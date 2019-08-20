@@ -1,9 +1,10 @@
 <?php
 
 
-namespace Authentication\Controller;
+namespace Authentication\Controller\Factory;
 
 
+use Authentication\Controller\AuthenticationController;
 use Authentication\Service\AuthenticationManager;
 use Authentication\Service\UserManager;
 use Interop\Container\ContainerInterface;

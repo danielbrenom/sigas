@@ -4,7 +4,7 @@ namespace Authentication;
 
 use Application\Controller\IndexController;
 use Authentication\Controller\AuthenticationController;
-use Authentication\Controller\AuthenticationControllerFactory;
+use Authentication\Controller\Factory\AuthenticationControllerFactory;
 use Authentication\Service\AuthenticationAdapter;
 use Authentication\Service\AuthenticationManager;
 use Authentication\Service\Factory\AuthenticationAdapterFactory;
