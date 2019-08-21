@@ -19,13 +19,31 @@ class UserAppointment
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(name="id_appointment")
+     * @ORM\Column(name="id_appointment", type="integer")
      */
     protected $id;
     /**
      * @ORM\Column(name="id_user_ps")
      */
     protected $id_user_ps;
+
+    /**
+     * @ORM\Column(name="id_especiality")
+     */
+    protected $id_especiality;
+    /**
+     * @ORM\Column(name="solicited_for")
+     */
+    protected $solicited_for;
+    /**
+     * @ORM\Column(name="created_on")
+     */
+    protected $created_on;
+
+    /**
+     * @ORM\Column(name="id_procedure")
+     */
+    protected $id_procedure;
 
     /**
      * @return mixed
@@ -106,16 +124,23 @@ class UserAppointment
     {
         $this->created_on = $created_on;
     }
+
     /**
-     * @ORM\Column(name="id_especiality")
+     * @return mixed
      */
-    protected $id_especiality;
+    public function getIdProcedure()
+    {
+        return $this->id_procedure;
+    }
+
     /**
-     * @ORM\Column(name="solicited_for")
+     * @param mixed $id_procedure
      */
-    protected $solicited_for;
-    /**
-     * @ORM\Column(name="created_on")
-     */
-    protected $created_on;
+    public function setIdProcedure($id_procedure)
+    {
+        $this->id_procedure = $id_procedure;
+    }
+
+
+
 }

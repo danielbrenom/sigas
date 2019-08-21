@@ -14,6 +14,7 @@ use Application\Entity\Seg\User;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserHistoric;
+use Application\Entity\Sis\UserHistoricType;
 use Application\Entity\Sis\UserInfoPessoal;
 use Authentication\Service\AuthenticationManager;
 use DateInterval;
@@ -101,18 +102,20 @@ class MobileController extends AbstractActionController
     public function getScheduleAction()
     {
         $params = $this->getRequest()->getQuery()->toArray();
-        $params['id_professional'] = 2;
+        $resp = [];
         try {
             $resultados = $this->entityManager->getRepository(UserAppointment::class)
                 ->createQueryBuilder('a')
                 ->where('a.id_user_ps = :sId')
+                ->andWhere('a.solicited_for between :sIni and :sFim')
+                ->setParameter("sIni", explode("T",$params['start'])[0])
+                ->setParameter("sFim", explode("T",$params['end'])[0])
                 ->setParameter("sId", $params['id_professional'])
                 ->getQuery()->getResult(2);
-            $resp = [];
             foreach ($resultados as $appointment) {
                 $data = (new DateTime($appointment['solicited_for'], new DateTimeZone("America/Belem")))->format('Y-m-d');
                 $resp[] = [
-                    "title" => "A",
+                    "title" => $this->entityManager->getRepository(UserHistoricType::class)->find($appointment['id_procedure'])->getHistoricTypeDescription(),
                     "start" => $data,
                     "end" => $data
                 ];
@@ -120,9 +123,9 @@ class MobileController extends AbstractActionController
         } catch (Exception $e) {
             $resp = $e->getMessage();
         }
-        return new JsonModel([
-            $resp[0]
-        ]);
+        return new JsonModel(
+            $resp
+        );
     }
 
     public function loginFormAction()
@@ -149,7 +152,8 @@ class MobileController extends AbstractActionController
         return $view;
     }
 
-    public function saveAppointAction(){
+    public function saveAppointAction()
+    {
         $params = $this->params()->fromPost();
         $vData = [
             "datareq" => UtilsFile::formataDataToBdSemHora($params['fDataReq']),
@@ -158,22 +162,29 @@ class MobileController extends AbstractActionController
             "user_req" => $this->authManager->getActiveUser()['user_id'],
             "prof_req" => $params['fIdProf']
         ];
-        UtilsFile::printvar($params, $vData);
         try {
+            $prof = $this->entityManager->getRepository(UserInfoPessoal::class)->createQueryBuilder('u')->addSelect('esp')->leftJoin('u.user_especiality', 'esp')->where('u.id = :sId')->setParameter('sId', $vData['prof_req'])->getQuery()->getResult(3)[0];
             $this->entityManager->beginTransaction();
             //Primeiro deve criar o appointment para depois criar o registro no historico
             $userAppoint = new UserAppointment();
             $userAppoint->setIdUserPs($vData['prof_req']);
             $userAppoint->setCreatedOn(date("Y-m-d H:i:s"));
             $userAppoint->setSolicitedFor(date("Y-m-d H:i:s", strtotime("{$vData['datareq']} {$vData['horareq']}")));
-            //$userAppoint->setIdEspeciality();
-//            $this->entityManager->getRepository(UserInfoPessoal::class)->createQueryBuilder('u')->addSelect('esp')->leftJoin('u.user_especiality', 'esp')->where('u.id = :sId')->setParameter('sId',$vData['prof_req'])->getQuery()->getResult(3)[0]
-            UtilsFile::printvardie($userAppoint, $this->entityManager->getRepository(UserInfoPessoal::class)->findOneBy(['id'=>$vData['prof_req']])
-               );
+            $userAppoint->setIdEspeciality($prof['esp_id']);
+            $userAppoint->setIdProcedure($vData['proc']);
+            //UtilsFile::printvardie($userAppoint);
+            $this->entityManager->persist($userAppoint);
+            $this->entityManager->flush();
             $userHistoric = new UserHistoric();
-            $userHistoric->setUserId($vData['user_req']);
+            $userHistoric->setUserId($this->entityManager->getRepository(User::class)->find($vData['user_req']));
             $userHistoric->setIdTypeRegistry(1);
-        }catch (Exception $e){
+            $userHistoric->setIdAppointmentEntry($userAppoint);
+            $this->entityManager->persist($userHistoric);
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            $this->redirect()->toRoute('application_mobile');
+
+        } catch (Exception $e) {
             $this->entityManager->rollback();
             UtilsFile::printvardie($e->getMessage());
         }

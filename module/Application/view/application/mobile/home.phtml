@@ -46,7 +46,7 @@
         </ons-toolbar>
         <ons-row id="fInformacoes">
         </ons-row>
-        <ons-bottom-toolbar onclick="fn.checkDates(0)">
+        <ons-bottom-toolbar onclick="fn.checkDates($('#profid').val())">
             <ons-row>
                 <ons class="col"></ons>
                 <ons class="col" style="padding-top: 10px">SOLICITAR PROCEDIMENTO</ons>
@@ -89,7 +89,7 @@
                 <ons-card>
                     <div class="title">Preencha as informações para agendamento:</div>
                     <ons-list>
-                        <form action="/mobile/save-appoint" method="post" enctype="multipart/form-data" id="form-appoint">
+                        <form action="<?=$this->url('application_mobile', ["action"=> "save-appoint"])?>" method="post" enctype="multipart/form-data" id="form-appoint">
                             <ons-list-header>Data desejada:</ons-list-header>
                             <ons-list-item class="input-items">
                                 <div>
@@ -100,9 +100,9 @@
                             <ons-list-item class="input-items">
                                 <div>
                                     <select class="select-input select-input--material" name="fProcdReq" id="req-procd">
-                                        <option value="0">Option 1</option>
-                                        <option value="1">Option 2</option>
-                                        <option value="2">Option 3</option>
+                                        <option value="1">Option 1</option>
+                                        <option value="2">Option 2</option>
+                                        <option value="3">Option 3</option>
                                     </select>
                                 </div>
                             </ons-list-item>
@@ -152,6 +152,11 @@
                 </ons-card>
             </ons-col>
         </ons-row>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                fn.especialidadeList();
+            }
+        </script>
     </ons-page>
 </template>
 
@@ -271,19 +276,18 @@
 
 <script>
     $(function () {
-        // $(document)[0].addEventListener('prechange', function(event) {
-        //     $('ons-toolbar .center')
-        //         .innerHTML = event.tabItem.getAttribute('label');
-        // });
-        if (ons.isReady()) {
+        // if (ons.isReady()) {
+        // }
+
+        fn = {};
+
+        fn.especialidadeList = function (){
             $.get("/mobile/get-especialidades", {}, function (data) {
                 $.each(data[0], function (key, value) {
                     $("#fSelectEsp ons-lazy-repeat").append('<ons-list-item modifier="chevron longdivider" onclick="fn.selectP(' + value.id + ')" tappable>' + value.desc_especialidade + '</ons-list-item>');
                 });
             });
-        }
-
-        fn = {};
+        };
 
         fn.alert = function () {
             console.log("Called", $("#alert"));

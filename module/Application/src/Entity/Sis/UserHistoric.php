@@ -3,7 +3,12 @@
 
 namespace Application\Entity\Sis;
 
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="sis_user_historic")
+ */
 class UserHistoric
 {
     /**
@@ -14,8 +19,8 @@ class UserHistoric
     protected $id_historic;
 
     /**
-     * @ORM\OneToOne(targetEntity="User",mappedBy="user_historic")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id_user")
+     * @ORM\OneToOne(targetEntity="Application\Entity\Seg\User",mappedBy="user_historic")
+     * @ORM\JoinColumn(name="id_user", referencedColumnName="id_user")
      */
     protected $user_id;
 
@@ -26,7 +31,7 @@ class UserHistoric
 
     /**
      * @ORM\OneToOne(targetEntity="UserAppointment", inversedBy="id")
-     * @ORM\JoinColumn(name="id_appointment_entry", referencedColumnName="id")
+     * @ORM\JoinColumn(name="id_appointment_entry", referencedColumnName="id_appointment")
      */
     protected $id_appointment_entry;
 
