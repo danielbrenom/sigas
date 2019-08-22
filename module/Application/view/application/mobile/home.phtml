@@ -251,10 +251,30 @@
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
-                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
+                                <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
                             </div>
                             <ons-input style="width: 100%" id="cpf" modifier="material" name="fCpf" type="text"
                                        placeholder="CPF" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+<!--                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>-->
+                            </div>
+                            <ons-input style="width: 100%; margin-left: 30px" id="rg" modifier="material" name="fRg" type="text"
+                                       placeholder="RG" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-plus-square" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-select style="width: 100%" id="plano" modifier="material" name="fPlano" class="select"
+                                       float required>
+                                <select class="select-input">
+                                    <option value="">Selecione seu plano de saúde</option>
+                                    <option value="1">Unimed</option>
+                                    <option value="2">Hapvida</option>
+                                </select>
+                            </ons-select>
                         </ons-list-item>
                         <ons-list-item>
                             <div class="right right-label">
