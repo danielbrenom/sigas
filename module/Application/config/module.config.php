@@ -11,6 +11,8 @@ use Application\Controller\Factory\IndexControllerFactory;
 use Application\Controller\Factory\MobileControllerFactory;
 use Application\Controller\MobileController;
 use Application\Controller\Plugin\Factory\HtmlRenderFactory;
+use Application\Controller\Repository\Factory\MobileRepositoryFactory;
+use Application\Controller\Repository\MobileRepository;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
@@ -69,6 +71,11 @@ return [
                     __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_entities'
                 ]
             ],
+        ]
+    ],
+    'service_manager' => [
+        'factories' => [
+            MobileRepository::class => MobileRepositoryFactory::class
         ]
     ],
     'controllers' => [

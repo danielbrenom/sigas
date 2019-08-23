@@ -89,7 +89,8 @@
                 <ons-card>
                     <div class="title">Preencha as informações para agendamento:</div>
                     <ons-list>
-                        <form action="<?=$this->url('application_mobile', ["action"=> "save-appoint"])?>" method="post" enctype="multipart/form-data" id="form-appoint">
+                        <form action="<?= $this->url('application_mobile', ["action" => "save-appoint"]) ?>"
+                              method="post" enctype="multipart/form-data" id="form-appoint">
                             <ons-list-header>Data desejada:</ons-list-header>
                             <ons-list-item class="input-items">
                                 <div>
@@ -162,9 +163,36 @@
 
 <template id="tab2.html">
     <ons-page id="Tab2">
-        <p style="text-align: center;">
-            This is the second page.
-        </p>
+        <ons-row>
+            <ons-col style="padding: 0 10px">
+                <ons-card modifier="material">
+                    <div class="title">
+                        <h2 class="card__title" style="text-align: center;"></h2>
+                    </div>
+                    <div class="content">
+                        <ons-row>
+                            <ons-col width="100%">
+                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fHist">
+                                    <ons-lazy-repeat>
+                                        <ons-list-item modifier="chevron longdivider" onclick="fn.selectP(' + value.id + ')" tappable>
+                                            Consulta
+                                        </ons-list-item>
+                                        <ons-list-item modifier="chevron longdivider" onclick="fn.selectP(' + value.id + ')" tappable>
+                                            Exame
+                                        </ons-list-item>
+                                    </ons-lazy-repeat>
+                                </ons-list>
+                            </ons-col>
+                        </ons-row>
+                    </div>
+                </ons-card>
+            </ons-col>
+        </ons-row>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                //$.get('')
+            }
+        </script>
     </ons-page>
 </template>
 
@@ -238,7 +266,7 @@
         </ons-toolbar>
 
         <ons-card>
-            <form action="<?= $this->url('login') ?>" method="post" enctype="multipart/form-data">
+            <form action="<?= $this->url('application_mobile', ["action" => "user-profile"]) ?>" method="post" enctype="multipart/form-data">
                 <ons-row>
                     <ons-col width="100%">
                         <ons-list-item class="input-items">
@@ -254,27 +282,43 @@
                                 <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
                             </div>
                             <ons-input style="width: 100%" id="cpf" modifier="material" name="fCpf" type="text"
-                                       placeholder="CPF" float required validate></ons-input>
+                                       placeholder="CPF" float validate></ons-input>
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
-<!--                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>-->
+                                <!--                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>-->
                             </div>
-                            <ons-input style="width: 100%; margin-left: 30px" id="rg" modifier="material" name="fRg" type="text"
-                                       placeholder="RG" float required validate></ons-input>
+                            <ons-input style="width: 100%; margin-left: 30px" id="rg" modifier="material" name="fRg"
+                                       type="text"
+                                       placeholder="RG" float validate></ons-input>
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
                                 <ons-icon icon="fa-plus-square" class="list-item__icon"></ons-icon>
                             </div>
                             <ons-select style="width: 100%" id="plano" modifier="material" name="fPlano" class="select"
-                                       float required>
+                                        float>
                                 <select class="select-input">
                                     <option value="">Selecione seu plano de saúde</option>
                                     <option value="1">Unimed</option>
                                     <option value="2">Hapvida</option>
                                 </select>
                             </ons-select>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-mobile-alt" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="telcel" modifier="material" name="fTelCel" type="text"
+                                       placeholder="Telefone Celular" float validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-phone" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="telres" modifier="material"
+                                       name="fTelRes" type="text"
+                                       placeholder="Telefone Residencial" float validate></ons-input>
                         </ons-list-item>
                         <ons-list-item>
                             <div class="right right-label">
@@ -301,7 +345,7 @@
 
         fn = {};
 
-        fn.especialidadeList = function (){
+        fn.especialidadeList = function () {
             $.get("/mobile/get-especialidades", {}, function (data) {
                 $.each(data[0], function (key, value) {
                     $("#fSelectEsp ons-lazy-repeat").append('<ons-list-item modifier="chevron longdivider" onclick="fn.selectP(' + value.id + ')" tappable>' + value.desc_especialidade + '</ons-list-item>');
