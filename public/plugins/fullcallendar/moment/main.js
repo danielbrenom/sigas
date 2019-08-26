@@ -1,16 +1,16 @@
 /*!
-@fullcalendar/moment v4.0.1
+FullCalendar Moment Plugin v4.3.0
 Docs & License: https://fullcalendar.io/
 (c) 2019 Adam Shaw
 */
+
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('moment'), require('@fullcalendar/core')) :
     typeof define === 'function' && define.amd ? define(['exports', 'moment', '@fullcalendar/core'], factory) :
     (global = global || self, factory(global.FullCalendarMoment = {}, global.moment, global.FullCalendar));
-}(this, function (exports, moment, core) { 'use strict';
+}(this, function (exports, momentNs, core) { 'use strict';
 
-    moment = moment && moment.hasOwnProperty('default') ? moment['default'] : moment;
-
+    var moment = momentNs; // the directly callable function
     function toMoment(date, calendar) {
         if (!(calendar instanceof core.Calendar)) {
             throw new Error('must supply a Calendar instance');
@@ -18,7 +18,7 @@ Docs & License: https://fullcalendar.io/
         return convertToMoment(date, calendar.dateEnv.timeZone, null, calendar.dateEnv.locale.codes[0]);
     }
     function toDuration(fcDuration) {
-        return moment.duration(fcDuration); // momment accepts all the props that fc.Duration already has!
+        return moment.duration(fcDuration); // moment accepts all the props that fc.Duration already has!
     }
     function formatWithCmdStr(cmdStr, arg) {
         var cmd = parseCmdStr(cmdStr);
@@ -91,12 +91,19 @@ Docs & License: https://fullcalendar.io/
                     startTail;
             }
         }
-        return formatStart(cmd.whole) + separator + formatEnd(cmd.whole);
+        var startWhole = formatStart(cmd.whole);
+        var endWhole = formatEnd(cmd.whole);
+        if (startWhole === endWhole) {
+            return startWhole;
+        }
+        else {
+            return startWhole + separator + endWhole;
+        }
     }
 
-    exports.toMoment = toMoment;
-    exports.toDuration = toDuration;
     exports.default = main;
+    exports.toDuration = toDuration;
+    exports.toMoment = toMoment;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

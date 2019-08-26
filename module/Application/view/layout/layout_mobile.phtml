@@ -14,7 +14,8 @@
     <?= $this->headLink(['rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'])
         ->prependStylesheet($this->basePath('layout_browser/css/bootstrap.css'))
         ->prependStylesheet($this->basePath('plugins/fullcallendar/core/main.css'))
-        ->prependStylesheet($this->basePath('plugins/daygrid/main.css'))
+        ->prependStylesheet($this->basePath('plugins/fullcallendar/daygrid/main.css'))
+        ->prependStylesheet($this->basePath('plugins/fullcallendar/timegrid/main.css'))
         ->prependStylesheet($this->basePath('plugins/bootstrap/main.css'))
         ->prependStylesheet($this->basePath('plugins/sweetalert/sweetalert2.css'))
         ->prependStylesheet($this->basePath('layout_mobile/css/onsenui.css'))
@@ -23,16 +24,19 @@
 
     <!-- Scripts -->
     <?= $this->headScript()
+        ->prependFile($this->basePath('plugins/controllers/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/bootstrap/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/interaction/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/moment/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/moment-timezone/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/daygrid/main.js'))
+        ->prependFile($this->basePath('plugins/fullcallendar/timegrid/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/core/locales/pt-br.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/core/main.js'))
         ->prependFile($this->basePath('plugins/sweetalert/sweetalert2.js'))
         ->prependFile($this->basePath('layout_mobile/js/onsenui.js'))
-        ->prependFile($this->basePath('layout_mobile/js/jquery-3.1.0.min.js'))
+//        ->prependFile($this->basePath('layout_mobile/js/jquery-3.1.0.min.js'))
+        ->prependFile($this->basePath('layout_mobile/js/jquery-2.2.4.js'))
     ?>
 </head>
 <body>

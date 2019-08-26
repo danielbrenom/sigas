@@ -1,8 +1,9 @@
 /*!
-@fullcalendar/interaction v4.0.1
+FullCalendar Interaction Plugin v4.3.0
 Docs & License: https://fullcalendar.io/
 (c) 2019 Adam Shaw
 */
+
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@fullcalendar/core')) :
     typeof define === 'function' && define.amd ? define(['exports', '@fullcalendar/core'], factory) :
@@ -842,7 +843,7 @@ Docs & License: https://fullcalendar.io/
                 this.delayTimeoutId = setTimeout(function () {
                     _this.delayTimeoutId = null;
                     _this.handleDelayEnd(ev);
-                }, this.delay);
+                }, this.delay); // not assignable to number!
             }
             else {
                 this.handleDelayEnd(ev);
@@ -1053,6 +1054,7 @@ Docs & License: https://fullcalendar.io/
         };
         HitDragging.prototype.prepareHits = function () {
             this.offsetTrackers = core.mapHash(this.droppableStore, function (interactionSettings) {
+                interactionSettings.component.buildPositionCaches();
                 return new OffsetTracker(interactionSettings.el);
             });
         };
@@ -1286,7 +1288,7 @@ Docs & License: https://fullcalendar.io/
                 mirror.parentNode = initialCalendar.el;
                 mirror.revertDuration = component.opt('dragRevertDuration');
                 var isValid = component.isValidSegDownEl(origTarget) &&
-                    !core.elementClosest(origTarget, '.fc-resizer');
+                    !core.elementClosest(origTarget, '.fc-resizer'); // NOT on a resizer
                 dragging.setIgnoreMove(!isValid);
                 // disable dragging for elements that are resizable (ie, selectable)
                 // but are not draggable
@@ -1346,7 +1348,7 @@ Docs & License: https://fullcalendar.io/
                         if (mutation) {
                             mutatedRelevantEvents = core.applyMutationToEventStore(relevantEvents, receivingCalendar.eventUiBases, mutation, receivingCalendar);
                             interaction.mutatedEvents = mutatedRelevantEvents;
-                            if (!_this.component.isInteractionValid(interaction)) {
+                            if (!receivingComponent.isInteractionValid(interaction)) {
                                 isInvalid = true;
                                 mutation = null;
                                 mutatedRelevantEvents = null;
@@ -1389,7 +1391,7 @@ Docs & License: https://fullcalendar.io/
                 if (_this.isDragging) {
                     var initialCalendar_1 = _this.component.calendar;
                     var initialView = _this.component.view;
-                    var receivingCalendar = _this.receivingCalendar;
+                    var _a = _this, receivingCalendar = _a.receivingCalendar, validMutation = _a.validMutation;
                     var eventDef = _this.eventRange.def;
                     var eventInstance = _this.eventRange.instance;
                     var eventApi = new core.EventApi(initialCalendar_1, eventDef, eventInstance);
@@ -1405,33 +1407,25 @@ Docs & License: https://fullcalendar.io/
                             view: initialView
                         }
                     ]);
-                    if (_this.validMutation) {
+                    if (validMutation) {
                         // dropped within same calendar
                         if (receivingCalendar === initialCalendar_1) {
                             initialCalendar_1.dispatch({
                                 type: 'MERGE_EVENTS',
                                 eventStore: mutatedRelevantEvents
                             });
-                            var eventDropArg = {};
-                            for (var _i = 0, _a = initialCalendar_1.pluginSystem.hooks.eventDropTransformers; _i < _a.length; _i++) {
-                                var transformer = _a[_i];
-                                __assign(eventDropArg, transformer(_this.validMutation, initialCalendar_1));
+                            var transformed = {};
+                            for (var _i = 0, _b = initialCalendar_1.pluginSystem.hooks.eventDropTransformers; _i < _b.length; _i++) {
+                                var transformer = _b[_i];
+                                __assign(transformed, transformer(validMutation, initialCalendar_1));
                             }
-                            __assign(eventDropArg, {
-                                el: ev.subjectEl,
-                                delta: _this.validMutation.startDelta,
-                                oldEvent: eventApi,
-                                event: new core.EventApi(// the data AFTER the mutation
-                                initialCalendar_1, mutatedRelevantEvents.defs[eventDef.defId], eventInstance ? mutatedRelevantEvents.instances[eventInstance.instanceId] : null),
-                                revert: function () {
+                            var eventDropArg = __assign({}, transformed, { el: ev.subjectEl, delta: validMutation.datesDelta, oldEvent: eventApi, event: new core.EventApi(// the data AFTER the mutation
+                                initialCalendar_1, mutatedRelevantEvents.defs[eventDef.defId], eventInstance ? mutatedRelevantEvents.instances[eventInstance.instanceId] : null), revert: function () {
                                     initialCalendar_1.dispatch({
                                         type: 'MERGE_EVENTS',
                                         eventStore: relevantEvents_1
                                     });
-                                },
-                                jsEvent: ev.origEvent,
-                                view: initialView
-                            });
+                                }, jsEvent: ev.origEvent, view: initialView });
                             initialCalendar_1.publiclyTrigger('eventDrop', [eventDropArg]);
                             // dropped in different calendar
                         }
@@ -1457,17 +1451,15 @@ Docs & License: https://fullcalendar.io/
                                     eventInstanceId: eventInstance.instanceId
                                 });
                             }
-                            var dropArg = receivingCalendar.buildDatePointApi(finalHit.dateSpan);
-                            dropArg.draggedEl = ev.subjectEl;
-                            dropArg.jsEvent = ev.origEvent;
-                            dropArg.view = finalHit.component; // ?
+                            var dropArg = __assign({}, receivingCalendar.buildDatePointApi(finalHit.dateSpan), { draggedEl: ev.subjectEl, jsEvent: ev.origEvent, view: finalHit.component // should this be finalHit.component.view? See #4644
+                             });
                             receivingCalendar.publiclyTrigger('drop', [dropArg]);
                             receivingCalendar.publiclyTrigger('eventReceive', [
                                 {
                                     draggedEl: ev.subjectEl,
                                     event: new core.EventApi(// the data AFTER the mutation
                                     receivingCalendar, mutatedRelevantEvents.defs[eventDef.defId], mutatedRelevantEvents.instances[eventInstance.instanceId]),
-                                    view: finalHit.component
+                                    view: finalHit.component // should this be finalHit.component.view? See #4644
                                 }
                             ]);
                         }
@@ -1568,8 +1560,7 @@ Docs & License: https://fullcalendar.io/
             standardProps.allDay = false;
         }
         var mutation = {
-            startDelta: delta,
-            endDelta: delta,
+            datesDelta: delta,
             standardProps: standardProps
         };
         for (var _i = 0, massagers_1 = massagers; _i < massagers_1.length; _i++) {
@@ -1879,10 +1870,7 @@ Docs & License: https://fullcalendar.io/
                     var finalHit = _this.hitDragging.finalHit;
                     var finalView = finalHit.component.view;
                     var dragMeta = _this.dragMeta;
-                    var arg = receivingCalendar.buildDatePointApi(finalHit.dateSpan);
-                    arg.draggedEl = pev.subjectEl;
-                    arg.jsEvent = pev.origEvent;
-                    arg.view = finalView;
+                    var arg = __assign({}, receivingCalendar.buildDatePointApi(finalHit.dateSpan), { draggedEl: pev.subjectEl, jsEvent: pev.origEvent, view: finalView });
                     receivingCalendar.publiclyTrigger('drop', [arg]);
                     if (dragMeta.create) {
                         receivingCalendar.dispatch({
@@ -1960,7 +1948,7 @@ Docs & License: https://fullcalendar.io/
             var transform = _a[_i];
             __assign(defProps, transform(dateSpan, dragMeta));
         }
-        var def = core.parseEventDef(defProps, dragMeta.sourceId, dateSpan.allDay, Boolean(dragMeta.duration), // hasEnd
+        var def = core.parseEventDef(defProps, dragMeta.sourceId, dateSpan.allDay, calendar.opt('forceEventDuration') || Boolean(dragMeta.duration), // hasEnd
         calendar);
         var start = dateSpan.range.start;
         // only rely on time info if drop zone is all-day,
@@ -1997,8 +1985,8 @@ Docs & License: https://fullcalendar.io/
     */
     var ExternalDraggable = /** @class */ (function () {
         function ExternalDraggable(el, settings) {
-            if (settings === void 0) { settings = {}; }
             var _this = this;
+            if (settings === void 0) { settings = {}; }
             this.handlePointerDown = function (ev) {
                 var dragging = _this.dragging;
                 var _a = _this.settings, minDistance = _a.minDistance, longPressDelay = _a.longPressDelay;
@@ -2144,11 +2132,11 @@ Docs & License: https://fullcalendar.io/
         elementDraggingImpl: FeaturefulElementDragging
     });
 
-    exports.default = main;
+    exports.Draggable = ExternalDraggable;
     exports.FeaturefulElementDragging = FeaturefulElementDragging;
     exports.PointerDragging = PointerDragging;
-    exports.Draggable = ExternalDraggable;
     exports.ThirdPartyDraggable = ThirdPartyDraggable;
+    exports.default = main;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
