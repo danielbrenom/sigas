@@ -4,7 +4,9 @@
 namespace Authentication\Service;
 
 
+use Exception;
 use Zend\Authentication\AuthenticationService;
+use Zend\Authentication\Result;
 use Zend\Session\SessionManager;
 
 class AuthenticationManager
@@ -34,13 +36,13 @@ class AuthenticationManager
      * @param $email
      * @param $password
      * @param null $rememberMe
-     * @return \Zend\Authentication\Result
-     * @throws \Exception
+     * @return Result
+     * @throws Exception
      */
     public function login($email, $password, $rememberMe = null)
     {
         if ($this->authService->getIdentity() !== null) {
-            throw new \Exception("Já logado");
+            throw new Exception("Já logado");
         }
         /**
          * @var $authAdapter AuthenticationAdapter
@@ -59,7 +61,7 @@ class AuthenticationManager
     public function logout()
     {
         if ($this->authService->getIdentity() === null) {
-            throw new \Exception("Não está logado");
+            throw new Exception("Não está logado");
         }
         $this->authService->clearIdentity();
     }

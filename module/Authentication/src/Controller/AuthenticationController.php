@@ -4,6 +4,7 @@
 namespace Authentication\Controller;
 
 
+use Application\Controller\Repository\MobileRepository;
 use Application\Debug\UtilsFile;
 use Exception;
 use Zend\Authentication\AuthenticationService;
@@ -23,10 +24,10 @@ use Zend\View\Model\ViewModel;
 class AuthenticationController extends AbstractActionController
 {
     /**
-     * Entity manager.
-     * @var EntityManager
+     * Repository Manager.
+     * @var MobileRepository
      */
-    private $entityManager;
+    private $mobileRepository;
 
     /**
      * Auth manager.
@@ -41,15 +42,14 @@ class AuthenticationController extends AbstractActionController
 
     /**
      * AuthenticationController constructor.
-     * @param EntityManager $entityManager
      * @param AuthenticationManager $authManager
      * @param UserManager $userManager
      */
-    public function __construct(EntityManager $entityManager, AuthenticationManager $authManager, UserManager $userManager)
+    public function __construct(AuthenticationManager $authManager, UserManager $userManager, MobileRepository $mobileRepository)
     {
-        $this->entityManager = $entityManager;
         $this->authManager = $authManager;
         $this->userManager = $userManager;
+        $this->mobileRepository = $mobileRepository;
     }
 
     public function userStateAction()
@@ -66,7 +66,6 @@ class AuthenticationController extends AbstractActionController
             if (strlen($redirectUrl) > 2048) {
                 throw new Exception("Redirecionamento inválido");
             }
-            $isLoginError = false;
             $error = '';
             if ($this->getRequest()->isPost()) {
                 $data = $this->params()->fromPost();
@@ -85,22 +84,15 @@ class AuthenticationController extends AbstractActionController
                     }
                     $this->redirect()->toUrl($redirectUrl);
                 } else {
-                    $isLoginError = true;
-                    //UtilsFile::printvardie($result->getMessages());
                     throw new Exception($result->getMessages()[0]);
                 }
-            } else {
-                $isLoginError = true;
             }
         } catch (Exception $e) {
-            $error = $e->getMessage();
+            $error = $e;
         }
-
-        return new JsonModel([
-            'isLoginError' => $isLoginError,
-            'redirectUrl' => $redirectUrl,
-            'error' => $error
-        ]);
+        $this->mobileRepository->setMessage($error->getMessage(), $error->getCode());
+        $this->redirect()->toRoute('home');
+        return false;
     }
 
     public function logoutAction()
@@ -121,18 +113,17 @@ class AuthenticationController extends AbstractActionController
                 $data = $this->params()->fromPost();
                 //UtilsFile::printvardie($data);
                 if (!$emailValidator->isValid($data['fEmail'])) {
-                    throw new Exception("Email inválido");
+                    throw new Exception('Email inválido');
                 }
                 $this->userManager->createUser($data['fEmail'], $data['fPass']);
+                $this->mobileRepository->setMessage("Usuário criado com sucesso. \n Efetue login.", 1);
                 $this->redirect()->toRoute('home');
             } else {
                 $this->redirect()->toRoute('home');
             }
         } catch (Exception $e) {
-            return new JsonModel(
-                ["code" => $e->getCode(),
-                    "message" => $e->getMessage()]
-            );
+            $this->mobileRepository->setMessage($e->getMessage(), $e->getCode());
+            $this->redirect()->toRoute('home');
         }
         return $this->getResponse();
     }

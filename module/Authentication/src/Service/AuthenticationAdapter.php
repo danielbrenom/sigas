@@ -58,7 +58,7 @@ class AuthenticationAdapter implements AdapterInterface
         $user = $this->entityManager->getRepository(User::class)->findOneByEmail($this->email);
 
         if ($user === null) {
-            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, ['Email inválido']);
+            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, ['Usuário não existe']);
         }
         $bcrypt = new Bcrypt();
         $passwordHash = $user->getUserPassword();

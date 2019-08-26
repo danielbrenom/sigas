@@ -4,6 +4,7 @@
 namespace Authentication\Controller\Factory;
 
 
+use Application\Controller\Repository\MobileRepository;
 use Authentication\Controller\AuthenticationController;
 use Authentication\Service\AuthenticationManager;
 use Authentication\Service\UserManager;
@@ -30,8 +31,8 @@ class AuthenticationControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new AuthenticationController($container->get('doctrine.entitymanager.orm_crawler'),
-            $container->get(AuthenticationManager::class),
-            $container->get(UserManager::class));
+        return new AuthenticationController($container->get(AuthenticationManager::class),
+            $container->get(UserManager::class),
+            $container->get(MobileRepository::class));
     }
 }

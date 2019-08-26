@@ -10,6 +10,7 @@ use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
+use Zend\Session\SessionManager;
 
 class MobileRepositoryFactory implements FactoryInterface
 {
@@ -27,6 +28,6 @@ class MobileRepositoryFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new MobileRepository($container->get('doctrine.entitymanager.orm_crawler'));
+        return new MobileRepository($container->get('doctrine.entitymanager.orm_crawler'), $container->get(SessionManager::class));
     }
 }

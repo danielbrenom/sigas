@@ -262,5 +262,10 @@ class UserInfoPessoal
         $this->user_especiality = $user_especiality;
     }
 
-
+    public function toArray()
+    {
+        return ["id" => $this->getId(),
+            "user_name" => $this->getUserName(),
+            "user_cpf" => $this->getUserCpf()];
+    }
 }

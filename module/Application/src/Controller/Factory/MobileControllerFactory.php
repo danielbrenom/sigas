@@ -36,6 +36,7 @@ class MobileControllerFactory implements FactoryInterface
     {
         $mobileManager = $container->get(MobileRepository::class);
         $authManager = $container->get(AuthenticationManager::class);
+
         return new MobileController($mobileManager, $authManager);
     }
 }

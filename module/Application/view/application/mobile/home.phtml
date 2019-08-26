@@ -174,10 +174,12 @@
                             <ons-col width="100%">
                                 <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fHist">
                                     <ons-lazy-repeat>
-                                        <ons-list-item modifier="chevron longdivider" onclick="fn.selectP(' + value.id + ')" tappable>
+                                        <ons-list-item modifier="chevron longdivider"
+                                                       onclick="fn.viewHistory()" tappable>
                                             Consulta
                                         </ons-list-item>
-                                        <ons-list-item modifier="chevron longdivider" onclick="fn.selectP(' + value.id + ')" tappable>
+                                        <ons-list-item modifier="chevron longdivider"
+                                                       onclick="fn.viewHistory()" tappable>
                                             Exame
                                         </ons-list-item>
                                     </ons-lazy-repeat>
@@ -266,14 +268,15 @@
         </ons-toolbar>
 
         <ons-card>
-            <form action="<?= $this->url('application_mobile', ["action" => "user-profile"]) ?>" method="post" enctype="multipart/form-data">
+            <form action="<?= $this->url('application_mobile', ["action" => "user-profile"]) ?>" method="post"
+                  enctype="multipart/form-data">
                 <ons-row>
                     <ons-col width="100%">
                         <ons-list-item class="input-items">
                             <div class="left">
                                 <ons-icon icon="fa-user" class="list-item__icon"></ons-icon>
                             </div>
-                            <ons-input style="width: 100%" modifier="material" id="username" name="fName"
+                            <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fName"
                                        placeholder="Nome completo" type="text"
                                        float required validate></ons-input>
                         </ons-list-item>
@@ -281,14 +284,16 @@
                             <div class="left">
                                 <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
                             </div>
-                            <ons-input style="width: 100%" id="cpf" modifier="material" name="fCpf" type="text"
+                            <ons-input style="width: 100%" id="info_user_cpf" modifier="material" name="fCpf"
+                                       type="text"
                                        placeholder="CPF" float validate></ons-input>
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
-                                <!--                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>-->
+                                <ons-icon icon="" class="list-item__icon icon-spacer"></ons-icon>
                             </div>
-                            <ons-input style="width: 100%; margin-left: 30px" id="rg" modifier="material" name="fRg"
+                            <ons-input style="width: 100%" id="info_user_rg" modifier="material"
+                                       name="fRg"
                                        type="text"
                                        placeholder="RG" float validate></ons-input>
                         </ons-list-item>
@@ -296,7 +301,8 @@
                             <div class="left">
                                 <ons-icon icon="fa-plus-square" class="list-item__icon"></ons-icon>
                             </div>
-                            <ons-select style="width: 100%" id="plano" modifier="material" name="fPlano" class="select"
+                            <ons-select style="width: 100%" id="info_user_healthcare" modifier="material" name="fPlano"
+                                        class="select"
                                         float>
                                 <select class="select-input">
                                     <option value="">Selecione seu plano de saúde</option>
@@ -307,16 +313,25 @@
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
+                                <ons-icon icon="fa-map-marker-alt" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="info_user_addr" modifier="material" name="fEnd"
+                                       type="text"
+                                       placeholder="Endereço Residencial" float validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
                                 <ons-icon icon="fa-mobile-alt" class="list-item__icon"></ons-icon>
                             </div>
-                            <ons-input style="width: 100%" id="telcel" modifier="material" name="fTelCel" type="text"
+                            <ons-input style="width: 100%" id="info_user_ctt_phone" modifier="material" name="fTelCel"
+                                       type="text"
                                        placeholder="Telefone Celular" float validate></ons-input>
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
                                 <ons-icon icon="fa-phone" class="list-item__icon"></ons-icon>
                             </div>
-                            <ons-input style="width: 100%" id="telres" modifier="material"
+                            <ons-input style="width: 100%" id="info_user_ctt_res" modifier="material"
                                        name="fTelRes" type="text"
                                        placeholder="Telefone Residencial" float validate></ons-input>
                         </ons-list-item>
@@ -333,15 +348,58 @@
             .list-item__center, .list-item__right {
                 background-image: none;
             }
+
+            .icon-spacer::before,
+            .icon-blank::before {
+                width: 1em;
+                content: ' ';
+            }
         </style>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                $.get('/mobile/user-profile', {json: true}, function (response) {
+                    $.each(response, function (key, value) {
+                        if (value !== " " || value !== "" || value !== null) {
+                            $("#" + key).val(value);
+                        }
+                    })
+                })
+            }
+        </script>
     </ons-page>
 </template>
 
 
 <script>
     $(function () {
-        // if (ons.isReady()) {
-        // }
+        if (ons.isReady()) {
+            $.get('/mobile/get-log-messages', {}, function (response) {
+                if (response.error) {
+                    let titleT = "", icontype = "";
+                    switch (response.error.code) {
+                        case 0:
+                            titleT = "Erro";
+                            icontype = "error";
+                            break;
+                        case 1:
+                            titleT = "Sucesso";
+                            icontype = "success";
+                            break;
+                        default:
+                            titleT = "Erro";
+                            icontype = "error";
+                            break;
+                    }
+                    swal({
+                        title: titleT,
+                        text: response.error.message,
+                        timer: 3000,
+                        icon: icontype,
+                        buttons: false
+                    });
+                }
+            })
+        }
 
         fn = {};
 
@@ -398,37 +456,51 @@
                         let formatter = new Intl.DateTimeFormat('pt-BR');
                         try {
                             let calendar = new FullCalendar.Calendar($("#callendarArea")[0], {
-                                plugins: ['dayGrid', 'bootstrap', 'interaction', 'moment', 'momentTimezone'],
+                                plugins: ['dayGrid', 'timeGrid', 'bootstrap', 'interaction', 'moment', 'momentTimezone'],
                                 locale: 'pt-BR',
                                 themeSystem: "bootstrap",
                                 header: {
                                     left: 'prev,next',
-                                    center: '',
-                                    right: 'title'
+                                    center: 'title',
+                                    right: 'dayGridMonth',
+                                },
+                                buttonText: {
+                                    month: 'mês'
                                 },
                                 fullday: false,
                                 height: 600,
                                 dateClick: function (info) {
-                                    swal({
-                                        title: "Confirmação",
-                                        text: 'Continuar escolha para data ' + fn.formattDate(info.date) + '?',
-                                        buttons: {
-                                            no: {
-                                                text: "Não",
-                                                value: false
-                                            },
-                                            yes: {
-                                                text: "Sim",
-                                                value: true,
-                                                className: 'btn-success'
+                                    if (info.view.type === 'dayGridMonth') {
+                                        calendar.changeView('timeGridDay');
+                                        calendar.gotoDate(info.date);
+                                    } else if (info.view.type === 'timeGridDay') {
+                                        swal({
+                                            title: "Confirmação",
+                                            text: 'Continuar escolha para data ' + fn.formattDate(info.date) + '?',
+                                            buttons: {
+                                                no: {
+                                                    text: "Não",
+                                                    value: false
+                                                },
+                                                yes: {
+                                                    text: "Sim",
+                                                    value: true,
+                                                    className: 'btn-success'
+                                                }
                                             }
-                                        }
-                                    }).then(r => {
-                                        if (r) {
-                                            fn.finishAppointment(info);
-                                        }
-                                    })
-                                    //alert("Date:" + info.date.toUTCString());
+                                        }).then(r => {
+                                            if (r) {
+                                                fn.finishAppointment(info);
+                                            }
+                                        })
+                                    }
+                                },
+                                views: {
+                                    timeGridDay: {
+                                        type: 'dayGrid',
+                                        duration: {days: 1},
+                                        buttonText: 'Day',
+                                    }
                                 },
                                 timeZone: "UTC",
                                 eventSources: [

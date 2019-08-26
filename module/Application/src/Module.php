@@ -11,6 +11,7 @@ namespace Application;
 use Mobile_Detect;
 use Zend\ModuleManager\ModuleManager;
 use Zend\Mvc\MvcEvent;
+use Zend\Session\SessionManager;
 
 class Module
 {
@@ -25,6 +26,16 @@ class Module
     {
         $sharedeventManager = $manager->getEventManager()->getSharedManager();
         $sharedeventManager->attach(__NAMESPACE__, 'dispatch', [$this, 'onDispatch'], 10);
+    }
+
+    public function onBootstrap(MvcEvent $event)
+    {
+        $application = $event->getApplication();
+        $serviceManager = $application->getServiceManager();
+
+        // The following line instantiates the SessionManager and automatically
+        // makes the SessionManager the 'default' one.
+        $sessionManager = $serviceManager->get(SessionManager::class);
     }
 
     public function onDispatch(MvcEvent $event)

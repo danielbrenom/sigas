@@ -24,6 +24,7 @@ use DateTimeZone;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Session\SessionManager;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
@@ -34,6 +35,7 @@ class MobileController extends AbstractActionController
     protected $mobileManager;
     /** @var $authManager AuthenticationManager */
     protected $authManager;
+
 
     /**
      * MobileController constructor.
@@ -88,7 +90,7 @@ class MobileController extends AbstractActionController
         try {
             $resultados = $this->mobileManager->getSchedule($params);
             foreach ($resultados as $appointment) {
-                $data = (new DateTime($appointment['solicited_for'], new DateTimeZone("America/Belem")))->format('Y-m-d');
+                $data = (new DateTime($appointment['solicited_for'], new DateTimeZone("America/Belem")))->format('Y-m-d H:i:s');
                 $resp[] = [
                     "title" => $this->mobileManager->getAppointmentDescription($appointment['id_procedure']),
                     "start" => $data,
@@ -120,7 +122,21 @@ class MobileController extends AbstractActionController
     {
         $activeUser = $this->authManager->getActiveUser();
         if ($this->getRequest()->isPost()) {
-            $this->mobileManager->updateUserInfo($this->params()->fromPost(), $this->mobileManager->getUserInformation($activeUser['user_id']));
+            $this->mobileManager->updateUserInfo($this->params()->fromPost(), $activeUser['user_id']);
+            $this->redirect()->toRoute('home');
+        }
+        if ($this->params()->fromQuery('json')) {
+            $data = $this->mobileManager->getUserInformation($activeUser['user_id'], 3)[0];
+            $info = [
+                'info_user_name' => $data['info_user_name'],
+                'info_user_cpf' => $data['info_user_cpf'],
+                'info_user_rg' => $data['info_user_rg'],
+                'info_user_healthcare' => $data['info_user_healthcare'],
+                'info_user_addr' => $data['info_user_addr'],
+                'info_user_ctt_phone' => $data['info_user_ctt_phone'],
+                'info_user_ctt_res' => $data['info_user_ctt_res']
+            ];
+            return new JsonModel($info);
         }
         $userInfo = $this->mobileManager->getUserInformation($activeUser['user_id']);
         $view = new ViewModel([
@@ -142,14 +158,24 @@ class MobileController extends AbstractActionController
         ];
         try {
             if ($this->mobileManager->saveAppointment($vData)) {
+                $this->mobileManager->setMessage("Solicitação salva com sucesso", 1);
                 $this->redirect()->toRoute('application_mobile');
             } else {
                 //Mostrar que ocorreu um erro
+                $this->mobileManager->setMessage("Ocorreu um erro ao realizar a solicitação. \n 
+                Por favor tente novamente mais tarde", 0);
                 $this->redirect()->toRoute('application_mobile');
             }
         } catch (Exception $e) {
-            UtilsFile::printvardie($e->getMessage());
+            $this->mobileManager->setMessage($e->getMessage(), 0);
+            $this->redirect()->toRoute('home');
         }
     }
 
+    public function getLogMessagesAction()
+    {
+        return new JsonModel([
+            "error" => $this->mobileManager->getMessage()
+        ]);
+    }
 }
