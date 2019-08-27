@@ -83,7 +83,7 @@ $(function () {
                     let formatter = new Intl.DateTimeFormat('pt-BR');
                     try {
                         let calendar = new FullCalendar.Calendar($("#callendarArea")[0], {
-                            plugins: ['dayGrid', 'timeGrid', 'bootstrap', 'interaction', 'moment', 'momentTimezone'],
+                            plugins: ['moment', 'dayGrid', 'timeGrid', 'bootstrap', 'interaction', 'momentTimezone'],
                             locale: 'pt-BR',
                             themeSystem: "bootstrap",
                             header: {
@@ -94,18 +94,20 @@ $(function () {
                             buttonText: {
                                 month: 'mês'
                             },
-                            fullday: false,
                             allDaySlot: false,
                             slotEventOverlap: false,
                             height: 600,
+                            contentHeight: 550,
+                            displayEventTime: false,
                             dateClick: function (info) {
                                 if (info.view.type === 'dayGridMonth') {
-                                    calendar.changeView('timeGridDay');
+                                    calendar.changeView('oneGridDay');
                                     calendar.gotoDate(info.date);
-                                } else if (info.view.type === 'timeGridDay') {
+                                } else if (info.view.type === 'oneGridDay') {
+                                    console.log(info.date);
                                     swal({
                                         title: "Confirmação",
-                                        text: 'Continuar escolha para data ' + fn.formattDate(info.date) + '?',
+                                        text: 'Continuar escolha para data ' + info.date.toLocaleDateString() + '?',
                                         buttons: {
                                             no: {
                                                 text: "Não",
@@ -129,9 +131,11 @@ $(function () {
                                     type: 'timeGridDay',
                                     duration: {days: 1},
                                     buttonText: 'Day',
+                                    minTime: "08:00:00",
+                                    maxTime: "19:00:00"
                                 }
                             },
-                            timeZone: "UTC",
+                            timeZone: "local",
                             eventSources: [
                                 {
                                     url: '/mobile/get-schedule',
@@ -220,7 +224,9 @@ $(function () {
 
     fn.finishAppointment = function (info) {
         $("#mainNavigator")[0].pushPage('finishAppoint.html').then(() => {
-            $("#req-date").val(fn.formattDate(info.date));
+            // $("#req-date").val(fn.formattDate(info.date));
+            $("#req-date").val(info.date.toLocaleDateString());
+            $("#req-hour").val(info.date.toLocaleTimeString());
             $("#idProf").val($("#profid").val());
         });
     };
@@ -230,6 +236,6 @@ $(function () {
     };
 
     fn.formattDate = function (date) {
-        return [(date.getDate() + 1) + '/' + (date.getMonth() + 1) + '/' + date.getFullYear()].join('');
+        return [(date.getDate()) + '/' + (date.getMonth() + 1) + '/' + date.getFullYear()].join('');
     }
 });

@@ -90,11 +90,11 @@ class MobileController extends AbstractActionController
         try {
             $resultados = $this->mobileManager->getSchedule($params);
             foreach ($resultados as $appointment) {
-                $data = (new DateTime($appointment['solicited_for'], new DateTimeZone("America/Belem")))->format('Y-m-d H:i:s');
+                $data = new DateTime($appointment['solicited_for'], new DateTimeZone("America/Belem"));
                 $resp[] = [
                     "title" => $this->mobileManager->getAppointmentDescription($appointment['id_procedure']),
-                    "start" => $data,
-                    "end" => $data
+                    "start" => $data->format("Y-m-d") . 'T' . $data->format("H:i:s") . '-03:00',
+                    "end" => $data->format("Y-m-d") . 'T' . $data->format("H:i:s") . '-03:00'
                 ];
             }
         } catch (Exception $e) {
@@ -156,6 +156,7 @@ class MobileController extends AbstractActionController
             "user_req" => $this->authManager->getActiveUser()['user_id'],
             "prof_req" => $params['fIdProf']
         ];
+//        UtilsFile::printvar($vData);
         try {
             if ($this->mobileManager->saveAppointment($vData)) {
                 $this->mobileManager->setMessage("Solicitação salva com sucesso", 1);
