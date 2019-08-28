@@ -38,26 +38,6 @@ $(function () {
         });
     };
 
-    fn.alert = function () {
-        console.log("Called", $("#alert"));
-        let dialog = $('#alert');
-
-        if (dialog) {
-            dialog.show();
-        } else {
-            ons.createElement('dialog.html', {append: true})
-                .then(function (dialog) {
-                    dialog.show();
-                });
-        }
-    };
-
-    fn.hideDialog = function (id) {
-        document
-            .getElementById(id)
-            .hide();
-    };
-
     fn.viewDetails = function (id) {
         let html;
         $.get('/mobile/get-profissional-info', {id_user: id}, function (data) {
@@ -66,6 +46,27 @@ $(function () {
             $('#mainNavigator')[0].pushPage('detailsPage.html').then(function () {
                 $('#fInformacoes').empty();
                 $('#fInformacoes').append(html);
+                let addr = $("#addr_text").text();
+                if(addr.match("/tv\./"))
+                $.get('https://nominatim.openstreetmap.org/search.php', {
+                    q: 'Travessa barão do triunfo 706',
+                    format: 'json'
+                }, function (response) {
+                    console.log(response);
+                    let map = L.map("mapid", {
+                        zoomControl: false,
+                        dragging: false
+                    }).setView([response[0].lat, response[0].lon], 15);
+                    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGFuaWVsYnJlbm9tIiwiYSI6ImNqenR2ZXc0bzA0b2szaG12NGlxenJnZHgifQ.rVgxkTv_r5dDyL0WHuKn4Q', {
+                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                        maxZoom: 18,
+                        id: 'mapbox.streets',
+                        accessToken: 'pk.eyJ1IjoiZGFuaWVsYnJlbm9tIiwiYSI6ImNqenR2ZXc0bzA0b2szaG12NGlxenJnZHgifQ.rVgxkTv_r5dDyL0WHuKn4Q'
+                    }).addTo(map);
+                    let marker = L.marker([response[0].lat, response[0].lon]).addTo(map);
+                    let title =  response[0].display_name.split(',');
+                    marker.bindPopup("<b>"+title[1]+"</b>").openPopup();
+                });
             });
         });
     };
@@ -77,9 +78,6 @@ $(function () {
         }).then(function () {
             if (state) {
                 $("#mainNavigator")[0].pushPage('checkDatePage.html').then(function () {
-                    // $("#calendarArea").fullCalendar({
-                    //     monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-                    // });
                     let formatter = new Intl.DateTimeFormat('pt-BR');
                     try {
                         let calendar = new FullCalendar.Calendar($("#callendarArea")[0], {
@@ -104,7 +102,6 @@ $(function () {
                                     calendar.changeView('oneGridDay');
                                     calendar.gotoDate(info.date);
                                 } else if (info.view.type === 'oneGridDay') {
-                                    console.log(info.date);
                                     swal({
                                         title: "Confirmação",
                                         text: 'Continuar escolha para data ' + info.date.toLocaleDateString() + '?',
@@ -224,14 +221,13 @@ $(function () {
 
     fn.finishAppointment = function (info) {
         $("#mainNavigator")[0].pushPage('finishAppoint.html').then(() => {
-            // $("#req-date").val(fn.formattDate(info.date));
             $("#req-date").val(info.date.toLocaleDateString());
             $("#req-hour").val(info.date.toLocaleTimeString());
             $("#idProf").val($("#profid").val());
         });
     };
 
-    fn.sendAppointment = function (data) {
+    fn.sendAppointment = function () {
         $("#form-appoint").submit();
     };
 

@@ -20,10 +20,12 @@
         ->prependStylesheet($this->basePath('plugins/sweetalert/sweetalert2.css'))
         ->prependStylesheet($this->basePath('layout_mobile/css/onsenui.css'))
         ->prependStylesheet($this->basePath('layout_mobile/css/onsen-css-components.css'))
+        ->headLink(['rel' => 'stylesheet', 'href' => 'https://unpkg.com/leaflet@1.5.1/dist/leaflet.css', 'integrity' => 'sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==', 'crossorigin' => ''])
     ?>
 
     <!-- Scripts -->
     <?= $this->headScript()
+        ->prependFile('https://unpkg.com/leaflet@1.5.1/dist/leaflet.js', 'text/javascript' ,['integrity' => 'sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==', 'crossorigin' => ''])
         ->prependFile($this->basePath('plugins/controllers/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/bootstrap/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/interaction/main.js'))
