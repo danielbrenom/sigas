@@ -39,13 +39,17 @@ $infos = $this->prof[0];
     <ons-card>
         <div class="title">Procedimentos disponíveis</div>
         <div class="content">
-            Lorem ipsum
+            <ons-list modifier="nodivider">
+                <?php foreach ($infos['procedures'] as $procedure): ?>
+                    <ons-list-item><?= $procedure['procedure_description'] ?></ons-list-item>
+                <?php endforeach; ?>
+            </ons-list>
         </div>
     </ons-card>
     <ons-card>
         <div class="title">Localização</div>
         <div class="content">
-            <div id="mapid" style="height: 250px"></div>
+            <div id="mapid" style="height: 200px"></div>
         </div>
     </ons-card>
 </div>

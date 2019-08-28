@@ -23,120 +23,6 @@
     </ons-page>
 </template>
 
-<template id="professionalsPage.html">
-    <ons-page id="professionalsPage">
-        <ons-toolbar modifier="noshadow">
-            <div class="left">
-                <ons-back-button>Busca</ons-back-button>
-            </div>
-            <div class="center">Resultados</div>
-        </ons-toolbar>
-        <ons-row id="fResultados">
-        </ons-row>
-    </ons-page>
-</template>
-
-<template id="detailsPage.html">
-    <ons-page id="detailsPage">
-        <ons-toolbar modifier="noshadow" style="background-color: aliceblue !important;">
-            <div class="left">
-                <ons-back-button>Busca</ons-back-button>
-            </div>
-            <div class="center"></div>
-        </ons-toolbar>
-        <ons-row id="fInformacoes">
-        </ons-row>
-        <ons-bottom-toolbar onclick="fn.checkDates($('#profid').val())">
-            <ons-row>
-                <ons class="col"></ons>
-                <ons class="col" style="padding-top: 10px">SOLICITAR PROCEDIMENTO</ons>
-                <ons class="col"></ons>
-
-            </ons-row>
-        </ons-bottom-toolbar>
-        <script>
-            ons.getScriptPage().onInit = function () {
-
-            }
-        </script>
-    </ons-page>
-</template>
-
-<template id="checkDatePage.html">
-    <ons-page id="checkDate">
-        <ons-toolbar modifier="noshadow">
-            <div class="left">
-                <ons-back-button>Informações</ons-back-button>
-            </div>
-            <div class="center"></div>
-        </ons-toolbar>
-        <ons-row>
-            <ons-col>
-                <ons-card>
-                    <div class="title">Selecione uma data abaixo:</div>
-                    <div id="callendarArea" style="margin: 10px 0"></div>
-                </ons-card>
-            </ons-col>
-        </ons-row>
-    </ons-page>
-</template>
-
-<template id="finishAppoint.html">
-    <ons-page id="finishAppoint">
-        <ons-toolbar modifier="noshadow">
-            <div class="left">
-                <ons-back-button>Data</ons-back-button>
-            </div>
-            <div class="center"></div>
-        </ons-toolbar>
-        <ons-row>
-            <ons-col>
-                <ons-card>
-                    <div class="title">Preencha as informações para agendamento:</div>
-                    <ons-list>
-                        <form action="<?= $this->url('application_mobile', ["action" => "save-appoint"]) ?>"
-                              method="post" enctype="multipart/form-data" id="form-appoint">
-                            <ons-list-header>Data desejada:</ons-list-header>
-                            <ons-list-item class="input-items">
-                                <div>
-                                    <input type="text" class="text-input" name="fDataReq" id="req-date" readonly>
-                                </div>
-                            </ons-list-item>
-                            <ons-list-header>Procedimento desejado:</ons-list-header>
-                            <ons-list-item class="input-items">
-                                <div>
-                                    <select class="select-input select-input--material" name="fProcdReq" id="req-procd">
-                                        <option value="1">Option 1</option>
-                                        <option value="2">Option 2</option>
-                                        <option value="3">Option 3</option>
-                                    </select>
-                                </div>
-                            </ons-list-item>
-                            <ons-list-header>Horário desejado:</ons-list-header>
-                            <ons-list-item class="input-items">
-                                <div>
-                                    <input type="time" class="text-input text-input--material" name="fHoraReq"
-                                           id="req-hour">
-                                </div>
-                            </ons-list-item>
-                            <div class="form-params" style="display: none">
-                                <input type="text" id="idProf" name="fIdProf">
-                            </div>
-                        </form>
-                    </ons-list>
-                </ons-card>
-            </ons-col>
-        </ons-row>
-        <ons-bottom-toolbar onclick="fn.sendAppointment()">
-            <ons-row>
-                <ons class="col"></ons>
-                <ons class="col" style="padding-top: 10px">FINALIZAR SOLICITAÇÃO</ons>
-                <ons class="col"></ons>
-            </ons-row>
-        </ons-bottom-toolbar>
-    </ons-page>
-</template>
-
 <template id="tab1.html">
     <ons-page id="Tab1">
         <ons-row>
@@ -172,7 +58,7 @@
             <ons-col style="padding: 0 10px">
                 <ons-card modifier="material">
                     <div class="title">
-                        <h2 class="card__title" style="text-align: center;"></h2>
+                        <h3 class="card__title" style="text-align: center;">Selecione um tipo de registro</h3>
                     </div>
                     <div class="content">
                         <ons-row>
@@ -180,11 +66,11 @@
                                 <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fHist">
                                     <ons-lazy-repeat>
                                         <ons-list-item modifier="chevron longdivider"
-                                                       onclick="fn.viewHistory()" tappable>
+                                                       onclick="fn.viewHistory(1)" tappable>
                                             Consulta
                                         </ons-list-item>
                                         <ons-list-item modifier="chevron longdivider"
-                                                       onclick="fn.viewHistory()" tappable>
+                                                       onclick="fn.viewHistory(2)" tappable>
                                             Exame
                                         </ons-list-item>
                                     </ons-lazy-repeat>
@@ -371,5 +257,152 @@
                 })
             }
         </script>
+    </ons-page>
+</template>
+
+<template id="professionalsPage.html">
+    <ons-page id="professionalsPage">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Busca</ons-back-button>
+            </div>
+            <div class="center">Resultados</div>
+        </ons-toolbar>
+        <ons-row id="fResultados">
+        </ons-row>
+    </ons-page>
+</template>
+
+<template id="detailsPage.html">
+    <ons-page id="detailsPage">
+        <ons-toolbar modifier="noshadow" style="background-color: aliceblue !important;">
+            <div class="left">
+                <ons-back-button>Busca</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row id="fInformacoes">
+        </ons-row>
+        <ons-bottom-toolbar onclick="fn.checkDates($('#profid').val())">
+            <ons-row>
+                <ons class="col"></ons>
+                <ons class="col" style="padding-top: 10px">SOLICITAR PROCEDIMENTO</ons>
+                <ons class="col"></ons>
+
+            </ons-row>
+        </ons-bottom-toolbar>
+        <script>
+            ons.getScriptPage().onInit = function () {
+
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="checkDatePage.html">
+    <ons-page id="checkDate">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Informações</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-col>
+                <ons-card>
+                    <div class="title">Selecione uma data abaixo:</div>
+                    <div id="callendarArea" style="margin: 10px 0"></div>
+                </ons-card>
+            </ons-col>
+        </ons-row>
+    </ons-page>
+</template>
+
+<template id="finishAppoint.html">
+    <ons-page id="finishAppoint">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Data</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-col>
+                <ons-card>
+                    <div class="title">Preencha as informações para agendamento:</div>
+                    <ons-list>
+                        <form action="<?= $this->url('application_mobile', ["action" => "save-appoint"]) ?>"
+                              method="post" enctype="multipart/form-data" id="form-appoint">
+                            <ons-list-header>Data desejada:</ons-list-header>
+                            <ons-list-item class="input-items">
+                                <div>
+                                    <input type="text" class="text-input" name="fDataReq" id="req-date" readonly>
+                                </div>
+                            </ons-list-item>
+                            <ons-list-header>Procedimento desejado:</ons-list-header>
+                            <ons-list-item class="input-items">
+                                <div>
+                                    <select class="select-input select-input--material" name="fProcdReq" id="req-procd">
+                                    </select>
+                                </div>
+                            </ons-list-item>
+                            <ons-list-header>Horário desejado:</ons-list-header>
+                            <ons-list-item class="input-items">
+                                <div>
+                                    <input type="time" class="text-input text-input--material" name="fHoraReq"
+                                           id="req-hour">
+                                </div>
+                            </ons-list-item>
+                            <div class="form-params" style="display: none">
+                                <input type="text" id="idProf" name="fIdProf">
+                            </div>
+                        </form>
+                    </ons-list>
+                </ons-card>
+            </ons-col>
+        </ons-row>
+        <ons-bottom-toolbar onclick="fn.sendAppointment()">
+            <ons-row>
+                <ons class="col"></ons>
+                <ons class="col" style="padding-top: 10px">FINALIZAR SOLICITAÇÃO</ons>
+                <ons class="col"></ons>
+            </ons-row>
+        </ons-bottom-toolbar>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                fn.procedureList();
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="userHistory.html">
+    <ons-page>
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Histórico</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-col>
+                <ons-card modifier="material">
+                    <div class="title">
+                        Registros existentes
+                    </div>
+                    <div class="content">
+                        <ons-row>
+                            <ons-col width="100%">
+                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="historyList">
+                                    <ons-lazy-repeat>
+
+                                    </ons-lazy-repeat>
+                                </ons-list>
+                            </ons-col>
+                        </ons-row>
+                    </div>
+                </ons-card>
+            </ons-col>
+        </ons-row>
     </ons-page>
 </template>

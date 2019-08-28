@@ -7,21 +7,21 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="sis_user_historic_type")
+ * @ORM\Table(name="sis_user_historic_information")
  */
-class UserHistoricType
+class UserHistoricInformation
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(name="id_type")
+     * @ORM\Column(name="id_reg")
      */
     protected $id;
 
     /**
-     * @ORM\Column(name="historic_type_description")
+     * @ORM\Column(name="historic_information")
      */
-    protected $historic_type_description;
+    protected $historic_information;
 
     /**
      * @ORM\Column(name="sis_user_historic_typecol")
@@ -49,15 +49,15 @@ class UserHistoricType
      */
     public function getHistoricTypeDescription()
     {
-        return $this->historic_type_description;
+        return $this->historic_information;
     }
 
     /**
-     * @param mixed $historic_type_description
+     * @param mixed $historic_information
      */
-    public function setHistoricTypeDescription($historic_type_description)
+    public function setHistoricTypeDescription($historic_information)
     {
-        $this->historic_type_description = $historic_type_description;
+        $this->historic_information = $historic_information;
     }
 
     /**

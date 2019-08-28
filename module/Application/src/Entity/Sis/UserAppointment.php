@@ -35,6 +35,12 @@ class UserAppointment
      * @ORM\Column(name="solicited_for")
      */
     protected $solicited_for;
+
+    /**
+     * @ORM\Column(name="confirmed_for")
+     */
+    protected $confirmed_for;
+
     /**
      * @ORM\Column(name="created_on")
      */
@@ -141,6 +147,19 @@ class UserAppointment
         $this->id_procedure = $id_procedure;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getConfirmedFor()
+    {
+        return $this->confirmed_for;
+    }
 
-
+    /**
+     * @param mixed $confirmed_for
+     */
+    public function setConfirmedFor($confirmed_for)
+    {
+        $this->confirmed_for = $confirmed_for;
+    }
 }

@@ -38,6 +38,18 @@ $(function () {
         });
     };
 
+    fn.procedureList = function (profid) {
+        $.get('/mobile/get-profissional-info', {proc: true, prof: $("#profid").val()}, function (response) {
+            $("#req-procd").empty();
+            $.each(response[0], function (key, value) {
+                $("#req-procd").append(
+                    '<option value="' + value.p_id_procedure + '">' + value.procedure_description + '</option>'
+                );
+            });
+
+        })
+    };
+
     fn.viewDetails = function (id) {
         let html;
         $.get('/mobile/get-profissional-info', {id_user: id}, function (data) {
@@ -46,28 +58,52 @@ $(function () {
             $('#mainNavigator')[0].pushPage('detailsPage.html').then(function () {
                 $('#fInformacoes').empty();
                 $('#fInformacoes').append(html);
-                let addr = $("#addr_text").text();
-                if(addr.match("/tv\./"))
-                $.get('https://nominatim.openstreetmap.org/search.php', {
-                    q: 'Travessa barão do triunfo 706',
-                    format: 'json'
-                }, function (response) {
-                    console.log(response);
-                    let map = L.map("mapid", {
-                        zoomControl: false,
-                        dragging: false
-                    }).setView([response[0].lat, response[0].lon], 15);
-                    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGFuaWVsYnJlbm9tIiwiYSI6ImNqenR2ZXc0bzA0b2szaG12NGlxenJnZHgifQ.rVgxkTv_r5dDyL0WHuKn4Q', {
-                        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                        maxZoom: 18,
-                        id: 'mapbox.streets',
-                        accessToken: 'pk.eyJ1IjoiZGFuaWVsYnJlbm9tIiwiYSI6ImNqenR2ZXc0bzA0b2szaG12NGlxenJnZHgifQ.rVgxkTv_r5dDyL0WHuKn4Q'
-                    }).addTo(map);
-                    let marker = L.marker([response[0].lat, response[0].lon]).addTo(map);
-                    let title =  response[0].display_name.split(',');
-                    marker.bindPopup("<b>"+title[1]+"</b>").openPopup();
-                });
+                let addr = fn.formattAddr($("#addr_text").text());
+                if (addr === "") {
+                    $.get('https://nominatim.openstreetmap.org/search.php', {
+                        q: addr,
+                        format: 'json'
+                    }, function (response) {
+                        console.log(response);
+                        let map = L.map("mapid", {
+                            zoomControl: false,
+                            dragging: false
+                        }).setView([response[0].lat, response[0].lon], 15);
+                        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGFuaWVsYnJlbm9tIiwiYSI6ImNqenR2ZXc0bzA0b2szaG12NGlxenJnZHgifQ.rVgxkTv_r5dDyL0WHuKn4Q', {
+                            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                            maxZoom: 18,
+                            id: 'mapbox.streets',
+                            accessToken: 'pk.eyJ1IjoiZGFuaWVsYnJlbm9tIiwiYSI6ImNqenR2ZXc0bzA0b2szaG12NGlxenJnZHgifQ.rVgxkTv_r5dDyL0WHuKn4Q'
+                        }).addTo(map);
+                        let marker = L.marker([response[0].lat, response[0].lon]).addTo(map);
+                        let title = response[0].display_name.split(',');
+                        marker.bindPopup("<b>" + title[1] + ", " + title[0] + "</b>").openPopup();
+                    });
+                }
             });
+        });
+    };
+
+    fn.viewHistory = function (type_id) {
+        $("#mainNavigator")[0].pushPage('userHistory.html').then(() => {
+            $.get('/mobile/get-user-historic', {type: type_id}, function (response) {
+                let list = $("#historyList>ons-lazy-repeat");
+                list.empty();
+                $.each(response, function (ket, value) {
+                    let dataShow = value.confirmed_for == null ? value.solicited_for : value.confirmed_for;
+                    dataShow = new Date(dataShow);
+                    let item = '<ons-list-item expandable>\n' +
+                        value.procedure_description + ' de ' + value.desc_especialidade +
+                        '  <div class="expandable-content">' +
+                        '<ul>' +
+                        '<li>Profissional: ' + value.prof_name + '</li>' +
+                        '<li>Solicitado para: ' + dataShow.toLocaleDateString() + ' às ' + dataShow.toLocaleTimeString() + '</li>' +
+                        '</ul>' +
+                        '</div>\n' +
+                        '</ons-list-item>';
+                    list.append(item);
+                })
+            })
         });
     };
 
@@ -233,5 +269,23 @@ $(function () {
 
     fn.formattDate = function (date) {
         return [(date.getDate()) + '/' + (date.getMonth() + 1) + '/' + date.getFullYear()].join('');
-    }
+    };
+
+    fn.formattAddr = function (addr) {
+        let string = "";
+        console.log(addr);
+        if (addr.match(/^tv\.?/i)) {
+            string = addr.replace(/^tv\.?/gi, "travessa")
+        }
+        if (addr.match(/^av\.?/i)) {
+            string = addr.replace(/^av\.?/gi, "avenida")
+        }
+        if (addr.match(/^r\.?/i)) {
+            string = addr.replace(/^r\.?/gi, "rua")
+        }
+        if (addr.match(/^rod\.?/i)) {
+            string = addr.replace(/^rod\.?/gi, "rodovia")
+        }
+        return string;
+    };
 });

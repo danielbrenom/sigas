@@ -6,15 +6,17 @@ namespace Application\Controller\Repository;
 
 use Application\Debug\UtilsFile;
 use Application\Entity\Seg\User;
+use Application\Entity\Sis\Procedures;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserHistoric;
-use Application\Entity\Sis\UserHistoricType;
+use Application\Entity\Sis\UserHistoricInformation;
 use Application\Entity\Sis\UserInfoPessoal;
 use Doctrine\ORM\EntityManager;
 use Exception;
 use Zend\Session\Container;
 use Zend\Session\SessionManager;
+use Application\Entity\Sis\ProfessionalProcedures;
 
 class MobileRepository
 {
@@ -43,9 +45,46 @@ class MobileRepository
             ->getQuery()->getResult($mode);
     }
 
-    public function getUserHistoric($user_id)
+    public function getUserHistoric($user_id, $type)
     {
 
+        try {
+            $results = [];
+            if ((int)$type === 1) {
+                $results = $this->entityManager->getRepository(UserHistoric::class)
+                    ->createQueryBuilder('h')
+                    ->select(['ap.solicited_for', 'ap.confirmed_for'])
+                    ->addSelect('proc.procedure_description')
+                    ->addSelect('ip.user_name as prof_name')
+                    ->addSelect('e.desc_especialidade')
+                    ->leftJoin(UserAppointment::class, 'ap',
+                        'WITH', 'h.id_appointment_entry = ap.id')
+                    ->leftJoin(Procedures::class, 'proc', 'WITH',
+                        'proc.id = ap.id_procedure')
+                    ->leftJoin(UserInfoPessoal::class, 'ip', 'WITH',
+                        'ip.id = ap.id_user_ps')
+                    ->leftJoin(UserEspeciality::class, 'e', 'WITH',
+                        'e.id = ap.id_especiality')
+                    ->where('h.historic_type = :sType and h.user_id = :sId')
+                    ->setParameter('sType', $type)
+                    ->setParameter('sId', $user_id)
+                    ->getQuery()->getResult(3);
+            }
+            if ((int)$type === 2) {
+                $results = $this->entityManager->getRepository(UserHistoric::class)
+                    ->createQueryBuilder('h')
+                    ->addSelect('ap')
+                    ->leftJoin(UserAppointment::class, 'ap',
+                        'WITH', 'h.id_appointment_entry = ap.id')
+                    ->where('h.historic_type = :sType and h.user_id = :sId')
+                    ->setParameter('sType', $type)
+                    ->setParameter('sId', $user_id)
+                    ->getQuery()->getResult(3);
+            }
+            return $results;
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
 
     public function updateUserInfo($info, $user_id)
@@ -91,7 +130,18 @@ class MobileRepository
 
     public function getAppointmentDescription($appoint_id)
     {
-        return $this->entityManager->getRepository(UserHistoricType::class)->find($appoint_id)->getHistoricTypeDescription();
+        return $this->entityManager->getRepository(Procedures::class)->find($appoint_id)->getProcedureDescription();
+    }
+
+    public function getProceduresProfessional($id_prof)
+    {
+        return $this->entityManager->getRepository(ProfessionalProcedures::class)
+            ->createQueryBuilder('p')
+            ->addSelect('pd.procedure_description')
+            ->leftJoin(Procedures::class, 'pd', 'WITH', 'p.id_procedure = pd.id')
+            ->where('p.id_professional = :sId')
+            ->setParameter('sId', $id_prof)
+            ->getQuery()->getResult(3);
     }
 
     public function getEspecialidade()
@@ -144,16 +194,17 @@ class MobileRepository
             $this->entityManager->flush();
             $userHistoric = new UserHistoric();
             $userHistoric->setUserId($this->entityManager->getRepository(User::class)->find($params['user_req']));
-            $userHistoric->setIdTypeRegistry(1);
+            $userHistoric->setHistoricType($params['proc']);
+            $userHistoric->setIdReginformation(null);
             $userHistoric->setIdAppointmentEntry($userAppoint);
             $this->entityManager->persist($userHistoric);
             $this->entityManager->flush();
             $this->entityManager->commit();
             return true;
         } catch (Exception $e) {
+            //UtilsFile::printvardie($e->getMessage());
             $this->entityManager->rollback();
             return false;
-            //UtilsFile::printvardie($e->getMessage());
         }
     }
 

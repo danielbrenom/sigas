@@ -25,9 +25,14 @@ class UserHistoric
     protected $user_id;
 
     /**
-     * @ORM\Column(name="id_type_registry")
+     * @ORM\Column(name="historic_type")
      */
-    protected $id_type_registry;
+    protected $historic_type;
+
+    /**
+     * @ORM\Column(name="id_reg_informations")
+     */
+    protected $id_reg_informations;
 
     /**
      * @ORM\OneToOne(targetEntity="UserAppointment", inversedBy="id")
@@ -70,17 +75,17 @@ class UserHistoric
     /**
      * @return mixed
      */
-    public function getIdTypeRegistry()
+    public function getIdReginformation()
     {
-        return $this->id_type_registry;
+        return $this->id_reg_informations;
     }
 
     /**
-     * @param mixed $id_type_registry
+     * @param mixed $id_reg_informations
      */
-    public function setIdTypeRegistry($id_type_registry)
+    public function setIdReginformation($id_reg_informations)
     {
-        $this->id_type_registry = $id_type_registry;
+        $this->id_reg_informations = $id_reg_informations;
     }
 
     /**
@@ -97,6 +102,38 @@ class UserHistoric
     public function setIdAppointmentEntry($id_appointment_entry)
     {
         $this->id_appointment_entry = $id_appointment_entry;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHistoricType()
+    {
+        return $this->historic_type;
+    }
+
+    /**
+     * @param mixed $historic_type
+     */
+    public function setHistoricType($historic_type)
+    {
+        $this->historic_type = $historic_type;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIdRegInformations()
+    {
+        return $this->id_reg_informations;
+    }
+
+    /**
+     * @param mixed $id_reg_informations
+     */
+    public function setIdRegInformations($id_reg_informations)
+    {
+        $this->id_reg_informations = $id_reg_informations;
     }
 
 

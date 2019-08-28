@@ -15,7 +15,7 @@ use Application\Entity\Seg\User;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserHistoric;
-use Application\Entity\Sis\UserHistoricType;
+use Application\Entity\Sis\UserHistoricInformation;
 use Application\Entity\Sis\UserInfoPessoal;
 use Authentication\Service\AuthenticationManager;
 use DateInterval;
@@ -51,15 +51,23 @@ class MobileController extends AbstractActionController
     public function homeAction()
     {
         return new ViewModel([
-            "userstate" => $this->authManager->userState()
+            'userstate' => $this->authManager->userState()
         ]);
     }
 
     public function getProfissionalInfoAction()
     {
         $params = $this->params()->fromQuery();
+        if (isset($params['proc'])) {
+            $procedures = $this->mobileManager->getProceduresProfessional($params['prof']);
+            return new JsonModel([
+                $procedures
+            ]);
+        }
+        $infos = $this->mobileManager->getProfissionalInfo($params['id_user']);
+        $infos[0]['procedures'] = $this->mobileManager->getProceduresProfessional($params['id_user']);
         $view = new ViewModel([
-            "prof" => $this->mobileManager->getProfissionalInfo($params['id_user'])
+            'prof' => $infos
         ]);
         $view->setTerminal(true);
         return $view;
@@ -69,7 +77,7 @@ class MobileController extends AbstractActionController
     {
         $params = $this->getRequest()->getQuery()->toArray();
         $view = new ViewModel([
-            "profissionais" => $this->mobileManager->getProfissinais($params['esp'])
+            'profissionais' => $this->mobileManager->getProfissinais($params['esp'])
         ]);
         $view->setTerminal(true);
         return $view;
@@ -92,13 +100,13 @@ class MobileController extends AbstractActionController
             foreach ($resultados as $appointment) {
                 $data = new DateTime($appointment['solicited_for'], new DateTimeZone("America/Belem"));
                 $resp[] = [
-                    "title" => $this->mobileManager->getAppointmentDescription($appointment['id_procedure']),
-                    "start" => $data->format("Y-m-d") . 'T' . $data->format("H:i:s") . '-03:00',
-                    "end" => $data->format("Y-m-d") . 'T' . $data->format("H:i:s") . '-03:00'
+                    'title' => $this->mobileManager->getAppointmentDescription($appointment['id_procedure']),
+                    'start' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
+                    'end' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00'
                 ];
             }
         } catch (Exception $e) {
-            $resp = $e->getMessage();
+            $resp = ['erro' => $e->getMessage()];
         }
         return new JsonModel(
             $resp
@@ -108,7 +116,11 @@ class MobileController extends AbstractActionController
     public function getUserHistoricAction()
     {
         $params = $this->params()->fromQuery();
-        $this->mobileManager->getUserHistoric($this->authManager->getActiveUser()['user_id']);
+        $results = $this->mobileManager->getUserHistoric($this->authManager->getActiveUser()['user_id'], $params['type']);
+        if (!count($results)) {
+            $results = [];
+        }
+        return new JsonModel($results);
     }
 
     public function loginFormAction()
@@ -176,7 +188,7 @@ class MobileController extends AbstractActionController
     public function getLogMessagesAction()
     {
         return new JsonModel([
-            "error" => $this->mobileManager->getMessage()
+            'error' => $this->mobileManager->getMessage()
         ]);
     }
 }
