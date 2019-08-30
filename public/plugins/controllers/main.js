@@ -89,20 +89,27 @@ $(function () {
             $.get('/mobile/get-user-historic', {type: type_id}, function (response) {
                 let list = $("#historyList>ons-lazy-repeat");
                 list.empty();
-                $.each(response, function (ket, value) {
-                    let dataShow = value.confirmed_for == null ? value.solicited_for : value.confirmed_for;
-                    dataShow = new Date(dataShow);
-                    let item = '<ons-list-item expandable>\n' +
-                        value.procedure_description + ' de ' + value.desc_especialidade +
-                        '  <div class="expandable-content">' +
-                        '<ul>' +
-                        '<li>Profissional: ' + value.prof_name + '</li>' +
-                        '<li>Solicitado para: ' + dataShow.toLocaleDateString() + ' às ' + dataShow.toLocaleTimeString() + '</li>' +
-                        '</ul>' +
-                        '</div>\n' +
+                if (response.length === 0) {
+                    let item = '<ons-list-item>' +
+                        'Não foram encontrados registros para este usuário' +
                         '</ons-list-item>';
                     list.append(item);
-                })
+                } else {
+                    $.each(response, function (ket, value) {
+                        let dataShow = value.confirmed_for == null ? value.solicited_for : value.confirmed_for;
+                        dataShow = new Date(dataShow);
+                        let item = '<ons-list-item expandable>\n' +
+                            value.procedure_description + ' de ' + value.desc_especialidade +
+                            '  <div class="expandable-content">' +
+                            '<ul>' +
+                            '<li>Profissional: ' + value.prof_name + '</li>' +
+                            '<li>Solicitado para: ' + dataShow.toLocaleDateString() + ' às ' + dataShow.toLocaleTimeString() + '</li>' +
+                            '</ul>' +
+                            '</div>\n' +
+                            '</ons-list-item>';
+                        list.append(item);
+                    })
+                }
             })
         });
     };
