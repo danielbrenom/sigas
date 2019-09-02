@@ -4,6 +4,7 @@
 namespace Authentication\Service;
 
 use Application\Debug\UtilsFile;
+use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserInfoPessoal;
 use Authentication\Entity\Seg\User;
@@ -97,5 +98,65 @@ class UserManager
         }
 
         throw new \Exception("Este email já foi utilizado", -1);
+    }
+
+    /**
+     * Criação de um usuário de profissional
+     * Cria um usuário comum e salva a solicitação de perfil de profissional
+     * @param array $data
+     * @return bool
+     */
+    public function createProfessional($data)
+    {
+        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($data['fEmail']);
+        try {
+            if ($user === null) {
+                $this->entityManager->beginTransaction();
+                $timeSolicited = date('Y-m-d H:i:s');
+                //Informações do usuário
+                $newUser = new User();
+                $newUser->setEmail($data['fEmail']);
+                $bcrypt = new Bcrypt();
+                $newUser->setUserPassword($bcrypt->create($data['fPass']));
+                $newUser->setCreationDate($timeSolicited);
+                $newUser->setIdUserType(2);
+                $this->entityManager->persist($newUser);
+                $this->entityManager->flush();
+                $lastId = $newUser->getIdUser();
+                /**
+                 * Informações pessoais
+                 * @var UserEspeciality $userEspec
+                 */
+                $userEspec = $this->entityManager->getRepository(UserEspeciality::class)->find(1);
+                $userPersonalInfo = new UserInfoPessoal();
+                $userPersonalInfo->setId($lastId);
+                $userPersonalInfo->setUserEmail($data['fEmail']);
+                $userPersonalInfo->setUserName($data['fName']);
+                $userPersonalInfo->setUserEspeciality($userEspec);
+                $userPersonalInfo->setUserCpf("");
+                $userPersonalInfo->setUserRg("");
+                $userPersonalInfo->setUserAddr("");
+                $this->entityManager->persist($userPersonalInfo);
+                $this->entityManager->flush();
+                //Inserir solicitação nas tabela de info de profissional
+                $profInfo = new ProfessionalInfo();
+                $profInfo->setIdUser($lastId);
+                $profInfo->setEspecialitySolicited($data['fEspeciality']);
+                $profInfo->setConsName($data['fCons']);
+                $profInfo->setConsRegistry($data['fNumCons']);
+                $profInfo->setSolicitedIn($timeSolicited);
+                $this->entityManager->persist($profInfo);
+                $this->entityManager->flush();
+                $this->entityManager->commit();
+                return true;
+            }
+        } catch (OptimisticLockException $e) {
+            $this->entityManager->rollback();
+            throw new \Exception($e->getMessage());
+        } catch (ORMException $e) {
+            $this->entityManager->rollback();
+            throw new \Exception($e->getMessage());
+        }
+        return false;
     }
 }

@@ -127,4 +127,33 @@ class AuthenticationController extends AbstractActionController
         }
         return $this->getResponse();
     }
+
+    public function singupProfAction()
+    {
+        try {
+            if ($this->getRequest()->isPost()) {
+                $emailValidator = new EmailAddress([
+                    "allow" => Hostname::ALLOW_DNS | Hostname::ALLOW_IP | Hostname::ALLOW_LOCAL,
+                    "mxCheck" => true,
+                    'deepMxCheck' => true
+                ]);
+                $data = $this->params()->fromPost();
+                //UtilsFile::printvardie($data);
+                if (!$emailValidator->isValid($data['fEmail'])) {
+                    throw new Exception('Email inválido');
+                }
+                if ($this->userManager->createProfessional($data))
+                    $this->mobileRepository->setMessage("Solicitação enviada com sucesso. \n Seu usuário foi criado, assim que for confirmado seu perfil de profissional será ativado.", 1);
+                else
+                    $this->mobileRepository->setMessage("Não foi possível criar seu usuário. \n Tente novamente mais tarde", 0);
+                $this->redirect()->toRoute('home');
+            } else {
+                $this->redirect()->toRoute('home');
+            }
+        } catch (Exception $e) {
+            $this->mobileRepository->setMessage($e->getMessage(), $e->getCode());
+            $this->redirect()->toRoute('home');
+        }
+        return $this->getResponse();
+    }
 }

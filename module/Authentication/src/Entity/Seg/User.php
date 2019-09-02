@@ -20,6 +20,11 @@ class User
     protected $id_user;
 
     /**
+     * @ORM\Column(name="id_user_type")
+     */
+    protected $id_user_type;
+
+    /**
      * @ORM\Column(name="user_login")
      */
     protected $email;
@@ -139,4 +144,22 @@ class User
     {
         $this->pwd_reset_creation_date = $pwd_reset_creation_date;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getIdUserType()
+    {
+        return $this->id_user_type;
+    }
+
+    /**
+     * @param mixed $id_user_type
+     */
+    public function setIdUserType($id_user_type)
+    {
+        $this->id_user_type = $id_user_type;
+    }
+
+
 }

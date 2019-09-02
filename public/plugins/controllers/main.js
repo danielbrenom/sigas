@@ -235,8 +235,12 @@ $(function () {
         content.load(page).then(menu.close.bind(menu));
     };
 
-    fn.singupForm = function () {
-        $('#mainNavigator')[0].pushPage('singupForm.html');
+    fn.singupForm = function (type) {
+        if(type == 1) {
+            $('#mainNavigator')[0].pushPage('singupForm.html');
+        }else{
+            $('#mainNavigator')[0].pushPage('singupProfForm.html');
+        }
     };
 
     fn.profileHandler = function (page) {

@@ -62,6 +62,16 @@ return [
                             ],
                         ],
                     ],
+                    'singup-prof' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/singup-prof',
+                            'defaults' => [
+                                'controller' => Controller\AuthenticationController::class,
+                                'action' => 'singup-prof'
+                            ]
+                        ]
+                    ]
                 ]
         ],
     'doctrine' => [

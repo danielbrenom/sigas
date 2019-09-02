@@ -147,6 +147,104 @@
     </ons-page>
 </template>
 
+<template id="singupProfForm.html">
+    <ons-page id="singup">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Login</ons-back-button>
+            </div>
+            <div class="center">
+                Cadastro de Profissional
+            </div>
+        </ons-toolbar>
+        <ons-card>
+            <form action="<?= $this->url('singup-prof') ?>" method="post" enctype="multipart/form-data">
+                <ons-row>
+                    <ons-col width="100%">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-user" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fName"
+                                       placeholder="Nome completo" type="text"
+                                       float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="md-email" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="username" name="fEmail"
+                                       placeholder="Email" type="email"
+                                       float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="password" modifier="material" name="fPass" type="password"
+                                       placeholder="Senha" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-user-md" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-select style="width: 100%" id="info_user_healthcare" modifier="material" name="fCons"
+                                        class="select"
+                                        float>
+                                <select class="select-input">
+                                    <option value="">Selecione seu conselho</option>
+                                    <option value="1">Conselho de Medicina</option>
+                                    <option value="2">Conselho de Odontologia</option>
+                                    <option value="3">Conselho de Fisioterapia</option>
+                                    <option value="4">Conselho de Fisioterapia</option>
+                                </select>
+                            </ons-select>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-map-marker" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-select style="width: 100%" id="info_user_healthcare" modifier="material" name="fConsRegion"
+                                        class="select"
+                                        float>
+                                <select class="select-input">
+                                    <option value="">Selecione seu estado</option>
+                                    <option value="1">AP</option>
+                                    <option value="2">PA</option>
+                                </select>
+                            </ons-select>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="num_reg" modifier="material" name="fNumCons" type="text"
+                                       placeholder="Número de registro" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-plus-square" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="espec" modifier="material" name="fEspeciality" type="text"
+                                       placeholder="Especialidade" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <button type="submit" class="button">Efetuar solicitação</button>
+                            </div>
+                        </ons-list-item>
+                    </ons-col>
+                </ons-row>
+            </form>
+        </ons-card>
+        <style>
+            .list-item__center, .list-item__right {
+                background-image: none;
+            }
+        </style>
+    </ons-page>
+</template>
+
 <template id="editInfoForm.html">
     <ons-page id="editInfoForm">
         <ons-toolbar modifier="noshadow">
