@@ -1,6 +1,6 @@
 $(function () {
     if (ons.isReady()) {
-        $.get('/mobile/get-log-messages', {}, function (response) {
+        $.get('/mobile/user/get-log-messages', {}, function (response) {
             if (response.error) {
                 let titleT = "", icontype = "";
                 switch (response.error.code) {
@@ -31,7 +31,7 @@ $(function () {
     fn = {};
 
     fn.especialidadeList = function () {
-        $.get("/mobile/get-especialidades", {}, function (data) {
+        $.get("/mobile/user/get-especialidades", {}, function (data) {
             $.each(data[0], function (key, value) {
                 $("#fSelectEsp ons-lazy-repeat").append('<ons-list-item modifier="chevron longdivider" onclick="fn.selectP(' + value.id + ')" tappable>' + value.desc_especialidade + '</ons-list-item>');
             });
@@ -39,7 +39,7 @@ $(function () {
     };
 
     fn.procedureList = function (profid) {
-        $.get('/mobile/get-profissional-info', {proc: true, prof: $("#profid").val()}, function (response) {
+        $.get('/mobile/user/get-profissional-info', {proc: true, prof: $("#profid").val()}, function (response) {
             $("#req-procd").empty();
             $.each(response[0], function (key, value) {
                 $("#req-procd").append(
@@ -52,7 +52,7 @@ $(function () {
 
     fn.viewDetails = function (id) {
         let html;
-        $.get('/mobile/get-profissional-info', {id_user: id}, function (data) {
+        $.get('/mobile/user/get-profissional-info', {id_user: id}, function (data) {
             html = data;
         }).then(function () {
             $('#mainNavigator')[0].pushPage('detailsPage.html').then(function () {
@@ -86,7 +86,7 @@ $(function () {
 
     fn.viewHistory = function (type_id) {
         $("#mainNavigator")[0].pushPage('userHistory.html').then(() => {
-            $.get('/mobile/get-user-historic', {type: type_id}, function (response) {
+            $.get('/mobile/user/get-user-historic', {type: type_id}, function (response) {
                 let list = $("#historyList>ons-lazy-repeat");
                 list.empty();
                 if (response.length === 0) {
@@ -115,104 +115,86 @@ $(function () {
     };
 
     fn.checkDates = function (id) {
-        let state;
-        $.get('/user-state', {}, function (response) {
-            state = response.state;
-        }).then(function () {
-            if (state) {
-                $("#mainNavigator")[0].pushPage('checkDatePage.html').then(function () {
-                    let formatter = new Intl.DateTimeFormat('pt-BR');
-                    try {
-                        let calendar = new FullCalendar.Calendar($("#callendarArea")[0], {
-                            plugins: ['moment', 'dayGrid', 'timeGrid', 'bootstrap', 'interaction', 'momentTimezone'],
-                            locale: 'pt-BR',
-                            themeSystem: "bootstrap",
-                            header: {
-                                left: 'prev,next',
-                                center: 'title',
-                                right: 'dayGridMonth',
-                            },
-                            buttonText: {
-                                month: 'mês'
-                            },
-                            allDaySlot: false,
-                            slotEventOverlap: false,
-                            height: 600,
-                            contentHeight: 550,
-                            displayEventTime: false,
-                            dateClick: function (info) {
-                                if (info.view.type === 'dayGridMonth') {
-                                    calendar.changeView('oneGridDay');
-                                    calendar.gotoDate(info.date);
-                                } else if (info.view.type === 'oneGridDay') {
-                                    swal({
-                                        title: "Confirmação",
-                                        text: 'Continuar escolha para data ' + info.date.toLocaleDateString() + '?',
-                                        buttons: {
-                                            no: {
-                                                text: "Não",
-                                                value: false
-                                            },
-                                            yes: {
-                                                text: "Sim",
-                                                value: true,
-                                                className: 'btn-success'
-                                            }
-                                        }
-                                    }).then(r => {
-                                        if (r) {
-                                            fn.finishAppointment(info);
-                                        }
-                                    })
-                                }
-                            },
-                            views: {
-                                oneGridDay: {
-                                    type: 'timeGridDay',
-                                    duration: {days: 1},
-                                    buttonText: 'Day',
-                                    minTime: "08:00:00",
-                                    maxTime: "19:00:00"
-                                }
-                            },
-                            timeZone: "local",
-                            eventSources: [
-                                {
-                                    url: '/mobile/get-schedule',
-                                    method: 'GET',
-                                    extraParams: {
-                                        id_professional: id
+        $("#mainNavigator")[0].pushPage('checkDatePage.html').then(function () {
+            let formatter = new Intl.DateTimeFormat('pt-BR');
+            try {
+                let calendar = new FullCalendar.Calendar($("#callendarArea")[0], {
+                    plugins: ['moment', 'dayGrid', 'timeGrid', 'bootstrap', 'interaction', 'momentTimezone'],
+                    locale: 'pt-BR',
+                    themeSystem: "bootstrap",
+                    header: {
+                        left: 'prev,next',
+                        center: 'title',
+                        right: 'dayGridMonth',
+                    },
+                    buttonText: {
+                        month: 'mês'
+                    },
+                    allDaySlot: false,
+                    slotEventOverlap: false,
+                    height: 600,
+                    contentHeight: 550,
+                    displayEventTime: false,
+                    dateClick: function (info) {
+                        if (info.view.type === 'dayGridMonth') {
+                            calendar.changeView('oneGridDay');
+                            calendar.gotoDate(info.date);
+                        } else if (info.view.type === 'oneGridDay') {
+                            swal({
+                                title: "Confirmação",
+                                text: 'Continuar escolha para data ' + info.date.toLocaleDateString() + '?',
+                                buttons: {
+                                    no: {
+                                        text: "Não",
+                                        value: false
                                     },
-                                    failure: function (e) {
-                                        console.log("erro" + e.toString());
+                                    yes: {
+                                        text: "Sim",
+                                        value: true,
+                                        className: 'btn-success'
                                     }
                                 }
-                            ]
-                        });
-                        calendar.render();
-                    } catch (e) {
-                        console.log(e.message);
-                        console.log(e.stack)
-                    }
+                            }).then(r => {
+                                if (r) {
+                                    fn.finishAppointment(info);
+                                }
+                            })
+                        }
+                    },
+                    views: {
+                        oneGridDay: {
+                            type: 'timeGridDay',
+                            duration: {days: 1},
+                            buttonText: 'Day',
+                            minTime: "08:00:00",
+                            maxTime: "19:00:00"
+                        }
+                    },
+                    timeZone: "local",
+                    eventSources: [
+                        {
+                            url: '/mobile/user/get-schedule',
+                            method: 'GET',
+                            extraParams: {
+                                id_professional: id
+                            },
+                            failure: function (e) {
+                                console.log("erro" + e.toString());
+                            }
+                        }
+                    ]
                 });
-            } else {
-                swal({
-                    title: "Atenção",
-                    text: "Você deve estar logado para solicitar um procedimento.",
-                    icon: "warning",
-                    buttons: false,
-                    timer: 4000
-                }).then(() => {
-                    $('#mainNavigator')[0].resetToPage('mainPage.html')
-                })
+                calendar.render();
+            } catch (e) {
+                console.log(e.message);
+                console.log(e.stack)
             }
-        })
-
+        });
     };
 
     fn.selectP = function (id) {
         let html;
-        $.get("/mobile/get-profissionais", {esp: id}, function (data) {
+        $.get("/mobile/user/get-profissionais", {esp: id}, function (data) {
             html = data;
             // if ($("#Tab1 .page__content #prof_found").length)
             //     $("#Tab1 .page__content #prof_found").remove();
@@ -241,25 +223,6 @@ $(function () {
         }else{
             $('#mainNavigator')[0].pushPage('singupProfForm.html');
         }
-    };
-
-    fn.profileHandler = function (page) {
-        let html;
-        $.get('/user-state', {}, function (data) {
-            if (data.state) {
-                $.get('/mobile/user-profile', {}, function (response) {
-                    html = response;
-                }).then(function () {
-                    page.find('#form-area').empty().append(html);
-                })
-            } else {
-                $.get('/mobile/login-form', {}, function (response) {
-                    html = response;
-                }).then(function () {
-                    page.find('#form-area').empty().append(html);
-                })
-            }
-        })
     };
 
     fn.editInfo = function () {

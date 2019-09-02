@@ -26,7 +26,7 @@
     <!-- Scripts -->
     <?= $this->headScript()
         ->prependFile('https://unpkg.com/leaflet@1.5.1/dist/leaflet.js', 'text/javascript' ,['integrity' => 'sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==', 'crossorigin' => ''])
-        ->prependFile($this->basePath('plugins/controllers/main.js'))
+        //->prependFile($this->basePath('plugins/controllers/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/bootstrap/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/interaction/main.js'))
         ->prependFile($this->basePath('plugins/fullcallendar/moment-timezone/main.js'))

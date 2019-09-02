@@ -1,0 +1,295 @@
+<ons-navigator swipeable id="mainNavigator" page="mainPage.html"></ons-navigator>
+
+<template id="mainPage.html">
+    <ons-page id="mainPage">
+        <ons-toolbar>
+            <div class="center">SIGAS</div>
+        </ons-toolbar>
+        <ons-tabbar swipeable position="bottom" id="mainTabbar">
+            <ons-tab page="tab1.html" label="Inicio" icon="fa-medkit" active>
+            </ons-tab>
+            <ons-tab page="tab3.html" label="Login" icon="fa-user-circle">
+            </ons-tab>
+        </ons-tabbar>
+    </ons-page>
+</template>
+
+<template id="tab1.html">
+    <ons-page id="Tab1">
+        <ons-row>
+            <ons-col style="padding: 0 10px">
+                <ons-card modifier="material">
+                    <div class="title">
+                        <h2 class="card__title" style="text-align: center;">Qual especialidade você procura?</h2>
+                    </div>
+                    <div class="content">
+                        <ons-row>
+                            <ons-col width="100%">
+                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fSelectEsp">
+                                    <ons-lazy-repeat>
+                                    </ons-lazy-repeat>
+                                </ons-list>
+                            </ons-col>
+                        </ons-row>
+                    </div>
+                </ons-card>
+            </ons-col>
+        </ons-row>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                fn.especialidadeList();
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="tab3.html">
+    <ons-page id="Tab3">
+        <div id="form-area">
+            <form action="<?= $this->url('login') ?>" method="post" enctype="multipart/form-data">
+                <ons-card modifier="material">
+                    <div class="title">
+                        <h2 class="card__title" style="text-align: center;">Entre no SIGAS para ter acesso a todas as
+                            funções</h2>
+                    </div>
+                    <div class="content">
+                        <ons-row>
+                            <ons-col width="100%">
+                                <div style="text-align: center; margin-top: 30px;">
+                                    <ons-if plataform="ios other">
+                                        <p>
+                                            <ons-input style="width: 80%" modifier="material" id="username"
+                                                       name="fEmail"
+                                                       placeholder="Email"
+                                                       float required></ons-input>
+                                        </p>
+                                        <p>
+                                            <ons-input style="width: 80%" id="password" modifier="material" name="fPass"
+                                                       type="password"
+                                                       placeholder="Senha" float required></ons-input>
+                                        </p>
+                                    </ons-if>
+
+                                    <label class="checkbox checkbox--material" hidden>
+                                        <input type="checkbox" class="checkbox__input checkbox--material__input"
+                                               name="fRem">
+                                        <div class="checkbox__checkmark checkbox--material__checkmark"></div>
+                                        Lembrar de min
+                                    </label>
+                                    <p style="margin-top: 30px;">
+                                        <button type="submit" class="button">Login</button>
+                                    </p>
+                                </div>
+                            </ons-col>
+                        </ons-row>
+                        <ons-row>
+                            <ons-col width="100%">
+                                <div style="text-align: center">
+                                    <p>Ainda não possui cadastro?</p>
+                                    <ons-button onclick="fn.singupForm(1)">Cadastre-se aqui!</ons-button>
+                                </div>
+                            </ons-col>
+                        </ons-row>
+                        <ons-row>
+                            <ons-col width="100%">
+                                <div style="text-align: center; margin-top: 30px">
+                                    <p>Profissional da Saúde?</p>
+                                    <ons-button onclick="fn.singupForm(2)">Solicite seu cadastro aqui!</ons-button>
+                                </div>
+                            </ons-col>
+                        </ons-row>
+                    </div>
+                </ons-card>
+
+            </form>
+        </div>
+    </ons-page>
+</template>
+
+<template id="singupForm.html">
+    <ons-page id="singup">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Login</ons-back-button>
+            </div>
+            <div class="center">
+                Cadastro
+            </div>
+        </ons-toolbar>
+        <ons-card>
+            <form action="<?= $this->url('singup') ?>" method="post" enctype="multipart/form-data">
+                <ons-row>
+                    <ons-col width="100%">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="md-email" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 80%" modifier="material" id="username" name="fEmail"
+                                       placeholder="Email" type="email"
+                                       float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 80%" id="password" modifier="material" name="fPass" type="password"
+                                       placeholder="Senha" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <button type="submit" class="button">Cadastrar</button>
+                            </div>
+                        </ons-list-item>
+                    </ons-col>
+                </ons-row>
+            </form>
+        </ons-card>
+        <style>
+            .list-item__center, .list-item__right {
+                background-image: none;
+            }
+        </style>
+    </ons-page>
+</template>
+
+<template id="singupProfForm.html">
+    <ons-page id="singup">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Login</ons-back-button>
+            </div>
+            <div class="center">
+                Cadastro de Profissional
+            </div>
+        </ons-toolbar>
+        <ons-card>
+            <form action="<?= $this->url('singup-prof') ?>" method="post" enctype="multipart/form-data">
+                <ons-row>
+                    <ons-col width="100%">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-user" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fName"
+                                       placeholder="Nome completo" type="text"
+                                       float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="md-email" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="username" name="fEmail"
+                                       placeholder="Email" type="email"
+                                       float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="password" modifier="material" name="fPass"
+                                       type="password"
+                                       placeholder="Senha" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-user-md" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-select style="width: 100%" id="info_user_healthcare" modifier="material" name="fCons"
+                                        class="select"
+                                        float>
+                                <select class="select-input">
+                                    <option value="">Selecione seu conselho</option>
+                                    <option value="1">Conselho de Medicina</option>
+                                    <option value="2">Conselho de Odontologia</option>
+                                    <option value="3">Conselho de Fisioterapia</option>
+                                    <option value="4">Conselho de Fisioterapia</option>
+                                </select>
+                            </ons-select>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-map-marker" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-select style="width: 100%" id="info_user_healthcare" modifier="material"
+                                        name="fConsRegion"
+                                        class="select"
+                                        float>
+                                <select class="select-input">
+                                    <option value="">Selecione seu estado</option>
+                                    <option value="1">AP</option>
+                                    <option value="2">PA</option>
+                                </select>
+                            </ons-select>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="num_reg" modifier="material" name="fNumCons" type="text"
+                                       placeholder="Número de registro" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-plus-square" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="espec" modifier="material" name="fEspeciality"
+                                       type="text"
+                                       placeholder="Especialidade" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <button type="submit" class="button">Efetuar solicitação</button>
+                            </div>
+                        </ons-list-item>
+                    </ons-col>
+                </ons-row>
+            </form>
+        </ons-card>
+        <style>
+            .list-item__center, .list-item__right {
+                background-image: none;
+            }
+        </style>
+    </ons-page>
+</template>
+
+<template id="professionalsPage.html">
+    <ons-page id="professionalsPage">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Busca</ons-back-button>
+            </div>
+            <div class="center">Resultados</div>
+        </ons-toolbar>
+        <ons-row id="fResultados">
+        </ons-row>
+    </ons-page>
+</template>
+
+<template id="detailsPage.html">
+    <ons-page id="detailsPage">
+        <ons-toolbar modifier="noshadow" style="background-color: aliceblue !important;">
+            <div class="left">
+                <ons-back-button>Busca</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row id="fInformacoes">
+        </ons-row>
+        <ons-bottom-toolbar onclick="fn.checkDates($('#profid').val())">
+            <ons-row>
+                <ons class="col"></ons>
+                <ons class="col" style="padding-top: 10px">SOLICITAR PROCEDIMENTO</ons>
+                <ons class="col"></ons>
+
+            </ons-row>
+        </ons-bottom-toolbar>
+        <script>
+            ons.getScriptPage().onInit = function () {
+
+            }
+        </script>
+    </ons-page>
+</template>
+
+<?= $this->headScript()->appendFile($this->basePath('plugins/controllers/front-controller.js')) ?>

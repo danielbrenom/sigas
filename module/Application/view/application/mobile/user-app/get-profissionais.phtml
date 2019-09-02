@@ -1,0 +1,35 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: 400005
+ * Date: 11/03/2019
+ * Time: 12:02
+ */ ?>
+<ons-row id="prof_found">
+    <ons-col style="padding: 0 10px">
+        <ons-card modifier="material">
+            <!--            <div class="title">-->
+            <!--                <h2 class="card__title" style="text-align: center;"></h2>-->
+            <!--            </div>-->
+            <div class="content">
+                <ons-row>
+                    <ons-list style="width: 100%" modifier="inset">
+                        <ons-lazy-repeat>
+                            <?php foreach ($this->profissionais as $p): ?>
+                                <ons-list-item modifier="chevron longdivider" onclick="fn.viewDetails(<?= $p['id'] ?>)"
+                                               tappable>
+                                    <?= $p['user_information']['user_name'] ?>
+                                </ons-list-item>
+                            <?php endforeach; ?>
+                            <?php if (!count($this->profissionais)): ?>
+                                <ons-list-item modifier="longdivider">
+                                    Não foram encontrados profissionais da especialidade desejada.
+                                </ons-list-item>
+                            <?php endif; ?>
+                        </ons-lazy-repeat>
+                    </ons-list>
+                </ons-row>
+            </div>
+        </ons-card>
+    </ons-col>
+</ons-row>

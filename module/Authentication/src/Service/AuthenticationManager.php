@@ -52,7 +52,7 @@ class AuthenticationManager
         $authAdapter->setPassword($password);
         $result = $this->authService->authenticate();
         if ($result->isValid()) {
-            $user = $this->authService->getAdapter()->getUserIdentity();
+            $user = $authAdapter->getUserIdentity();
             $this->authService->getStorage()->write($user);
         }
         return $result;

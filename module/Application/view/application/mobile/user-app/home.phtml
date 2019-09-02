@@ -6,19 +6,12 @@
             <div class="center">SIGAS</div>
         </ons-toolbar>
         <ons-tabbar swipeable position="bottom" id="mainTabbar">
-            <?php if ($this->userstate): ?>
-                <ons-tab page="tab1.html" label="Inicio" icon="fa-medkit" active>
-                </ons-tab>
-                <ons-tab page="tab2.html" label="Histórico" icon="fa-history">
-                </ons-tab>
-                <ons-tab page="tab3.html" label="Perfil" icon="fa-user-circle">
-                </ons-tab>
-            <?php else: ?>
-                <ons-tab page="tab1.html" label="Inicio" icon="fa-medkit" active>
-                </ons-tab>
-                <ons-tab page="tab3.html" label="Login" icon="fa-user-circle">
-                </ons-tab>
-            <?php endif; ?>
+            <ons-tab page="tab1.html" label="Inicio" icon="fa-medkit" active>
+            </ons-tab>
+            <ons-tab page="tab2.html" label="Histórico" icon="fa-history">
+            </ons-tab>
+            <ons-tab page="tab3.html" label="Perfil" icon="fa-user-circle">
+            </ons-tab>
         </ons-tabbar>
     </ons-page>
 </template>
@@ -92,154 +85,226 @@
 <template id="tab3.html">
     <ons-page id="Tab3">
         <div id="form-area">
+            <div class="content" style="width: 100%">
+                <div style="padding: 14px 6px 14px 16px; background-color: aliceblue !important;">
+                    <div class="profile_wrapper">
+                        <div class="profile_image_wrapper">
+                            <img src="assets/img/profile-image-08.png">
+                        </div>
+                        <div class="profile_info_wrapper">
+                            <div class="profile_info_numbers">
+                                <div>
+                                    <div><?= $this->user['user_information']['user_name'] === null ?
+                                            "Não informado" :
+                                            $this->user['user_information']['user_name'] ?></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="profile_info_wrapper">
+                            <div class="logoff">
+                                <a href="<?= $this->url('logout') ?>">
+                                    <ons-toolbar-button style="float: right; ">
+                                        <ons-icon icon="ion-log-out"></ons-icon>
+                                    </ons-toolbar-button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <ons-card>
+                    <div class="title">Dados Pessoais
+                        <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo()">
+                            <ons-icon icon="ion-edit"></ons-icon>
+                        </ons-toolbar-button>
+                    </div>
+
+                    <div class="content">
+                        <div class="profile_wrapper">
+                            <div class="profile_info_wrapper">
+                                <div class="profile_info_numbers">
+                                    <div>
+                                        <div class="profile_info_text">Nome</div>
+                                        <div><?= $this->user['user_information']['user_name'] === null ?
+                                                "Não informado" :
+                                                $this->user['user_information']['user_name'] ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">CPF</div>
+                                        <div><?= $this->user['user_information']['user_cpf'] ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">Endereço</div>
+                                        <div><?= $this->user['user_information']['user_addr'] ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">Plano de Saúde</div>
+                                        <div><?= $this->user['user_information']['user_healthcare'] ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">Números de contato</div>
+                                        <div>Telefone
+                                            Celular:<?= $this->user['user_information']['user_ctt_phone'] ?></div>
+                                        <div>Telefone
+                                            Residencial:<?= $this->user['user_information']['user_ctt_res'] ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ons-card>
+                <ons-card>
+                    <div class="title">Prescrições disponíveis</div>
+                </ons-card>
+            </div>
         </div>
-        <script>
-            ons.getScriptPage().onInit = function () {
-                fn.profileHandler($(this));
+        <style type="text/css">
+            .profile_wrapper {
+                display: inline-flex;
+                width: 100%;
             }
-        </script>
-    </ons-page>
-</template>
 
-<template id="singupForm.html">
-    <ons-page id="singup">
-        <ons-toolbar modifier="noshadow">
-            <div class="left">
-                <ons-back-button>Login</ons-back-button>
-            </div>
-            <div class="center">
-                Cadastro
-            </div>
-        </ons-toolbar>
-        <ons-card>
-            <form action="<?= $this->url('singup') ?>" method="post" enctype="multipart/form-data">
-                <ons-row>
-                    <ons-col width="100%">
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="md-email" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 80%" modifier="material" id="username" name="fEmail"
-                                       placeholder="Email" type="email"
-                                       float required validate></ons-input>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 80%" id="password" modifier="material" name="fPass" type="password"
-                                       placeholder="Senha" float required validate></ons-input>
-                        </ons-list-item>
-                        <ons-list-item>
-                            <div class="right right-label">
-                                <button type="submit" class="button">Cadastrar</button>
-                            </div>
-                        </ons-list-item>
-                    </ons-col>
-                </ons-row>
-            </form>
-        </ons-card>
-        <style>
-            .list-item__center, .list-item__right {
-                background-image: none;
+            .profile_image_wrapper {
+                margin-right: 10px;
+                width: 35%;
+                position: relative;
             }
-        </style>
-    </ons-page>
-</template>
 
-<template id="singupProfForm.html">
-    <ons-page id="singup">
-        <ons-toolbar modifier="noshadow">
-            <div class="left">
-                <ons-back-button>Login</ons-back-button>
-            </div>
-            <div class="center">
-                Cadastro de Profissional
-            </div>
-        </ons-toolbar>
-        <ons-card>
-            <form action="<?= $this->url('singup-prof') ?>" method="post" enctype="multipart/form-data">
-                <ons-row>
-                    <ons-col width="100%">
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-user" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fName"
-                                       placeholder="Nome completo" type="text"
-                                       float required validate></ons-input>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="md-email" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 100%" modifier="material" id="username" name="fEmail"
-                                       placeholder="Email" type="email"
-                                       float required validate></ons-input>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 100%" id="password" modifier="material" name="fPass" type="password"
-                                       placeholder="Senha" float required validate></ons-input>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-user-md" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-select style="width: 100%" id="info_user_healthcare" modifier="material" name="fCons"
-                                        class="select"
-                                        float>
-                                <select class="select-input">
-                                    <option value="">Selecione seu conselho</option>
-                                    <option value="1">Conselho de Medicina</option>
-                                    <option value="2">Conselho de Odontologia</option>
-                                    <option value="3">Conselho de Fisioterapia</option>
-                                    <option value="4">Conselho de Fisioterapia</option>
-                                </select>
-                            </ons-select>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-map-marker" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-select style="width: 100%" id="info_user_healthcare" modifier="material" name="fConsRegion"
-                                        class="select"
-                                        float>
-                                <select class="select-input">
-                                    <option value="">Selecione seu estado</option>
-                                    <option value="1">AP</option>
-                                    <option value="2">PA</option>
-                                </select>
-                            </ons-select>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 100%" id="num_reg" modifier="material" name="fNumCons" type="text"
-                                       placeholder="Número de registro" float required validate></ons-input>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-plus-square" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 100%" id="espec" modifier="material" name="fEspeciality" type="text"
-                                       placeholder="Especialidade" float required validate></ons-input>
-                        </ons-list-item>
-                        <ons-list-item>
-                            <div class="right right-label">
-                                <button type="submit" class="button">Efetuar solicitação</button>
-                            </div>
-                        </ons-list-item>
-                    </ons-col>
-                </ons-row>
-            </form>
-        </ons-card>
-        <style>
-            .list-item__center, .list-item__right {
-                background-image: none;
+            .profile_image_wrapper img {
+                width: 100%;
+                border-radius: 50%;
+                border: 1px solid black;
+            }
+
+            .profile_info_wrapper {
+                width: 100%;
+                text-align: center;
+            }
+
+            .profile_extra_wrapper {
+                margin: 5px 0 0 0;
+                font-size: 14px;
+            }
+
+            .profile_info_numbers {
+                font-size: 14px;
+                display: inline-flex;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .profile_info_numbers div {
+                text-align: left;
+                margin: 0 7% 1% 7%;
+            }
+
+            .profile_info_text {
+                opacity: 0.5;
+                margin-top: -5px;
+            }
+
+            .profile_info_button {
+                height: 25px;
+                background: transparent;
+                border: 1px solid #e0e0e0;
+                border-radius: 7px;
+                color: black;
+                line-height: 13px;
+                font-size: 14px;
+                margin-top: 5px;
+            }
+
+            .profile_info_button.button--material {
+                min-height: 25px;
+                line-height: 25px !important;
+            }
+
+            .profile_button_bar {
+                text-align: center;
+                font-size: 26px;
+                height: 50px;
+                line-height: 40px;
+                border-top: 1px solid rgba(187, 187, 187, 0.51)
+            }
+
+            .profile_button_bar ons-col {
+                width: 25%;
+            }
+
+            .post {
+                margin: 0px;
+                padding: 0px 0px 15px;
+                font-size: 14px;
+                border-bottom: 1px solid rgba(175, 175, 175, 0.43);
+                border-radius: 0;
+            }
+
+            .post_title {
+                padding-left: 10px;
+            }
+
+            .post-caption {
+                padding-left: 10px;
+            }
+
+            .post-like-info {
+                margin-bottom: 5px;
+                padding-left: 10px;
+            }
+
+            .post-image {
+                width: 100%;
+            }
+
+            .post-time {
+                font-size: 10px;
+                opacity: 0.7;
+                margin-top: 5px;
+                padding-left: 10px;
+            }
+
+            .post-like {
+                opacity: 0;
+                width: 100%;
+                position: absolute;
+                top: 25%;
+                color: white;
+                transition: opacity 0.4s;
+            }
+
+            .post-button-bar {
+                height: 40px;
+                padding-left: 0px;
+            }
+
+            .post-button {
+                font-size: 26px;
+                color: #1f1f21;
+                line-height: 26px;
+            }
+
+            .corner-button {
+                color: black;
+                font-size: 25px;
+                padding-right: 0;
+            }
+
+            .like {
+                color: red;
+            }
+
+            .list-item__thumbnail {
+                border-radius: 50%;
+            }
+
+            .grid_wrapper {
+                width: 33%;
+                margin-left: 0.25%;
+                margin-right: 0.25%;
+            }
+
+            .grid_thumbnail {
+                width: 100%;
             }
         </style>
     </ons-page>
@@ -257,7 +322,7 @@
         </ons-toolbar>
 
         <ons-card>
-            <form action="<?= $this->url('application_mobile', ["action" => "user-profile"]) ?>" method="post"
+            <form action="<?= $this->url('application_mobile_user', ["action" => "user-profile"]) ?>" method="post"
                   enctype="multipart/form-data">
                 <ons-row>
                     <ons-col width="100%">
@@ -429,7 +494,7 @@
                 <ons-card>
                     <div class="title">Preencha as informações para agendamento:</div>
                     <ons-list>
-                        <form action="<?= $this->url('application_mobile', ["action" => "save-appoint"]) ?>"
+                        <form action="<?= $this->url('application_mobile_user', ["action" => "save-appoint"]) ?>"
                               method="post" enctype="multipart/form-data" id="form-appoint">
                             <ons-list-header>Data desejada:</ons-list-header>
                             <ons-list-item class="input-items">
@@ -504,3 +569,5 @@
         </ons-row>
     </ons-page>
 </template>
+
+<?= $this->headScript()->appendFile($this->basePath('plugins/controllers/user-controller.js')) ?>

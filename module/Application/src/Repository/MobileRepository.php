@@ -1,12 +1,14 @@
 <?php
 
 
-namespace Application\Controller\Repository;
+namespace Application\Repository;
 
 
 use Application\Debug\UtilsFile;
 use Application\Entity\Seg\User;
 use Application\Entity\Sis\Procedures;
+use Application\Entity\Sis\ProfessionalConselhos;
+use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserHistoric;
@@ -163,17 +165,23 @@ class MobileRepository
             ->getQuery()->getResult(2);
     }
 
-    public function getProfissionalInfo($prof_id)
+    public function getProfissionalInfo($prof_id, $completeInfo = false)
     {
-        return $this->entityManager->getRepository(User::class)
+        $sql = $this->entityManager->getRepository(User::class)
             ->createQueryBuilder('u')
             ->addSelect('info')
-            ->addSelect('esp')
             ->leftJoin('u.user_information', 'info')
-            ->leftJoin('info.user_especiality', 'esp')
             ->where('u.id = :sId')
-            ->setParameter('sId', $prof_id)
-            ->getQuery()->getResult(3);
+            ->setParameter('sId', $prof_id);
+        if ($completeInfo) {
+            $sql->addSelect('pi')->leftJoin(ProfessionalInfo::class, 'pi', 'WITH', 'pi.id_user = u.id');
+            $sql->addSelect('pc')->leftJoin(ProfessionalConselhos::class, 'pc', 'WITH', 'pi.cons_name = pc.id');
+            $tempSql = $sql->getQuery()->getResult(3);
+            if ($tempSql[0]['pi_confirmed_in'] !== null) {
+                $sql->addSelect('esp')->leftJoin(UserEspeciality::class, 'esp', 'WITH', 'esp.id = pi.id_especiality');
+            }
+        }
+        return $sql->getQuery()->getResult(3);
     }
 
     //Operações no banco

@@ -8,6 +8,8 @@
 namespace Application;
 
 //use Application\Models\UtilsFile;
+use Application\Debug\UtilsFile;
+use Authentication\Service\AuthenticationManager;
 use Mobile_Detect;
 use Zend\ModuleManager\ModuleManager;
 use Zend\Mvc\MvcEvent;
@@ -16,6 +18,8 @@ use Zend\Session\SessionManager;
 class Module
 {
     const VERSION = '3.0.3-dev';
+    /** @var $authManager AuthenticationManager */
+    protected $authManager;
 
     public function getConfig()
     {
@@ -32,10 +36,8 @@ class Module
     {
         $application = $event->getApplication();
         $serviceManager = $application->getServiceManager();
-
-        // The following line instantiates the SessionManager and automatically
-        // makes the SessionManager the 'default' one.
         $sessionManager = $serviceManager->get(SessionManager::class);
+        $this->authManager = $serviceManager->get(AuthenticationManager::class);
     }
 
     public function onDispatch(MvcEvent $event)
@@ -44,8 +46,13 @@ class Module
         $controller = $event->getTarget();
         if ($mobileDetect->isMobile()) {
             $controller->layout('layout/mobile');
-            if ($event->getRouteMatch()->getMatchedRouteName() !== 'application_mobile') {
-                return $controller->redirect()->toRoute('application_mobile');
+            if ($this->authManager->userState()) {
+                $userType = (int)$this->authManager->getActiveUser()['user_type'] === 1 ? 'user' : 'prof';
+                if ($event->getRouteMatch()->getMatchedRouteName() !== "application_mobile_{$userType}") {
+                    return $controller->redirect()->toRoute("application_mobile_{$userType}");
+                }
+            } else if ($event->getRouteMatch()->getMatchedRouteName() !== 'application_mobile_front') {
+                return $controller->redirect()->toRoute('application_mobile_front');
             }
         } else {
             $controller->layout('layout/browser');
@@ -54,5 +61,6 @@ class Module
             }
         }
         return $event;
+        //@TODO: Fazer com que erros 404 redirecionem para o front
     }
 }

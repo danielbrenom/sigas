@@ -4,7 +4,7 @@
 namespace Authentication\Controller;
 
 
-use Application\Controller\Repository\MobileRepository;
+use Application\Repository\MobileRepository;
 use Application\Debug\UtilsFile;
 use Exception;
 use Zend\Authentication\AuthenticationService;
@@ -145,7 +145,7 @@ class AuthenticationController extends AbstractActionController
                 if ($this->userManager->createProfessional($data))
                     $this->mobileRepository->setMessage("Solicitação enviada com sucesso. \n Seu usuário foi criado, assim que for confirmado seu perfil de profissional será ativado.", 1);
                 else
-                    $this->mobileRepository->setMessage("Não foi possível criar seu usuário. \n Tente novamente mais tarde", 0);
+                    $this->mobileRepository->setMessage("Não foi possível processar sua solicitação. \n Tente novamente mais tarde", 0);
                 $this->redirect()->toRoute('home');
             } else {
                 $this->redirect()->toRoute('home');

@@ -1,10 +1,13 @@
-<!--<ons-toolbar>-->
-<!--    <div class="right">-->
-<!--        <ons-toolbar-button>-->
-<!--            <ons-icon icon="ion-log-out"></ons-icon>-->
-<!--        </ons-toolbar-button>-->
-<!--    </div>-->
-<!--</ons-toolbar>-->
+<?php
+/**
+ * Created by PhpStorm.
+ * User: 400005
+ * Date: 18/03/2019
+ * Time: 09:22
+ */
+$infos = $this->prof[0];
+//\Application\Debug\UtilsFile::printvar($infos);
+?>
 <div class="content" style="width: 100%">
     <div style="padding: 14px 6px 14px 16px; background-color: aliceblue !important;">
         <div class="profile_wrapper">
@@ -14,68 +17,43 @@
             <div class="profile_info_wrapper">
                 <div class="profile_info_numbers">
                     <div>
-                        <div><?= $this->user['user_information']['user_name'] === null ?
-                                "Não informado" :
-                                $this->user['user_information']['user_name'] ?></div>
+                        <div><?= $infos['info_user_name'] ?></div>
                     </div>
-                </div>
-            </div>
-            <div class="profile_info_wrapper">
-                <div class="logoff">
-                    <a href="<?= $this->url('logout') ?>">
-                        <ons-toolbar-button style="float: right; ">
-                            <ons-icon icon="ion-log-out"></ons-icon>
-                        </ons-toolbar-button>
-                    </a>
+                    <div>
+                        <div><?= $infos['esp_desc_especialidade'] ?></div>
+                    </div>
+                    <div>
+                        <div id="addr_text"><?= $infos['info_user_addr'] ?></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <ons-card>
-        <div class="title">Dados Pessoais
-            <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo()">
-                <ons-icon icon="ion-edit"></ons-icon>
-            </ons-toolbar-button>
-        </div>
-
+        <div class="title">Sobre</div>
         <div class="content">
-            <div class="profile_wrapper">
-                <div class="profile_info_wrapper">
-                    <div class="profile_info_numbers">
-                        <div>
-                            <div class="profile_info_text">Nome</div>
-                            <div><?= $this->user['user_information']['user_name'] === null ?
-                                    "Não informado" :
-                                    $this->user['user_information']['user_name'] ?></div>
-                        </div>
-                        <div>
-                            <div class="profile_info_text">CPF</div>
-                            <div><?= $this->user['user_information']['user_cpf'] ?></div>
-                        </div>
-                        <div>
-                            <div class="profile_info_text">Endereço</div>
-                            <div><?= $this->user['user_information']['user_addr'] ?></div>
-                        </div>
-                        <div>
-                            <div class="profile_info_text">Plano de Saúde</div>
-                            <div><?= $this->user['user_information']['user_healthcare'] ?></div>
-                        </div>
-                        <div>
-                            <div class="profile_info_text">Números de contato</div>
-                            <div>Telefone Celular:<?= $this->user['user_information']['user_ctt_phone'] ?></div>
-                            <div>Telefone Residencial:<?= $this->user['user_information']['user_ctt_res'] ?></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            Lorem ipsum
         </div>
     </ons-card>
     <ons-card>
-        <div class="title">Prescrições disponíveis</div>
+        <div class="title">Procedimentos disponíveis</div>
+        <div class="content">
+            <ons-list modifier="nodivider">
+                <?php foreach ($infos['procedures'] as $procedure): ?>
+                    <ons-list-item><?= $procedure['procedure_description'] ?></ons-list-item>
+                <?php endforeach; ?>
+            </ons-list>
+        </div>
+    </ons-card>
+    <ons-card>
+        <div class="title">Localização</div>
+        <div class="content">
+            <div id="mapid" style="height: 200px"></div>
+        </div>
     </ons-card>
 </div>
-
+<input type="text" readonly id="profid" value="<?= $infos['u_id'] ?>" hidden>
 <style type="text/css">
     .profile_wrapper {
         display: inline-flex;
@@ -113,7 +91,7 @@
 
     .profile_info_numbers div {
         text-align: left;
-        margin: 0 7% 1% 7%;
+        margin: 0 7% 0 7%;
     }
 
     .profile_info_text {

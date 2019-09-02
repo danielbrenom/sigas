@@ -77,7 +77,8 @@ class AuthenticationAdapter implements AdapterInterface
         $user = $this->entityManager->getRepository(User::class)->findOneByEmail($this->email);
         return [
             'user_id' => $user->getIdUser(),
-            'user_login' => $user->getEmail()
+            'user_login' => $user->getEmail(),
+            'user_type' => $user->getIdUserType()
         ];
     }
 }

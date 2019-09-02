@@ -6,10 +6,10 @@
  * Time: 09:24
  */
 
-namespace Application\Controller;
+namespace Application\Controller\Mobile;
 
 
-use Application\Controller\Repository\MobileRepository;
+use Application\Repository\MobileRepository;
 use Application\Debug\UtilsFile;
 use Application\Entity\Seg\User;
 use Application\Entity\Sis\UserAppointment;
@@ -28,7 +28,7 @@ use Zend\Session\SessionManager;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
-class MobileController extends AbstractActionController
+class UserAppController extends AbstractActionController
 {
 
     /** @var $mobileManager MobileRepository */
@@ -121,13 +121,6 @@ class MobileController extends AbstractActionController
             $results = [];
         }
         return new JsonModel($results);
-    }
-
-    public function loginFormAction()
-    {
-        $view = new ViewModel();
-        $view->setTerminal(true);
-        return $view;
     }
 
     public function userProfileAction()

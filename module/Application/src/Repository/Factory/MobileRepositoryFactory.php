@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Application\Controller\Repository\Factory;
+namespace Application\Repository\Factory;
 
 
-use Application\Controller\Repository\MobileRepository;
+use Application\Repository\MobileRepository;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;

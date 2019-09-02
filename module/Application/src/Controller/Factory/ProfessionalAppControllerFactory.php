@@ -1,20 +1,19 @@
 <?php
 
 
-namespace Authentication\Controller\Factory;
+namespace Application\Controller\Factory;
 
 
+use Application\Controller\Mobile\ProfessionalAppController;
 use Application\Repository\MobileRepository;
-use Authentication\Controller\AuthenticationController;
 use Authentication\Service\AuthenticationManager;
-use Authentication\Service\UserManager;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class AuthenticationControllerFactory implements FactoryInterface
+class ProfessionalAppControllerFactory implements FactoryInterface
 {
 
     /**
@@ -31,8 +30,6 @@ class AuthenticationControllerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        return new AuthenticationController($container->get(AuthenticationManager::class),
-            $container->get(UserManager::class),
-            $container->get(MobileRepository::class));
+        return new ProfessionalAppController($container->get(MobileRepository::class), $container->get(AuthenticationManager::class));
     }
 }

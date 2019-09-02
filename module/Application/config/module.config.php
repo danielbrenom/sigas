@@ -7,12 +7,15 @@
 
 namespace Application;
 
+use Application\Controller\Factory\FrontAppControllerFactory;
 use Application\Controller\Factory\IndexControllerFactory;
-use Application\Controller\Factory\MobileControllerFactory;
-use Application\Controller\MobileController;
-use Application\Controller\Plugin\Factory\HtmlRenderFactory;
-use Application\Controller\Repository\Factory\MobileRepositoryFactory;
-use Application\Controller\Repository\MobileRepository;
+use Application\Controller\Factory\ProfessionalAppControllerFactory;
+use Application\Controller\Factory\UserAppControllerFactory;
+use Application\Controller\Mobile\FrontAppController;
+use Application\Controller\Mobile\ProfessionalAppController;
+use Application\Controller\Mobile\UserAppController;
+use Application\Repository\Factory\MobileRepositoryFactory;
+use Application\Repository\MobileRepository;
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
@@ -42,16 +45,36 @@ return [
                     ],
                 ],
             ],
-            'application_mobile' => [
+            'application_mobile_user' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/mobile[/:action]',
+                    'route' => '/mobile/user[/:action]',
                     'defaults' => [
-                        'controller' => Controller\MobileController::class,
+                        'controller' => Controller\Mobile\UserAppController::class,
                         'action' => 'home'
                     ]
                 ]
-            ]
+            ],
+            'application_mobile_prof' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/mobile/prof[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\Mobile\ProfessionalAppController::class,
+                        'action' => 'home'
+                    ]
+                ]
+            ],
+            'application_mobile_front' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/mobile/front[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\Mobile\FrontAppController::class,
+                        'action' => 'index'
+                    ]
+                ]
+            ],
         ],
     ],
     'doctrine' => [
@@ -82,13 +105,10 @@ return [
         'factories' => [
             Controller\IndexController::class => IndexControllerFactory::class,
             Controller\BrowserController::class => InvokableFactory::class,
-            MobileController::class => MobileControllerFactory::class
+            UserAppController::class => UserAppControllerFactory::class,
+            ProfessionalAppController::class => ProfessionalAppControllerFactory::class,
+            FrontAppController::class => FrontAppControllerFactory::class
         ],
-    ],
-    'controller_plugins' => [
-        'factories' => [
-            'htmlRender' => HtmlRenderFactory::class
-        ]
     ],
     'session_containers' => [
         'MessagesContainer'
