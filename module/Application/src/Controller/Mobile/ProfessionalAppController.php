@@ -46,7 +46,7 @@ class ProfessionalAppController extends AbstractActionController
                 $data = new DateTime($appointment['a_solicited_for'], new DateTimeZone('America/Belem'));
                 $name = explode(' ', $appointment['user_name']);
                 $resp[] = [
-                    'title' => "{$this->mobileRepository->getAppointmentDescription($appointment['a_id_procedure'])} de {$name[0]}" ,
+                    'title' => "{$this->mobileRepository->getAppointmentDescription($appointment['a_id_procedure'])} de {$name[0]}",
                     'start' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
                     'end' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00'
                 ];
@@ -57,6 +57,22 @@ class ProfessionalAppController extends AbstractActionController
         return new JsonModel(
             $resp
         );
+    }
+
+    public function getPacientesAction()
+    {
+        $params = $this->params()->fromQuery();
+        $response = [];
+        switch ($params['mode']) {
+            case 'list':
+                $response = $this->mobileRepository->getUsersAtendidosProfessional($this->authManager->getActiveUser()['user_id']);
+                break;
+            case 'details':
+                break;
+            default:
+                break;
+        }
+        return new JsonModel($response);
     }
 
     public function getLogMessagesAction()

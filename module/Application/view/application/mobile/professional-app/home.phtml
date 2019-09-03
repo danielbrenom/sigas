@@ -53,16 +53,9 @@
                     <div class="content">
                         <ons-row>
                             <ons-col width="100%">
-                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fHist">
+                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fHistPac">
                                     <ons-lazy-repeat>
-                                        <ons-list-item modifier="chevron longdivider"
-                                                       onclick="fn.viewHistory(1)" tappable>
-                                            Consulta
-                                        </ons-list-item>
-                                        <ons-list-item modifier="chevron longdivider"
-                                                       onclick="fn.viewHistory(2)" tappable>
-                                            Exame
-                                        </ons-list-item>
+
                                     </ons-lazy-repeat>
                                 </ons-list>
                             </ons-col>
@@ -73,7 +66,7 @@
         </ons-row>
         <script>
             ons.getScriptPage().onInit = function () {
-                //$.get('')
+                fn.loadPacientes();
             }
         </script>
     </ons-page>
@@ -468,6 +461,11 @@
                 </ons-card>
             </ons-col>
         </ons-row>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                fn.loadPacientes();
+            }
+        </script>
     </ons-page>
 </template>
 

@@ -108,5 +108,21 @@ $(function () {
             console.log(e.message);
             console.log(e.stack)
         }
+    };
+
+    fn.loadPacientes = function () {
+        $.get('/mobile/prof/get-pacientes', {mode: 'list'}, function (response) {
+            let list = $("#fHistPac ons-lazy-repeat");
+            $.each(response, function (key, value) {
+                let item = '<ons-list-item modifier="chevron longdivider" tappable onclick="fn.loadPacienteInfo(' + value.id + ')">' +
+                    value.user_name +
+                    '</ons-list-item>';
+                list.append(item);
+            })
+        })
+    };
+
+    fn.loadPacienteInfo = function (id) {
+
     }
 });

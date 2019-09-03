@@ -23,4 +23,38 @@ class ProfessionalProcedures
      * @ORM\Column(name="id_professional")
      */
     protected $id_professional;
+
+    /**
+     * @return mixed
+     */
+    public function getIdProcedure()
+    {
+        return $this->id_procedure;
+    }
+
+    /**
+     * @param mixed $id_procedure
+     */
+    public function setIdProcedure($id_procedure)
+    {
+        $this->id_procedure = $id_procedure;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIdProfessional()
+    {
+        return $this->id_professional;
+    }
+
+    /**
+     * @param mixed $id_professional
+     */
+    public function setIdProfessional($id_professional)
+    {
+        $this->id_professional = $id_professional;
+    }
+
+
 }

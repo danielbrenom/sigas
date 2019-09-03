@@ -15,6 +15,8 @@ use Application\Entity\Sis\UserHistoric;
 use Application\Entity\Sis\UserHistoricInformation;
 use Application\Entity\Sis\UserInfoPessoal;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Exception;
 use Zend\Session\Container;
 use Zend\Session\SessionManager;
@@ -114,6 +116,21 @@ class MobileRepository
             Tente novamente mais tarde.", 2);
             //UtilsFile::printvardie($e->getMessage(),$e->getTraceAsString());
         }
+    }
+
+    public function getUsersAtendidosProfessional($prof_id)
+    {
+        return $this->entityManager->getRepository(UserAppointment::class)
+            ->createQueryBuilder('ua')
+            ->distinct()
+            ->select(['ui.user_name', 'ui.id'])
+            ->leftJoin(UserHistoric::class, 'uh', 'WITH',
+                'uh.id_appointment_entry = ua.id')
+            ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
+                'ui.id = uh.user_id')
+            ->where('uh.historic_type = 1 and ua.id_user_ps = :sId')
+            ->setParameter('sId', $prof_id)
+            ->getQuery()->getResult(3);
     }
 
     //Profissional
