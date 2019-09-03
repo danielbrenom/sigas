@@ -36,10 +36,11 @@ $(function () {
                 plugins: ['moment', 'dayGrid', 'timeGrid', 'bootstrap', 'interaction', 'momentTimezone'],
                 locale: 'pt-BR',
                 themeSystem: "bootstrap",
+                defaultView: 'weekGridDay',
                 header: {
                     left: 'prev,next',
                     center: 'title',
-                    right: 'dayGridMonth',
+                    right: 'dayGridMonth, weekGridDay',
                 },
                 buttonText: {
                     month: 'mês'
@@ -50,7 +51,7 @@ $(function () {
                 contentHeight: 550,
                 displayEventTime: false,
                 dateClick: function (info) {
-                    if (info.view.type === 'dayGridMonth') {
+                    if (info.view.type === 'dayGridMonth' || info.view.type === 'weekGridDay') {
                         calendar.changeView('oneGridDay');
                         calendar.gotoDate(info.date);
                     } else if (info.view.type === 'oneGridDay') {
@@ -80,6 +81,13 @@ $(function () {
                         type: 'timeGridDay',
                         duration: {days: 1},
                         buttonText: 'Day',
+                        minTime: "08:00:00",
+                        maxTime: "19:00:00"
+                    },
+                    weekGridDay: {
+                        type: 'timeGridWeek',
+                        duration: {days: 3},
+                        buttonText: 'sem',
                         minTime: "08:00:00",
                         maxTime: "19:00:00"
                     }

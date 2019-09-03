@@ -41,11 +41,12 @@ class ProfessionalAppController extends AbstractActionController
         $params['id_professional'] = $this->authManager->getActiveUser()['user_id'];
         $resp = [];
         try {
-            $resultados = $this->mobileRepository->getSchedule($params);
+            $resultados = $this->mobileRepository->getSchedule($params, true);
             foreach ($resultados as $appointment) {
-                $data = new DateTime($appointment['solicited_for'], new DateTimeZone('America/Belem'));
+                $data = new DateTime($appointment['a_solicited_for'], new DateTimeZone('America/Belem'));
+                $name = explode(' ', $appointment['user_name']);
                 $resp[] = [
-                    'title' => $this->mobileRepository->getAppointmentDescription($appointment['id_procedure']),
+                    'title' => "{$this->mobileRepository->getAppointmentDescription($appointment['a_id_procedure'])} de {$name[0]}" ,
                     'start' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
                     'end' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00'
                 ];

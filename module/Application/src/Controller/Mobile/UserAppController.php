@@ -64,7 +64,7 @@ class UserAppController extends AbstractActionController
                 $procedures
             ]);
         }
-        $infos = $this->mobileManager->getProfissionalInfo($params['id_user']);
+        $infos = $this->mobileManager->getProfissionalInfo($params['id_user'], true);
         $infos[0]['procedures'] = $this->mobileManager->getProceduresProfessional($params['id_user']);
         $view = new ViewModel([
             'prof' => $infos
@@ -98,9 +98,9 @@ class UserAppController extends AbstractActionController
         try {
             $resultados = $this->mobileManager->getSchedule($params);
             foreach ($resultados as $appointment) {
-                $data = new DateTime($appointment['solicited_for'], new DateTimeZone("America/Belem"));
+                $data = new DateTime($appointment['a_solicited_for'], new DateTimeZone("America/Belem"));
                 $resp[] = [
-                    'title' => $this->mobileManager->getAppointmentDescription($appointment['id_procedure']),
+                    'title' => $this->mobileManager->getAppointmentDescription($appointment['a_id_procedure']),
                     'start' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
                     'end' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00'
                 ];
@@ -165,12 +165,12 @@ class UserAppController extends AbstractActionController
         try {
             if ($this->mobileManager->saveAppointment($vData)) {
                 $this->mobileManager->setMessage("Solicitação salva com sucesso", 1);
-                $this->redirect()->toRoute('application_mobile');
+                $this->redirect()->toRoute('application_mobile_user');
             } else {
                 //Mostrar que ocorreu um erro
                 $this->mobileManager->setMessage("Ocorreu um erro ao realizar a solicitação. \n 
                 Por favor tente novamente mais tarde", 0);
-                $this->redirect()->toRoute('application_mobile');
+                $this->redirect()->toRoute('application_mobile_user');
             }
         } catch (Exception $e) {
             $this->mobileManager->setMessage($e->getMessage(), 0);

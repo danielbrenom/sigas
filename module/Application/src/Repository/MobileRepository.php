@@ -118,16 +118,21 @@ class MobileRepository
 
     //Profissional
 
-    public function getSchedule($params)
+    public function getSchedule($params, $for_prof = false)
     {
-        return $this->entityManager->getRepository(UserAppointment::class)
+        $sql = $this->entityManager->getRepository(UserAppointment::class)
             ->createQueryBuilder('a')
             ->where('a.id_user_ps = :sId')
             ->andWhere('a.solicited_for between :sIni and :sFim')
             ->setParameter("sIni", explode("T", $params['start'])[0])
             ->setParameter("sFim", explode("T", $params['end'])[0])
-            ->setParameter("sId", $params['id_professional'])
-            ->getQuery()->getResult(2);
+            ->setParameter("sId", $params['id_professional']);
+        if ($for_prof) {
+            $sql->leftJoin(UserHistoric::class, 'uh', 'WITH', 'a.id = uh.id_appointment_entry')
+                ->addSelect('pac_info.user_name')->leftJoin(UserInfoPessoal::class, 'pac_info', 'WITH', 'pac_info.id = uh.user_id')
+                ->andWhere("uh.historic_type = 1");
+        }
+        return $sql->getQuery()->getResult(3);
     }
 
     public function getAppointmentDescription($appoint_id)
@@ -160,7 +165,8 @@ class MobileRepository
             ->createQueryBuilder('u')
             ->addSelect('info')
             ->leftJoin('u.user_information', 'info')
-            ->where('info.user_especiality = :sId')
+            ->leftJoin(ProfessionalInfo::class, 'pi', 'WITH', 'pi.id_user = u.id')
+            ->where('pi.id_especiality = :sId')
             ->setParameter('sId', $esp_id)
             ->getQuery()->getResult(2);
     }
@@ -170,6 +176,7 @@ class MobileRepository
         $sql = $this->entityManager->getRepository(User::class)
             ->createQueryBuilder('u')
             ->addSelect('info')
+            ->addSelect('pi')
             ->leftJoin('u.user_information', 'info')
             ->where('u.id = :sId')
             ->setParameter('sId', $prof_id);
@@ -188,7 +195,8 @@ class MobileRepository
     public function saveAppointment($params)
     {
         try {
-            $prof = $this->entityManager->getRepository(UserInfoPessoal::class)->createQueryBuilder('u')->addSelect('esp')->leftJoin('u.user_especiality', 'esp')->where('u.id = :sId')->setParameter('sId', $params['prof_req'])->getQuery()->getResult(3)[0];
+            $prof = $this->getProfissionalInfo($params['prof_req'], true)[0];
+            //UtilsFile::printvardie($prof);
             $this->entityManager->beginTransaction();
             //Primeiro deve criar o appointment para depois criar o registro no historico
             $userAppoint = new UserAppointment();
