@@ -194,7 +194,6 @@ class MobileRepository
         $sql = $this->entityManager->getRepository(User::class)
             ->createQueryBuilder('u')
             ->addSelect('info')
-            ->addSelect('pi')
             ->leftJoin('u.user_information', 'info')
             ->where('u.id = :sId')
             ->setParameter('sId', $prof_id);
@@ -209,6 +208,37 @@ class MobileRepository
         return $sql->getQuery()->getResult(3);
     }
 
+    public function updateProfissionalJobInfo($info, $prof_id)
+    {
+        try {
+            $this->entityManager->beginTransaction();
+            $date = new \DateTime('now', new \DateTimeZone('America/Belem'));
+            /** @var ProfessionalInfo $profInfo */
+            $profInfo = $this->entityManager->getRepository(ProfessionalInfo::class)->find($prof_id);
+            $profInfo->setConsName($info['fCons']);
+            $profInfo->setEspecialitySolicited($info['fEspSoc']);
+            $profInfo->setConsRegistry($info['fNumIns']);
+            $profInfo->setConfirmedIn(null);
+            $profInfo->setSolicitedIn($date->format('Y-m-d H:i:s'));
+            /** @var UserInfoPessoal $profInfoPes */
+            $profInfoPes = $this->entityManager->getRepository(UserInfoPessoal::class)->find($prof_id);
+            $profInfoPes->setUserCttPhone($info['fTelCel']);
+            $profInfoPes->setUserCttRes($info['fTelRes']);
+            //UtilsFile::printvardie($profInfoPes);
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->entityManager->rollback();
+            UtilsFile::printvardie($e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateProfissionalPesInfo($info, $prof_id)
+    {
+    }
+
     //Buscas gerais
 
     public function getProceduresAvailableForUser($pac_id){
@@ -220,6 +250,13 @@ class MobileRepository
                 'uh.historic_type = uht.id')
             ->where('uh.user_id = :sId')
             ->setParameter('sId', $pac_id)
+            ->getQuery()->getResult(3);
+    }
+
+    public function getConselhos()
+    {
+        return $this->entityManager->getRepository(ProfessionalConselhos::class)
+            ->createQueryBuilder('c')
             ->getQuery()->getResult(3);
     }
 

@@ -102,10 +102,9 @@
                             "aguardando verificação" :
                             "verificado" ?></div>
                 </div>
-
                 <ons-card>
                     <div class="title">Dados Pessoais
-                        <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo()">
+                        <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo(0)">
                             <ons-icon icon="ion-edit"></ons-icon>
                         </ons-toolbar-button>
                     </div>
@@ -139,7 +138,7 @@
                         </div>
                     </div>
                     <div class="title">Dados Profissionais
-                        <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo()">
+                        <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo(1)">
                             <ons-icon icon="ion-edit"></ons-icon>
                         </ons-toolbar-button>
                     </div>
@@ -331,8 +330,8 @@
     </ons-page>
 </template>
 
-<template id="editInfoForm.html">
-    <ons-page id="editInfoForm">
+<template id="editInfoPesForm.html">
+    <ons-page id="editInfoPesForm">
         <ons-toolbar modifier="noshadow">
             <div class="left">
                 <ons-back-button>Perfil</ons-back-button>
@@ -372,44 +371,6 @@
                                        type="text"
                                        placeholder="RG" float validate></ons-input>
                         </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-plus-square" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-select style="width: 100%" id="info_user_healthcare" modifier="material" name="fPlano"
-                                        class="select"
-                                        float>
-                                <select class="select-input">
-                                    <option value="">Selecione seu plano de saúde</option>
-                                    <option value="1">Unimed</option>
-                                    <option value="2">Hapvida</option>
-                                </select>
-                            </ons-select>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-map-marker-alt" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 100%" id="info_user_addr" modifier="material" name="fEnd"
-                                       type="text"
-                                       placeholder="Endereço Residencial" float validate></ons-input>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-mobile-alt" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 100%" id="info_user_ctt_phone" modifier="material" name="fTelCel"
-                                       type="text"
-                                       placeholder="Telefone Celular" float validate></ons-input>
-                        </ons-list-item>
-                        <ons-list-item class="input-items">
-                            <div class="left">
-                                <ons-icon icon="fa-phone" class="list-item__icon"></ons-icon>
-                            </div>
-                            <ons-input style="width: 100%" id="info_user_ctt_res" modifier="material"
-                                       name="fTelRes" type="text"
-                                       placeholder="Telefone Residencial" float validate></ons-input>
-                        </ons-list-item>
                         <ons-list-item>
                             <div class="right right-label">
                                 <button type="submit" class="button">Salvar</button>
@@ -439,6 +400,109 @@
                         }
                     })
                 })
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="editInfoProfForm.html">
+    <ons-page id="editInfoProfForm">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Perfil</ons-back-button>
+            </div>
+            <div class="center">
+                Editar informações profissionais
+            </div>
+        </ons-toolbar>
+        <ons-card>
+            <ons-row>
+                <ons-col>
+                    <form action="<?= $this->url('application_mobile_prof', ['action' => 'get-profile']) ?>"
+                          method="post" enctype="multipart/form-data">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-plus-square" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-select style="width: 100%" id="pi_cons_name" modifier="material" name="fCons"
+                                        class="select"
+                                        float>
+                                <select class="select-input">
+                                    <?php foreach ($this->cons as $con): ?>
+                                        <option value="<?= $con['c_id'] ?>"><?= $con['c_desc_conselho'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </ons-select>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="pi_especiality_solicited" modifier="material"
+                                       name="fEspSoc"
+                                       type="text"
+                                       placeholder="Especialidade informada" float validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="pi_cons_registry" modifier="material" name="fNumIns"
+                                       type="text"
+                                       placeholder="Número de inscrição" float validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items end">
+                            <div class="left">
+                                <ons-icon icon="fa-map-marker-alt" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 80%" id="info_user_addr" modifier="material" name="fEnd[]"
+                                       type="text"
+                                       placeholder="Endereço Principal" float validate></ons-input>
+                            <button type="button" class="fab fab--mini" onclick="fn.addAddress()"><i
+                                        class="zmdi zmdi-plus"></i></button>
+                        </ons-list-item>
+                        <div class="addr-area">
+
+                        </div>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-mobile-alt" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="info_user_ctt_phone" modifier="material" name="fTelCel"
+                                       type="text"
+                                       placeholder="Telefone Celular" float validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-phone" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="info_user_ctt_res" modifier="material"
+                                       name="fTelRes" type="text"
+                                       placeholder="Telefone Clinica" float validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <button type="submit" class="button">Salvar</button>
+                            </div>
+                        </ons-list-item>
+                    </form>
+                </ons-col>
+            </ons-row>
+        </ons-card>
+        <style>
+            .list-item__center, .list-item__right {
+                background-image: none;
+            }
+
+            .icon-spacer::before,
+            .icon-blank::before {
+                width: 1em;
+                content: ' ';
+            }
+        </style>
+        <script>
+            ons.getScriptPage().onInit = function () {
+
             }
         </script>
     </ons-page>
@@ -481,7 +545,7 @@
                         <div class="profile_info_wrapper">
                             <div class="profile_info_numbers">
                                 <div>
-                                    <div ></div>
+                                    <div></div>
                                 </div>
                             </div>
                         </div>
@@ -539,6 +603,8 @@
         </div>
     </ons-page>
 </template>
+
+<template id="new1.html"></template>
 
 <?= $this->headScript()->appendFile($this->basePath('plugins/controllers/professional-controller.js')) ?>
 

@@ -38,7 +38,7 @@ class FrontAppController extends AbstractActionController
                 $procedures
             ]);
         }
-        $infos = $this->mobileManager->getProfissionalInfo($params['id_user']);
+        $infos = $this->mobileManager->getProfissionalInfo($params['id_user'], true);
         $infos[0]['procedures'] = $this->mobileManager->getProceduresProfessional($params['id_user']);
         $view = new ViewModel([
             'prof' => $infos

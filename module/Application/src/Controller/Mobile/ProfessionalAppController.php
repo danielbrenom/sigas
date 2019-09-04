@@ -29,9 +29,10 @@ class ProfessionalAppController extends AbstractActionController
     public function homeAction()
     {
         $profInfo = $this->mobileRepository->getProfissionalInfo($this->authManager->getActiveUser()['user_id'], true)[0];
-//        UtilsFile::printvardie($profInfo);
+        //UtilsFile::printvardie($this->mobileRepository->getConselhos());
         return new ViewModel([
-            'user' => $profInfo
+            'user' => $profInfo,
+            'cons' => $this->mobileRepository->getConselhos()
         ]);
     }
 
@@ -78,6 +79,45 @@ class ProfessionalAppController extends AbstractActionController
                 break;
             default:
                 break;
+        }
+        return new JsonModel($response);
+    }
+
+    public function getProfileAction()
+    {
+        $userId = $this->authManager->getActiveUser()['user_id'];
+        if ($this->getRequest()->isPost()) {
+            $params = $this->params()->fromPost();
+            if ($this->mobileRepository->updateProfissionalJobInfo($params, $userId)) {
+                $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
+                $this->redirect()->toRoute('application_mobile_prof');
+            } else {
+                $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
+                $this->redirect()->toRoute('application_mobile_prof');
+            }
+        } else {
+            $params = $this->params()->fromQuery();
+            switch ($params['type']) {
+                case 'pes':
+                    break;
+                case 'prof':
+                    $profInfo = $this->mobileRepository->getProfissionalInfo($userId, true)[0];
+                    $response = [
+                        'info_user_addr' => $profInfo['info_user_addr'],
+                        'info_user_ctt_phone' => $profInfo['info_user_ctt_phone'],
+                        'info_user_ctt_res' => $profInfo['info_user_ctt_res'],
+                        'pi_cons_name' => $profInfo['pi_cons_name'],
+                        'pi_cons_registry' => $profInfo['pi_cons_registry'],
+                        'pi_especiality_solicited' => $profInfo['pi_especiality_solicited'],
+                    ];
+                    break;
+                default:
+                    $response = [
+                        'code' => 0,
+                        'message' => 'Solicitação inválida'
+                    ];
+                    break;
+            }
         }
         return new JsonModel($response);
     }

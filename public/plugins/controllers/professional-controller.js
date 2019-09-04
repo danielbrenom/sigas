@@ -111,8 +111,18 @@ $(function () {
         }
     };
 
-    fn.editInfo = function () {
-        $("#mainNavigator")[0].pushPage('editInfoForm.html');
+    fn.editInfo = function (type) {
+        if (type) {
+            $.get('/mobile/prof/get-profile', {type: 'prof'}, function (response) {
+                $("#mainNavigator")[0].pushPage('editInfoProfForm.html').then(() => {
+                    $.each(response, function (key, value) {
+                        $("#" + key).val(value);
+                    })
+                });
+            });
+        } else {
+            $("#mainNavigator")[0].pushPage('editInfoPesForm.html');
+        }
     };
 
     fn.loadPacientes = function () {
@@ -150,5 +160,22 @@ $(function () {
             });
             swal.close();
         })
+    }
+
+    fn.addAddress = function () {
+        let addr = '<ons-list-item class="input-items end">\n' +
+            '                            <div class="left">\n' +
+            '                                <ons-icon icon="fa-map-marker-alt" class="list-item__icon"></ons-icon>\n' +
+            '                            </div>\n' +
+            '                            <ons-input style="width: 80%" id="info_user_addr" modifier="material" name="fEnd[]"\n' +
+            '                                       type="text"\n' +
+            '                                       placeholder="Endereço Adicional" float validate></ons-input>\n' +
+            '                            <button type="button" class="fab fab--mini" onclick="fn.removeAddress()"><i class="zmdi zmdi-minus"></i></button>\n' +
+            '                        </ons-list-item>';
+        $(".addr-area").append(addr);
+    }
+
+    fn.removeAddress = function () {
+        $(".addr-area ons-list-item:last-child").remove();
     }
 });
