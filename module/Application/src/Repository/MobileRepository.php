@@ -13,6 +13,7 @@ use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserHistoric;
 use Application\Entity\Sis\UserHistoricInformation;
+use Application\Entity\Sis\UserHistoricType;
 use Application\Entity\Sis\UserInfoPessoal;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\ResultSetMapping;
@@ -206,6 +207,20 @@ class MobileRepository
             }
         }
         return $sql->getQuery()->getResult(3);
+    }
+
+    //Buscas gerais
+
+    public function getProceduresAvailableForUser($pac_id){
+        return $this->entityManager->getRepository(UserHistoric::class)
+            ->createQueryBuilder('uh')
+            ->distinct()
+            ->select(['uh.historic_type', 'uht.historic_type_description'])
+            ->leftJoin(UserHistoricType::class, 'uht', 'WITH',
+                'uh.historic_type = uht.id')
+            ->where('uh.user_id = :sId')
+            ->setParameter('sId', $pac_id)
+            ->getQuery()->getResult(3);
     }
 
     //Operações no banco

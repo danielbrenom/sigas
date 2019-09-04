@@ -104,6 +104,40 @@
                 </div>
 
                 <ons-card>
+                    <div class="title">Dados Pessoais
+                        <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo()">
+                            <ons-icon icon="ion-edit"></ons-icon>
+                        </ons-toolbar-button>
+                    </div>
+                    <div class="content">
+                        <div class="profile_wrapper">
+                            <div class="profile_info_wrapper">
+                                <div class="profile_info_numbers">
+                                    <div>
+                                        <div class="profile_info_text">Nome</div>
+                                        <div>
+                                            <?= $this->user['info_user_name'] ?>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">CPF</div>
+                                        <div><?= $this->user['info_user_cpf'] ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">RG</div>
+                                        <div><?= $this->user['info_user_rg'] ?></div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">Status do Profissional</div>
+                                        <div>Cadastro solicitado
+                                            em: <?= date("d/m/Y", strtotime($this->user['pi_solicited_in'])) ?></div>
+                                        <div>Cadastro verificado
+                                            em: <?= $this->user['pi_confirmed_in'] === null ? "Aguardando verificação" : date("d/m/Y", strtotime($this->user['pi_confirmed_in'])) ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="title">Dados Profissionais
                         <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo()">
                             <ons-icon icon="ion-edit"></ons-icon>
@@ -126,10 +160,6 @@
                                         <div class="profile_info_text">Conselho</div>
                                         <div><?= $this->user['pi_cons_registry'] ?>
                                             - <?= $this->user['pc_desc_conselho'] ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">CPF</div>
-                                        <div><?= $this->user['info_user_cpf'] ?></div>
                                     </div>
                                     <div>
                                         <div class="profile_info_text">Endereço</div>
@@ -433,24 +463,70 @@
     </ons-page>
 </template>
 
-<template id="userHistory.html">
+<template id="pacProfile.html">
     <ons-page>
         <ons-toolbar modifier="noshadow">
             <div class="left">
-                <ons-back-button>Histórico</ons-back-button>
+                <ons-back-button>Pacientes</ons-back-button>
             </div>
             <div class="center"></div>
         </ons-toolbar>
-        <ons-row>
-            <ons-col>
-                <ons-card modifier="material">
-                    <div class="title">
-                        Registros existentes
+        <div id="form-area">
+            <div class="content" style="width: 100%">
+                <div style="padding: 14px 6px 14px 16px; background-color: aliceblue !important;">
+                    <div class="profile_wrapper">
+                        <div class="profile_image_wrapper">
+                            <img src="assets/img/profile-image-08.png">
+                        </div>
+                        <div class="profile_info_wrapper">
+                            <div class="profile_info_numbers">
+                                <div>
+                                    <div ></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <ons-card>
+                    <div class="title">Informações do paciente</div>
+
+                    <div class="content">
+                        <div class="profile_wrapper">
+                            <div class="profile_info_wrapper">
+                                <div class="profile_info_numbers">
+                                    <div>
+                                        <div class="profile_info_text">Nome</div>
+                                        <div id="u_name"></div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">CPF</div>
+                                        <div id="u_cpf"></div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">Plano de Saúde</div>
+                                        <div id="u_healthcare"></div>
+                                    </div>
+                                    <div>
+                                        <div class="profile_info_text">Números de contato</div>
+                                        <div id="u_ctt_phone">Telefone
+                                            Celular:
+                                        </div>
+                                        <div id="u_ctt_res">Telefone
+                                            Residencial:
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </ons-card>
+                <ons-card>
+                    <div class="title">Registros no histórico</div>
                     <div class="content">
                         <ons-row>
                             <ons-col width="100%">
-                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="historyList">
+                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fRegPac">
                                     <ons-lazy-repeat>
 
                                     </ons-lazy-repeat>
@@ -459,20 +535,15 @@
                         </ons-row>
                     </div>
                 </ons-card>
-            </ons-col>
-        </ons-row>
-        <script>
-            ons.getScriptPage().onInit = function () {
-                fn.loadPacientes();
-            }
-        </script>
+            </div>
+        </div>
     </ons-page>
 </template>
 
 <?= $this->headScript()->appendFile($this->basePath('plugins/controllers/professional-controller.js')) ?>
 
 <style>
-    .fc-next-button, .fc-prev-button, .fc-dayGridMonth-button, .fc.weekGridDay-button{
+    .fc-next-button, .fc-prev-button, .fc-dayGridMonth-button, .fc.weekGridDay-button {
         padding: 8px;
     }
 </style>

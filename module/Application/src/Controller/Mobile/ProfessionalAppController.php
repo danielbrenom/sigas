@@ -29,7 +29,7 @@ class ProfessionalAppController extends AbstractActionController
     public function homeAction()
     {
         $profInfo = $this->mobileRepository->getProfissionalInfo($this->authManager->getActiveUser()['user_id'], true)[0];
-        //UtilsFile::printvardie($profInfo);
+//        UtilsFile::printvardie($profInfo);
         return new ViewModel([
             'user' => $profInfo
         ]);
@@ -68,6 +68,13 @@ class ProfessionalAppController extends AbstractActionController
                 $response = $this->mobileRepository->getUsersAtendidosProfessional($this->authManager->getActiveUser()['user_id']);
                 break;
             case 'details':
+                $pacInfo = $this->mobileRepository->getUserInformation($params['pac_id'], 3)[0];
+                $response['u_name'] = $pacInfo['info_user_name'];
+                $response['u_cpf'] = $pacInfo['info_user_cpf'];
+                $response['u_ctt_phone'] = $pacInfo['info_user_ctt_phone'];
+                $response['u_ctt_res'] = $pacInfo['info_user_ctt_res'];
+                $response['u_healthcare'] = $pacInfo['info_user_healthcare'];
+                $response['reg_types'] = $this->mobileRepository->getProceduresAvailableForUser($params['pac_id']);
                 break;
             default:
                 break;

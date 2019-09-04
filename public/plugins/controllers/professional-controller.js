@@ -1,4 +1,5 @@
 $(function () {
+    let tempId;
     if (ons.isReady()) {
         $.get('/mobile/prof/get-log-messages', {}, function (response) {
             if (response.error) {
@@ -110,9 +111,14 @@ $(function () {
         }
     };
 
+    fn.editInfo = function () {
+        $("#mainNavigator")[0].pushPage('editInfoForm.html');
+    };
+
     fn.loadPacientes = function () {
         $.get('/mobile/prof/get-pacientes', {mode: 'list'}, function (response) {
             let list = $("#fHistPac ons-lazy-repeat");
+            list.empty();
             $.each(response, function (key, value) {
                 let item = '<ons-list-item modifier="chevron longdivider" tappable onclick="fn.loadPacienteInfo(' + value.id + ')">' +
                     value.user_name +
@@ -123,6 +129,26 @@ $(function () {
     };
 
     fn.loadPacienteInfo = function (id) {
-
+        swal({
+            title: "Carregando",
+            text: "Aguarde",
+            buttons: false
+        });
+        $.get('/mobile/prof/get-pacientes', {mode: 'details', pac_id: id}, function (response) {
+            $("#mainNavigator")[0].pushPage('pacProfile.html').then(() => {
+                $.each(response, function (key, value) {
+                    $("#" + key).empty().append(value);
+                });
+                let list = $("#fRegPac ons-lazy-repeat");
+                list.empty();
+                $.each(response.reg_types, function (key, value) {
+                    let item = '<ons-list-item modifier="chevron longdivider" tappable onclick="fn.loadProcedures(' + value.historic_type + ')">' +
+                        value.historic_type_description +
+                        '</ons-list-item>';
+                    list.append(item);
+                })
+            });
+            swal.close();
+        })
     }
 });
