@@ -26,31 +26,38 @@
             <ons-col style="padding: 0">
                 <ons-row class="profile_button_bar_agenda">
                     <ons-col>
-                        <ons-button id="agend" class="custom-button active" onclick="fn.display('agend')">Agenda</ons-button>
+                        <ons-button id="agend" class="custom-button active" onclick="display('agend','agenda')">Agenda
+                        </ons-button>
                     </ons-col>
                     <ons-col>
-                        <ons-button id="solic" class="custom-button" icon="fa-checkbox" onclick="fn.display('solic')">Solicitações</ons-button>
+                        <ons-button id="solic" class="custom-button" icon="fa-checkbox"
+                                    onclick="display('solic','agenda')">Solicitações
+                        </ons-button>
                     </ons-col>
                     <ons-col>
-                        <ons-button id="notif" class="custom-button" onclick="fn.display('notif')">Notificações</ons-button>
+                        <ons-button id="notif" class="custom-button" onclick="display('notif','agenda')">Notificações
+                        </ons-button>
                     </ons-col>
                 </ons-row>
                 <div id="agend-view">
                     <div class="calendarArea" style="padding-top: 20px"></div>
                 </div>
-                <div id="solic-view"></div>
-                <div id="notif-view"></div>
-                <ons-card modifier="material" hidden>
-                    <div class="content">
-                        <ons-row>
+                <div id="solic-view" style="display: none"></div>
+                <div id="notif-view" style="display: none">
+                    <ons-card modifier="material">
+                        <div class="content">
+                            <ons-row>
 
-                        </ons-row>
-                    </div>
-                </ons-card>
+                            </ons-row>
+                        </div>
+                    </ons-card>
+                </div>
+
             </ons-col>
         </ons-row>
         <style>
-            .profile_button_bar_agenda {
+            .profile_button_bar_agenda, .profile_button_bar_pac,
+            .profile_button_bar_profile {
                 text-align: center;
                 font-size: 26px;
                 /*height: 50px;*/
@@ -58,26 +65,29 @@
                 border-top: 1px solid rgba(187, 187, 187, 0.51);
                 background-color: #fafafa;
             }
+
             .profile_button_bar_agenda ons-col {
                 width: auto;
             }
+
             .custom-button {
                 color: #c3c3c3;
                 width: 100%;
                 background-color: #fafafa;
                 border-radius: 0;
+                box-shadow: none;
             }
-            .custom-button.active{
+
+            .custom-button.active {
                 color: #5fb4f4;
                 border-bottom: 2px solid #5fb4f4;
             }
         </style>
         <script>
-                ons.getScriptPage().onShow = function () {
-                    // fn.initializeCalendar();
-                    console.log('sbndkgb')
-                    initilizeCalendar();
-                }
+            ons.getScriptPage().onInit = function () {
+                initializeCalendar();
+                initializeSolics();
+            }
         </script>
     </ons-page>
 </template>
@@ -129,7 +139,7 @@
         </ons-row>
         <script>
             ons.getScriptPage().onInit = function () {
-                fn.loadPacientes();
+                loadPacientes();
             }
         </script>
         <style>
@@ -152,6 +162,10 @@
                 left: 42%;
                 top: 50%;
             }
+
+            .tweet-header {
+                width: 100%;
+            }
         </style>
     </ons-page>
 </template>
@@ -160,10 +174,10 @@
     <ons-page id="Tab3">
         <div id="form-area">
             <div class="content" style="width: 100%">
-                <div style="padding: 14px 6px 14px 16px; background-color: aliceblue !important;">
+                <div class="profile_upper" style="">
                     <div class="profile_wrapper">
                         <div class="profile_image_wrapper">
-                            <img src="assets/img/profile-image-08.png">
+                            <img src="http://placekitten.com/g/40/40">
                         </div>
                         <div class="profile_info_wrapper">
                             <div class="profile_info_numbers">
@@ -186,83 +200,114 @@
                             "aguardando verificação" :
                             "verificado" ?></div>
                 </div>
-                <ons-card>
-                    <div class="title">Dados Pessoais
-                        <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo(0)">
-                            <ons-icon icon="ion-edit"></ons-icon>
-                        </ons-toolbar-button>
-                    </div>
-                    <div class="content">
-                        <div class="profile_wrapper">
-                            <div class="profile_info_wrapper">
-                                <div class="profile_info_numbers">
-                                    <div>
-                                        <div class="profile_info_text">Nome</div>
-                                        <div>
-                                            <?= $this->user['info_user_name'] ?>
+                <ons-row class="profile_button_bar_profile">
+                    <ons-col>
+                        <ons-button id="dadpes" class="custom-button active" onclick="displayProfile('dadpes')">
+                            Pessoal
+                        </ons-button>
+                    </ons-col>
+                    <ons-col>
+                        <ons-button id="dadprof" class="custom-button" icon="fa-checkbox"
+                                    onclick="displayProfile('dadprof')">Profissional
+                        </ons-button>
+                    </ons-col>
+                    <ons-col>
+                        <ons-button id="dadad" class="custom-button" onclick="displayProfile('dadad')">Adicionais
+                        </ons-button>
+                    </ons-col>
+                </ons-row>
+                <div id="dadpes-view">
+                    <div style="height: 200px; padding: 1px 0 0 0;">
+                        <div class="card card--material">
+                            <div class="card__title card--material__title">Dados Pessoais
+                                <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(0)">
+                                    <ons-icon icon="ion-edit"></ons-icon>
+                                </ons-toolbar-button>
+                            </div>
+                            <div class="card__content card--material__content">
+                                <div class="profile_wrapper">
+                                    <div class="profile_info_wrapper">
+                                        <div class="profile_info_numbers">
+                                            <div>
+                                                <div class="profile_info_text">Nome</div>
+                                                <div>
+                                                    <?= $this->user['info_user_name'] ?>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">CPF</div>
+                                                <div><?= $this->user['info_user_cpf'] ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">RG</div>
+                                                <div><?= $this->user['info_user_rg'] ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">Status do Profissional</div>
+                                                <div>Cadastro solicitado
+                                                    em: <?= date("d/m/Y", strtotime($this->user['pi_solicited_in'])) ?></div>
+                                                <div>Cadastro verificado
+                                                    em: <?= $this->user['pi_confirmed_in'] === null ? "Aguardando verificação" : date("d/m/Y", strtotime($this->user['pi_confirmed_in'])) ?></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">CPF</div>
-                                        <div><?= $this->user['info_user_cpf'] ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">RG</div>
-                                        <div><?= $this->user['info_user_rg'] ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">Status do Profissional</div>
-                                        <div>Cadastro solicitado
-                                            em: <?= date("d/m/Y", strtotime($this->user['pi_solicited_in'])) ?></div>
-                                        <div>Cadastro verificado
-                                            em: <?= $this->user['pi_confirmed_in'] === null ? "Aguardando verificação" : date("d/m/Y", strtotime($this->user['pi_confirmed_in'])) ?></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="title">Dados Profissionais
-                        <ons-toolbar-button style="float: right; padding: 0" onclick="fn.editInfo(1)">
-                            <ons-icon icon="ion-edit"></ons-icon>
-                        </ons-toolbar-button>
-                    </div>
-
-                    <div class="content">
-                        <div class="profile_wrapper">
-                            <div class="profile_info_wrapper">
-                                <div class="profile_info_numbers">
-                                    <div>
-                                        <div class="profile_info_text">Especialidade</div>
-                                        <div>
-                                            <?= $this->user['pi_confirmed_in'] === null ?
-                                                "Aguardando validação" :
-                                                $this->user['esp_desc_especialidade'] ?>
+                </div>
+                <div id="dadprof-view" style="display: none">
+                    <div style="height: 200px; padding: 1px 0 0 0;">
+                        <div class="card card--material">
+                            <div class="card__title card--material__title">Dados Profissionais
+                                <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(1)">
+                                    <ons-icon icon="ion-edit"></ons-icon>
+                                </ons-toolbar-button>
+                            </div>
+                            <div class="card__content card--material__content">
+                                <div class="profile_wrapper">
+                                    <div class="profile_info_wrapper">
+                                        <div class="profile_info_numbers">
+                                            <div>
+                                                <div class="profile_info_text">Especialidade</div>
+                                                <div>
+                                                    <?= $this->user['pi_confirmed_in'] === null ?
+                                                        "Aguardando validação" :
+                                                        $this->user['esp_desc_especialidade'] ?>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">Conselho</div>
+                                                <div><?= $this->user['pi_cons_registry'] ?>
+                                                    - <?= $this->user['pc_desc_conselho'] ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">Endereço</div>
+                                                <div><?= $this->user['info_user_addr'] ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">Números de contato</div>
+                                                <div>Telefone
+                                                    Celular:<?= $this->user['info_user_ctt_phone'] ?></div>
+                                                <div>Telefone
+                                                    Residencial:<?= $this->user['info_user_ctt_res'] ?></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">Conselho</div>
-                                        <div><?= $this->user['pi_cons_registry'] ?>
-                                            - <?= $this->user['pc_desc_conselho'] ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">Endereço</div>
-                                        <div><?= $this->user['info_user_addr'] ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">Números de contato</div>
-                                        <div>Telefone
-                                            Celular:<?= $this->user['info_user_ctt_phone'] ?></div>
-                                        <div>Telefone
-                                            Residencial:<?= $this->user['info_user_ctt_res'] ?></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </ons-card>
+                </div>
+                <div id="dadad-view" style="display: none"></div>
             </div>
         </div>
         <style type="text/css">
+            .profile_upper {
+                padding: 14px 6px 14px 16px;
+                background-color: #fafafa;
+            }
+
             .profile_wrapper {
                 display: inline-flex;
                 width: 100%;
@@ -542,7 +587,7 @@
                             <ons-input style="width: 80%" id="info_user_addr" modifier="material" name="fEnd[]"
                                        type="text"
                                        placeholder="Endereço Principal" float validate></ons-input>
-                            <button type="button" class="fab fab--mini" onclick="fn.addAddress()"><i
+                            <button type="button" class="fab fab--mini" onclick="addAddress()"><i
                                         class="zmdi zmdi-plus"></i></button>
                         </ons-list-item>
                         <div class="addr-area">
@@ -621,10 +666,10 @@
         </ons-toolbar>
         <div id="form-area">
             <div class="content" style="width: 100%">
-                <div style="padding: 14px 6px 14px 16px; background-color: aliceblue !important;">
+                <div class="profile_upper">
                     <div class="profile_wrapper">
                         <div class="profile_image_wrapper">
-                            <img src="assets/img/profile-image-08.png">
+                            <img src="http://placekitten.com/g/40/40">
                         </div>
                         <div class="profile_info_wrapper">
                             <div class="profile_info_numbers">
@@ -635,56 +680,135 @@
                         </div>
                     </div>
                 </div>
-
-                <ons-card>
-                    <div class="title">Informações do paciente</div>
-
-                    <div class="content">
-                        <div class="profile_wrapper">
-                            <div class="profile_info_wrapper">
-                                <div class="profile_info_numbers">
-                                    <div>
-                                        <div class="profile_info_text">Nome</div>
-                                        <div id="u_name"></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">CPF</div>
-                                        <div id="u_cpf"></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">Plano de Saúde</div>
-                                        <div id="u_healthcare"></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">Números de contato</div>
-                                        <div id="u_ctt_phone">Telefone
-                                            Celular:
+                <ons-row class="profile_button_bar_pac">
+                    <ons-col>
+                        <ons-button id="infos" class="custom-button active" onclick="display('infos','pac')">
+                            Informações
+                        </ons-button>
+                    </ons-col>
+                    <ons-col>
+                        <ons-button id="histo" class="custom-button" icon="fa-checkbox"
+                                    onclick="display('histo', 'pac')">Histórico
+                        </ons-button>
+                    </ons-col>
+                </ons-row>
+                <div id="infos-view">
+                    <ons-card>
+                        <div class="title">Informações do paciente</div>
+                        <div class="content">
+                            <div class="profile_wrapper">
+                                <div class="profile_info_wrapper">
+                                    <div class="profile_info_numbers">
+                                        <div>
+                                            <div class="profile_info_text">Nome</div>
+                                            <div id="u_name"></div>
                                         </div>
-                                        <div id="u_ctt_res">Telefone
-                                            Residencial:
+                                        <div>
+                                            <div class="profile_info_text">CPF</div>
+                                            <div id="u_cpf"></div>
+                                        </div>
+                                        <div>
+                                            <div class="profile_info_text">Plano de Saúde</div>
+                                            <div id="u_healthcare"></div>
+                                        </div>
+                                        <div>
+                                            <div class="profile_info_text">Números de contato</div>
+                                            <div id="u_ctt_phone">Telefone
+                                                Celular:
+                                            </div>
+                                            <div id="u_ctt_res">Telefone
+                                                Residencial:
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </ons-card>
-                <ons-card>
-                    <div class="title">Registros no histórico</div>
-                    <div class="content">
-                        <ons-row>
-                            <ons-col width="100%">
-                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fRegPac">
-                                    <ons-lazy-repeat>
+                    </ons-card>
+                </div>
+                <div id="histo-view" style="display: none;">
+                    <ons-card>
+                        <div class="title">Registros no histórico</div>
+                        <div class="content">
+                            <ons-row>
+                                <ons-col width="100%">
+                                    <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fRegPac">
+                                        <ons-lazy-repeat>
 
-                                    </ons-lazy-repeat>
-                                </ons-list>
-                            </ons-col>
-                        </ons-row>
-                    </div>
-                </ons-card>
+                                        </ons-lazy-repeat>
+                                    </ons-list>
+                                </ons-col>
+                            </ons-row>
+                        </div>
+                    </ons-card>
+                </div>
+
             </div>
         </div>
+        <ons-speed-dial position="bottom right" direction="up">
+            <ons-fab>
+                <ons-icon icon="fa-plus"></ons-icon>
+            </ons-fab>
+            <ons-speed-dial-item>
+                <ons-icon icon="fa-prescription"></ons-icon>
+                <div>Prescrição</div>
+            </ons-speed-dial-item>
+            <ons-speed-dial-item>
+                <ons-icon icon="fa-stethoscope"></ons-icon>
+                <div class="speed-dial-text">Exame</div>
+            </ons-speed-dial-item>
+            <ons-speed-dial-item>
+                <ons-icon icon="fa-user-md"></ons-icon>
+                <div class="speed-dial-text">Procedimento</div>
+            </ons-speed-dial-item>
+        </ons-speed-dial>
+        <style>
+            ons-speed-dial-item.speed-dial__item {
+                /*width: 150px;*/
+                /*border-radius: 10%;*/
+            }
+
+            .speed-dial-text {
+                font-size: 14pt;
+                line-height: 20px;
+            }
+
+            .speed-dial__item div {
+                position: absolute;
+                background: rgba(0, 0, 0, 0);
+                font-size: 15px;
+                padding: 0 5px;
+                border-radius: 10px;
+                top: 3px;
+                right: 45px;
+                color: #5fb4f4;
+                width: 100px;
+                text-align: right;
+            }
+
+            .speed-dial__item {
+                overflow: visible !important;
+            }
+
+            ons-speed-dial:before {
+                content: '';
+                display: block;
+                position: fixed;
+                visibility: hidden;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.2);
+                opacity: 0;
+                transition: opacity 0.2s ease-in-out;
+            }
+
+            ons-speed-dial.open:before {
+                opacity: 1;
+                visibility: visible;
+            }
+        </style>
     </ons-page>
 </template>
 
@@ -881,10 +1005,10 @@
 
             <ons-row class="profile_button_bar">
                 <ons-col>
-                    <ons-icon id="grid" icon="ion-grid" style="color: #5fb4f4" onclick="fn.display('grid')"></ons-icon>
+                    <ons-icon id="grid" icon="ion-grid" style="color: #5fb4f4" onclick="display('grid')"></ons-icon>
                 </ons-col>
                 <ons-col>
-                    <ons-icon id="list" icon="md-format-list-bulleted" onclick="fn.display('list')"></ons-icon>
+                    <ons-icon id="list" icon="md-format-list-bulleted" onclick="display('list')"></ons-icon>
                 </ons-col>
                 <ons-col>
                     <ons-icon icon="ion-ios-pricetag-outline"></ons-icon>
@@ -1051,7 +1175,6 @@
                 </ons-row>
             </div>
         </div>
-
 
 
     </ons-page>
