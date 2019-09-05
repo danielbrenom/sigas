@@ -74,10 +74,17 @@ class ProfessionalAppController extends AbstractActionController
                 $response['u_cpf'] = $pacInfo['info_user_cpf'];
                 $response['u_ctt_phone'] = $pacInfo['info_user_ctt_phone'];
                 $response['u_ctt_res'] = $pacInfo['info_user_ctt_res'];
-                $response['u_healthcare'] = $pacInfo['info_user_healthcare'];
+                $response['u_healthcare'] = $pacInfo['desc_healthcare'];
                 $response['reg_types'] = $this->mobileRepository->getProceduresAvailableForUser($params['pac_id']);
                 break;
+            case 'procedure':
+                $procPacInfo = "";
+                break;
             default:
+                $response = [
+                    'code' => 0,
+                    'message' => 'Solicitação inválida'
+                ];
                 break;
         }
         return new JsonModel($response);

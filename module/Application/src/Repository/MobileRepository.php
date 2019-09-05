@@ -11,6 +11,7 @@ use Application\Entity\Sis\ProfessionalConselhos;
 use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
+use Application\Entity\Sis\UserHealthcare;
 use Application\Entity\Sis\UserHistoric;
 use Application\Entity\Sis\UserHistoricInformation;
 use Application\Entity\Sis\UserHistoricType;
@@ -43,8 +44,10 @@ class MobileRepository
     {
         return $this->entityManager->getRepository(User::class)
             ->createQueryBuilder('u')
-            ->addSelect('info')
+            ->addSelect(['info','uhc.desc_healthcare'])
             ->leftJoin('u.user_information', 'info')
+            ->leftJoin(UserHealthcare::class, 'uhc', 'WITH',
+                'uhc.id = info.user_healthcare')
             ->where('u.id = :sId')
             ->setParameter('sId', $user_id)
             ->getQuery()->getResult($mode);
@@ -124,11 +127,13 @@ class MobileRepository
         return $this->entityManager->getRepository(UserAppointment::class)
             ->createQueryBuilder('ua')
             ->distinct()
-            ->select(['ui.user_name', 'ui.id'])
+            ->select(['ui.user_name', 'ui.id', 'uhc.desc_healthcare'])
             ->leftJoin(UserHistoric::class, 'uh', 'WITH',
                 'uh.id_appointment_entry = ua.id')
             ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
                 'ui.id = uh.user_id')
+            ->leftJoin(UserHealthcare::class, 'uhc', 'WITH',
+                'uhc.id = ui.user_healthcare')
             ->where('uh.historic_type = 1 and ua.id_user_ps = :sId')
             ->setParameter('sId', $prof_id)
             ->getQuery()->getResult(3);

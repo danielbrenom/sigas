@@ -1,115 +1,123 @@
+if (ons.isReady()) {
+    $.get('/mobile/prof/get-log-messages', {}, function (response) {
+        if (response.error) {
+            let titleT = "", icontype = "";
+            switch (response.error.code) {
+                case 0:
+                    titleT = "Erro";
+                    icontype = "error";
+                    break;
+                case 1:
+                    titleT = "Sucesso";
+                    icontype = "success";
+                    break;
+                default:
+                    titleT = "Erro";
+                    icontype = "error";
+                    break;
+            }
+            swal({
+                title: titleT,
+                text: response.error.message,
+                timer: 3000,
+                icon: icontype,
+                buttons: false
+            });
+        }
+    })
+}
+
+function initilizeCalendar(){
+    console.log('jbehkfb')
+    try {
+        let calendar = new FullCalendar.Calendar($(".calendarArea")[0], {
+            plugins: ['moment', 'dayGrid', 'timeGrid', 'bootstrap', 'interaction', 'momentTimezone'],
+            locale: 'pt-BR',
+            themeSystem: "bootstrap",
+            defaultView: 'weekGridDay',
+            header: {
+                left: 'prev,next',
+                center: 'title',
+                right: 'dayGridMonth, weekGridDay',
+            },
+            buttonText: {
+                month: 'mês'
+            },
+            allDaySlot: false,
+            slotEventOverlap: false,
+            height: 600,
+            contentHeight: 550,
+            displayEventTime: false,
+            dateClick: function (info) {
+                if (info.view.type === 'dayGridMonth' || info.view.type === 'weekGridDay') {
+                    calendar.changeView('oneGridDay');
+                    calendar.gotoDate(info.date);
+                } else if (info.view.type === 'oneGridDay') {
+                    swal({
+                        title: "Confirmação",
+                        text: 'Continuar escolha para data ' + info.date.toLocaleDateString() + '?',
+                        buttons: {
+                            no: {
+                                text: "Não",
+                                value: false
+                            },
+                            yes: {
+                                text: "Sim",
+                                value: true,
+                                className: 'btn-success'
+                            }
+                        }
+                    }).then(r => {
+                        if (r) {
+                            fn.finishAppointment(info);
+                        }
+                    })
+                }
+            },
+            views: {
+                oneGridDay: {
+                    type: 'timeGridDay',
+                    duration: {days: 1},
+                    buttonText: 'Day',
+                    minTime: "08:00:00",
+                    maxTime: "19:00:00"
+                },
+                weekGridDay: {
+                    type: 'timeGridWeek',
+                    duration: {days: 3},
+                    buttonText: 'sem',
+                    minTime: "08:00:00",
+                    maxTime: "19:00:00"
+                }
+            },
+            timeZone: "local",
+            eventSources: [
+                {
+                    url: '/mobile/prof/get-schedule',
+                    method: 'GET',
+                    failure: function (e) {
+                        console.log(e);
+                    }
+                }
+            ]
+        });
+        calendar.render();
+    } catch (e) {
+        console.log(e.message);
+        console.log(e.stack)
+    }
+}
+
 $(function () {
     let tempId;
-    if (ons.isReady()) {
-        $.get('/mobile/prof/get-log-messages', {}, function (response) {
-            if (response.error) {
-                let titleT = "", icontype = "";
-                switch (response.error.code) {
-                    case 0:
-                        titleT = "Erro";
-                        icontype = "error";
-                        break;
-                    case 1:
-                        titleT = "Sucesso";
-                        icontype = "success";
-                        break;
-                    default:
-                        titleT = "Erro";
-                        icontype = "error";
-                        break;
-                }
-                swal({
-                    title: titleT,
-                    text: response.error.message,
-                    timer: 3000,
-                    icon: icontype,
-                    buttons: false
-                });
-            }
-        })
-    }
+
 
     fn = {};
 
     fn.initializeCalendar = function () {
-        try {
-            let calendar = new FullCalendar.Calendar($(".calendarArea")[0], {
-                plugins: ['moment', 'dayGrid', 'timeGrid', 'bootstrap', 'interaction', 'momentTimezone'],
-                locale: 'pt-BR',
-                themeSystem: "bootstrap",
-                defaultView: 'weekGridDay',
-                header: {
-                    left: 'prev,next',
-                    center: 'title',
-                    right: 'dayGridMonth, weekGridDay',
-                },
-                buttonText: {
-                    month: 'mês'
-                },
-                allDaySlot: false,
-                slotEventOverlap: false,
-                height: 600,
-                contentHeight: 550,
-                displayEventTime: false,
-                dateClick: function (info) {
-                    if (info.view.type === 'dayGridMonth' || info.view.type === 'weekGridDay') {
-                        calendar.changeView('oneGridDay');
-                        calendar.gotoDate(info.date);
-                    } else if (info.view.type === 'oneGridDay') {
-                        swal({
-                            title: "Confirmação",
-                            text: 'Continuar escolha para data ' + info.date.toLocaleDateString() + '?',
-                            buttons: {
-                                no: {
-                                    text: "Não",
-                                    value: false
-                                },
-                                yes: {
-                                    text: "Sim",
-                                    value: true,
-                                    className: 'btn-success'
-                                }
-                            }
-                        }).then(r => {
-                            if (r) {
-                                fn.finishAppointment(info);
-                            }
-                        })
-                    }
-                },
-                views: {
-                    oneGridDay: {
-                        type: 'timeGridDay',
-                        duration: {days: 1},
-                        buttonText: 'Day',
-                        minTime: "08:00:00",
-                        maxTime: "19:00:00"
-                    },
-                    weekGridDay: {
-                        type: 'timeGridWeek',
-                        duration: {days: 3},
-                        buttonText: 'sem',
-                        minTime: "08:00:00",
-                        maxTime: "19:00:00"
-                    }
-                },
-                timeZone: "local",
-                eventSources: [
-                    {
-                        url: '/mobile/prof/get-schedule',
-                        method: 'GET',
-                        failure: function (e) {
-                            console.log(e);
-                        }
-                    }
-                ]
-            });
-            calendar.render();
-        } catch (e) {
-            console.log(e.message);
-            console.log(e.stack)
-        }
+
     };
+
 
     fn.editInfo = function (type) {
         if (type) {
@@ -130,9 +138,34 @@ $(function () {
             let list = $("#fHistPac ons-lazy-repeat");
             list.empty();
             $.each(response, function (key, value) {
-                let item = '<ons-list-item modifier="chevron longdivider" tappable onclick="fn.loadPacienteInfo(' + value.id + ')">' +
-                    value.user_name +
-                    '</ons-list-item>';
+                // let item = '<ons-list-item modifier="chevron longdivider" tappable onclick="fn.loadPacienteInfo(' + value.id + ')">' +
+                //     value.user_name +
+                //     '</ons-list-item>';
+                let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
+                    '                        <div class="left">' +
+                    '                            <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">' +
+                    '                        </div>' +
+                    '                        <div class="center">' +
+                    '                            <div class="tweet-header">' +
+                    '                                <span class="list-item__title"><b>' + value.user_name + '</b></span>' +
+                    '                            </div>' +
+                    '                            <span class="list-item__content">Plano de saúde: ' + value.desc_healthcare + '</span>' +
+                    '                            <ons-row class="option-buttons">' +
+                    '                                <ons-col>' +
+                    '                                </ons-col>' +
+                    '                                <ons-col>' +
+                    '                                </ons-col>' +
+                    '                                <ons-col>' +
+                    '                                </ons-col>' +
+                    '                                <ons-col>' +
+                    '                                    <ons-button modifier="quiet" onclick="fn.loadPacienteInfo(' + value.id + ')">' +
+                    '                                        <ons-icon icon="fa-info"></ons-icon>' +
+                    '                                        <span class="reaction-no">mais informações</span>' +
+                    '                                    </ons-button>' +
+                    '                                </ons-col>' +
+                    '                            </ons-row>' +
+                    '                        </div>' +
+                    '                    </ons-list-item>';
                 list.append(item);
             })
         })
@@ -160,22 +193,55 @@ $(function () {
             });
             swal.close();
         })
-    }
+    };
+
+    fn.loadProcedures = function (type) {
+        $.get("/")
+    };
 
     fn.addAddress = function () {
-        let addr = '<ons-list-item class="input-items end">\n' +
-            '                            <div class="left">\n' +
-            '                                <ons-icon icon="fa-map-marker-alt" class="list-item__icon"></ons-icon>\n' +
-            '                            </div>\n' +
-            '                            <ons-input style="width: 80%" id="info_user_addr" modifier="material" name="fEnd[]"\n' +
-            '                                       type="text"\n' +
-            '                                       placeholder="Endereço Adicional" float validate></ons-input>\n' +
-            '                            <button type="button" class="fab fab--mini" onclick="fn.removeAddress()"><i class="zmdi zmdi-minus"></i></button>\n' +
+        let addr = '<ons-list-item class="input-items end">' +
+            '                            <div class="left">' +
+            '                                <ons-icon icon="fa-map-marker-alt" class="list-item__icon"></ons-icon>' +
+            '                            </div>' +
+            '                            <ons-input style="width: 80%" id="info_user_addr" modifier="material" name="fEnd[]"' +
+            '                                       type="text"' +
+            '                                       placeholder="Endereço Adicional" float validate></ons-input>' +
+            '                            <button type="button" class="fab fab--mini" onclick="fn.removeAddress()"><i class="zmdi zmdi-minus"></i></button>' +
             '                        </ons-list-item>';
         $(".addr-area").append(addr);
-    }
+    };
 
     fn.removeAddress = function () {
         $(".addr-area ons-list-item:last-child").remove();
-    }
+    };
+
+    fn.display = function (id) {
+        $.each($(".profile_button_bar_agenda ons-button"), function (key, value) {
+            $(value).removeClass('active');
+           console.log(value)
+        });
+        $('#' + id).addClass('active');
+        // document.getElementById("list").style.color = "#1f1f21";
+        // document.getElementById("grid").style.color = "#1f1f21";
+
+        //
+        // document.getElementById("list_view").style.display = "none";
+        // document.getElementById("grid_view").style.display = "none";
+        // document.getElementById(id + "_view").style.display = "block";
+    };
+
+    // ons.openActionSheet({
+    //     cancelable: true,
+    //     buttons: [
+    //         'Share Tweet via...',
+    //         'Add to Moment',
+    //         'I don\'t like this Tweet',
+    //         'Report Tweet',
+    //         {
+    //             label: 'Cancel',
+    //             icon: 'md-close'
+    //         }
+    //     ]
+    // })
 });
