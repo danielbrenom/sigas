@@ -129,6 +129,22 @@ class ProfessionalAppController extends AbstractActionController
         return new JsonModel($response);
     }
 
+    public function saveHistoricAction()
+    {
+        $params = $this->params()->fromPost();
+        $normPrescricoes = [];
+        $size = count($params['fMedic']);
+        for ($i = 0; $i < $size; $i++) {
+            $normPrescricoes[] = [
+                "medicamento" => $params['fMedic'][$i],
+                "dosagem" => $params['fDose'][$i],
+                "posologia" => $params['fPoso'][$i],
+            ];
+        }
+        $this->mobileRepository->savePrescriptions(["pacid" => $params['pacId'], "docid" => $this->authManager->getActiveUser()['user_id'], "presc" => $normPrescricoes]);
+        UtilsFile::printvardie($params, $normPrescricoes);
+    }
+
     public function getLogMessagesAction()
     {
         return new JsonModel([

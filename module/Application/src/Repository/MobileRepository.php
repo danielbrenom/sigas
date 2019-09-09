@@ -16,6 +16,7 @@ use Application\Entity\Sis\UserHistoric;
 use Application\Entity\Sis\UserHistoricInformation;
 use Application\Entity\Sis\UserHistoricType;
 use Application\Entity\Sis\UserInfoPessoal;
+use Application\Entity\Sis\UserPrescription;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
@@ -44,7 +45,7 @@ class MobileRepository
     {
         return $this->entityManager->getRepository(User::class)
             ->createQueryBuilder('u')
-            ->addSelect(['info','uhc.desc_healthcare'])
+            ->addSelect(['info', 'uhc.desc_healthcare'])
             ->leftJoin('u.user_information', 'info')
             ->leftJoin(UserHealthcare::class, 'uhc', 'WITH',
                 'uhc.id = info.user_healthcare')
@@ -246,7 +247,8 @@ class MobileRepository
 
     //Buscas gerais
 
-    public function getProceduresAvailableForUser($pac_id){
+    public function getProceduresAvailableForUser($pac_id)
+    {
         return $this->entityManager->getRepository(UserHistoric::class)
             ->createQueryBuilder('uh')
             ->distinct()
@@ -295,6 +297,33 @@ class MobileRepository
             //UtilsFile::printvardie($e->getMessage());
             $this->entityManager->rollback();
             return false;
+        }
+    }
+
+    public function savePrescriptions($params)
+    {
+        try {
+            $this->entityManager->beginTransaction();
+            foreach ($params['presc'] as $prescicao) {
+                $prescription = new UserPrescription();
+                $prescription->setPrescMedicamento($prescicao['medicamento']);
+                $prescription->setPrescDosagem($prescicao['dosagem']);
+                $prescription->setPrescPosologia($prescicao['posologia']);
+                $prescription->setProfCadastro($params['docid']);
+                $prescription->setDtCadastro((new \DateTime('now', new \DateTimeZone("America/Belem")))->format("Y-m-d H:i:s"));
+                $this->entityManager->persist($prescription);
+                $this->entityManager->flush();
+                $historic = new UserHistoric();
+                $historic->setUserId($this->entityManager->getRepository(User::class)->find($params['pacid']));
+                $historic->setHistoricType(4);
+                $historic->setIdGenericEntry($prescription->getId());
+                $this->entityManager->persist($historic);
+                $this->entityManager->flush();
+            }
+            $this->entityManager->commit();
+        } catch (Exception $e) {
+            UtilsFile::printvardie($e->getMessage());
+            $this->entityManager->rollback();
         }
     }
 

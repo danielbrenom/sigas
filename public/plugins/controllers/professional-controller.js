@@ -1,3 +1,4 @@
+let pacId;
 if (ons.isReady()) {
     $.get('/mobile/prof/get-log-messages', {}, function (response) {
         if (response.error) {
@@ -156,8 +157,10 @@ function loadPacienteInfo(id) {
     swal({
         title: "Carregando",
         text: "Aguarde",
-        buttons: false
+        buttons: false,
+        timer: 2000
     });
+    pacId = id;
     $.get('/mobile/prof/get-pacientes', {mode: 'details', pac_id: id}, function (response) {
         $("#mainNavigator")[0].pushPage('pacProfile.html').then(() => {
             $.each(response, function (key, value) {
@@ -172,8 +175,35 @@ function loadPacienteInfo(id) {
                 list.append(item);
             })
         });
-        swal.close();
     })
+}
+
+function insertHistoric(type) {
+    console.log(type);
+    let areas = ['pres', 'rx', 'rem', 'note'];
+    $.each(areas, function (key, value) {
+        $("#" + value + "Area").hide('fast');
+    });
+    $("#mainNavigator")[0].pushPage('addHistoric.html').then(() => {
+        $("#" + areas[type] + "Area").show('fast');
+        $("#pacId").val(pacId);
+    })
+}
+
+function addRem() {
+    let remInfo = $("#precFrom").serializeArray().slice(0, 3);
+    if (remInfo[0].value == "") {
+        ons.notification.toast('Todos os campos devem ser preenchidos', {timeout: 5000});
+    } else {
+        $("#prescList").show('fast')
+        let div = '<ons-list-item>' + remInfo[0].value + ' - ' + remInfo[1].value + '</ons-list-item>';
+        $("#prescList").append(div);
+        $.each(remInfo, function (key, value) {
+            let input = '<input name="' + value.name + '" value="' + value.value + '"/>';
+            $("#addPrescArea").append(input);
+        })
+    }
+
 }
 
 function editInfo(type) {

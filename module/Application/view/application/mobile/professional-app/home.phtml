@@ -749,17 +749,21 @@
             <ons-fab>
                 <ons-icon icon="fa-plus"></ons-icon>
             </ons-fab>
-            <ons-speed-dial-item>
-                <ons-icon icon="fa-prescription"></ons-icon>
+            <ons-speed-dial-item onclick="insertHistoric(0)">
+                <ons-icon icon="fa-pills"></ons-icon>
                 <div>Prescrição</div>
             </ons-speed-dial-item>
-            <ons-speed-dial-item>
+            <ons-speed-dial-item onclick="insertHistoric(1)">
                 <ons-icon icon="fa-stethoscope"></ons-icon>
                 <div class="speed-dial-text">Exame</div>
             </ons-speed-dial-item>
-            <ons-speed-dial-item>
+            <ons-speed-dial-item onclick="insertHistoric(2)">
                 <ons-icon icon="fa-user-md"></ons-icon>
                 <div class="speed-dial-text">Procedimento</div>
+            </ons-speed-dial-item>
+            <ons-speed-dial-item onclick="insertHistoric(3)">
+                <ons-icon icon="fa-notes-medical"></ons-icon>
+                <div class="speed-dial-text">Notas</div>
             </ons-speed-dial-item>
         </ons-speed-dial>
         <style>
@@ -812,14 +816,95 @@
     </ons-page>
 </template>
 
-<template id="new1.html"></template>
+<template id="addHistoric.html">
+    <ons-page id="add-Historic">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Paciente</ons-back-button>
+            </div>
+            <div class="center">Inserir no histórico</div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-col>
+                <ons-card>
+                    <div class="title">Preencha as informações necessárias:</div>
+                    <div id="presArea">
+                        <form action="<?= $this->url('application_mobile_prof', ['action' => 'save-historic']) ?>"
+                              method="post" enctype="multipart/form-data" id="precFrom">
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-pills" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fMedic[]"
+                                           type="text"
+                                           placeholder="Medicamento" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-prescription-bottle" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fDose[]"
+                                           type="text"
+                                           placeholder="Dosagem" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-clock" class="list-item__icon"></ons-icon>
+                                </div>
+                                <textarea class="textarea" name="fPoso[]" rows="3" placeholder="Posologia"
+                                          style="width: 100%"></textarea>
+
+                            </ons-list-item>
+                            <div id="prescList" style="display: none;">
+                                <div class="left">
+                                    Nesta prescrição:
+                                </div>
+                            </div>
+                            <ons-list-item>
+                                <div class="left left-label">
+                                    <button type="button" class="button" onclick="addRem()">+</button>
+                                </div>
+                                <div class="right right-label">
+                                    <button type="submit" class="button">Salvar</button>
+                                </div>
+                            </ons-list-item>
+
+                            <div id="addPrescArea" hidden>
+                                <input type="text" name="pacId" id="pacId">
+                            </div>
+                        </form>
+
+                    </div>
+                    <div id="rxArea"></div>
+                    <div id="remArea"></div>
+                    <div id="noteArea"></div>
+                </ons-card>
+            </ons-col>
+        </ons-row>
+        <style>
+            .list-item__center, .list-item__right {
+                background-image: none;
+            }
+
+            .toast {
+                background-color: #0f6674;
+                opacity: 100;
+            }
+
+            p {
+                width: 100%;
+            }
+        </style>
+    </ons-page>
+</template>
 
 <template id="twitter.html">
     <ons-page id="home-page">
         <ons-pull-hook>
             <ons-icon size="30px" spin icon="md-spinner"></ons-icon>
         </ons-pull-hook>
-
         <ons-list>
 
             <ons-list-item modifier="longdivider">

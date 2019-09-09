@@ -41,6 +41,11 @@ class UserHistoric
     protected $id_appointment_entry;
 
     /**
+     * @ORM\Column(name="id_general_entry")
+     */
+    protected $id_generic_entry;
+
+    /**
      * @return mixed
      */
     public function getIdHistoric()
@@ -135,6 +140,24 @@ class UserHistoric
     {
         $this->id_reg_informations = $id_reg_informations;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getIdGenericEntry()
+    {
+        return $this->id_generic_entry;
+    }
+
+    /**
+     * @param mixed $id_generic_entry
+     */
+    public function setIdGenericEntry($id_generic_entry)
+    {
+        $this->id_generic_entry = $id_generic_entry;
+    }
+
+
 
 
 
