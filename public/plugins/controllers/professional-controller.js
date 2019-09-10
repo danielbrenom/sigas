@@ -42,11 +42,13 @@ $().ready(function () {
     swiperagenda = new Swiper('.swiper-container-agenda', {
         direction: 'horizontal',
         loop: false,
-        width: screen.width
+        width: screen.width,
+        allowTouchMove: false
     });
     swiperprofile = new Swiper('.swiper-container-profile', {
         direction: 'horizontal',
         loop: false,
+        allowTouchMove: false,
         width: screen.width
     });
 
@@ -188,7 +190,8 @@ function loadPacienteInfo(id) {
             swiperpac = new Swiper('.swiper-container-pac', {
                 direction: 'horizontal',
                 loop: false,
-                width: screen.width
+                width: screen.width,
+                allowTouchMove: false
             });
             $.each(response, function (key, value) {
                 $("#" + key).empty().append(value);
