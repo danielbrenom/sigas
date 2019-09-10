@@ -29,10 +29,11 @@ class ProfessionalAppController extends AbstractActionController
     public function homeAction()
     {
         $profInfo = $this->mobileRepository->getProfissionalInfo($this->authManager->getActiveUser()['user_id'], true)[0];
-        //UtilsFile::printvardie($this->mobileRepository->getConselhos());
+        //UtilsFile::printvardie($this->mobileRepository->getProceduresProfessional($this->authManager->getActiveUser()['user_id']));
         return new ViewModel([
             'user' => $profInfo,
-            'cons' => $this->mobileRepository->getConselhos()
+            'cons' => $this->mobileRepository->getConselhos(),
+            'proceds' => $this->mobileRepository->getProceduresProfessional($this->authManager->getActiveUser()['user_id'])
         ]);
     }
 
@@ -132,23 +133,46 @@ class ProfessionalAppController extends AbstractActionController
     public function saveHistoricAction()
     {
         $params = $this->params()->fromPost();
-        $normPrescricoes = [];
-        $size = count($params['fMedic']);
-        for ($i = 0; $i < $size; $i++) {
-            $normPrescricoes[] = [
-                "medicamento" => $params['fMedic'][$i],
-                "dosagem" => $params['fDose'][$i],
-                "posologia" => $params['fPoso'][$i],
-            ];
+        switch ($params['op']) {
+            case 'prescriptions':
+                $normPrescricoes = [];
+                $size = count($params['fMedic']);
+                for ($i = 0; $i < $size; $i++) {
+                    if ($params['fMedic'][$i] == "") continue;
+                    $normPrescricoes[] = [
+                        "medicamento" => $params['fMedic'][$i],
+                        "dosagem" => $params['fDose'][$i],
+                        "posologia" => $params['fPoso'][$i],
+                    ];
+                }
+                if ($this->mobileRepository->savePrescriptions(["pacid" => $params['pacId'], "docid" => $this->authManager->getActiveUser()['user_id'], "presc" => $normPrescricoes])) {
+                    $this->mobileRepository->setMessage("Prescrição salva.", 1);
+                } else {
+                    $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
+                }
+                break;
+            case 'rx':
+                $params['docid'] = $this->authManager->getActiveUser()['user_id'];
+                if($this->mobileRepository->saveExams($params)){
+                    $this->mobileRepository->setMessage("Exame salvo.", 1);
+                } else {
+                    $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
+                }
+                break;
+            default:
+                $this->redirect()->toRoute('home');
+                break;
         }
-        $this->mobileRepository->savePrescriptions(["pacid" => $params['pacId'], "docid" => $this->authManager->getActiveUser()['user_id'], "presc" => $normPrescricoes]);
-        UtilsFile::printvardie($params, $normPrescricoes);
+
+        $this->redirect()->toRoute('application_mobile_prof');
+
     }
 
     public function getLogMessagesAction()
     {
         return new JsonModel([
             'error' => $this->mobileRepository->getMessage()
+            //'error' => ['code'=> 0, 'message' => "Registro salvo"]
         ]);
     }
 }

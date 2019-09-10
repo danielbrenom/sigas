@@ -19,6 +19,11 @@ class UserHistoricInformation
     protected $id;
 
     /**
+     * @ORM\Column(name="id_historic_reg")
+     */
+    protected $id_historic_reg;
+
+    /**
      * @ORM\Column(name="historic_information")
      */
     protected $historic_information;

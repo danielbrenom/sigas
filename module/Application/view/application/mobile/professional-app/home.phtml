@@ -17,41 +17,59 @@
             <ons-tab page="profilePage.html" label="Perfil" icon="fa-user-md">
             </ons-tab>
         </ons-tabbar>
+        <style>
+            .toast{
+                opacity: 100;
+                background-color: #0f6674;
+            }
+            .toast-success div{
+                background-color: #467447;
+            }
+            .toast-error div{
+                background-color: #a53a39;
+            }
+        </style>
     </ons-page>
 </template>
 
 <template id="tab1.html">
     <ons-page id="Tab1">
+        <ons-row class="profile_button_bar_agenda">
+            <ons-col>
+                <ons-button id="agend" class="custom-button active" onclick="display('agend','agenda',0)">Agenda
+                </ons-button>
+            </ons-col>
+            <ons-col>
+                <ons-button id="solic" class="custom-button" icon="fa-checkbox"
+                            onclick="display('solic','agenda',1)">Solicitações
+                </ons-button>
+            </ons-col>
+            <ons-col>
+                <ons-button id="notif" class="custom-button" onclick="display('notif','agenda',2)">Notificações
+                </ons-button>
+            </ons-col>
+        </ons-row>
         <ons-row>
             <ons-col style="padding: 0">
-                <ons-row class="profile_button_bar_agenda">
-                    <ons-col>
-                        <ons-button id="agend" class="custom-button active" onclick="display('agend','agenda')">Agenda
-                        </ons-button>
-                    </ons-col>
-                    <ons-col>
-                        <ons-button id="solic" class="custom-button" icon="fa-checkbox"
-                                    onclick="display('solic','agenda')">Solicitações
-                        </ons-button>
-                    </ons-col>
-                    <ons-col>
-                        <ons-button id="notif" class="custom-button" onclick="display('notif','agenda')">Notificações
-                        </ons-button>
-                    </ons-col>
-                </ons-row>
-                <div id="agend-view">
-                    <div class="calendarArea" style="padding-top: 20px"></div>
-                </div>
-                <div id="solic-view" style="display: none"></div>
-                <div id="notif-view" style="display: none">
-                    <ons-card modifier="material">
-                        <div class="content">
-                            <ons-row>
 
-                            </ons-row>
+                <div class="swiper-container-agenda">
+                    <div class="swiper-wrapper" style="width: 360px">
+                        <div id="agend-view" class="swiper-slide">
+                            <div class="calendarArea" style="padding-top: 20px"></div>
                         </div>
-                    </ons-card>
+                        <div id="solic-view" class="swiper-slide"></div>
+                        <div id="notif-view" class="swiper-slide">
+                            <ons-card modifier="material">
+                                <div class="content">
+                                    <ons-row>
+
+                                    </ons-row>
+                                </div>
+                            </ons-card>
+                        </div>
+                    </div>
                 </div>
+
 
             </ons-col>
         </ons-row>
@@ -81,6 +99,10 @@
             .custom-button.active {
                 color: #5fb4f4;
                 border-bottom: 2px solid #5fb4f4;
+            }
+
+            .swiper-container {
+                height: 100%;
             }
         </style>
         <script>
@@ -202,104 +224,110 @@
                 </div>
                 <ons-row class="profile_button_bar_profile">
                     <ons-col>
-                        <ons-button id="dadpes" class="custom-button active" onclick="displayProfile('dadpes')">
+                        <ons-button id="dadpes" class="custom-button active" onclick="display('dadpes', 'profile', 0)">
                             Pessoal
                         </ons-button>
                     </ons-col>
                     <ons-col>
                         <ons-button id="dadprof" class="custom-button" icon="fa-checkbox"
-                                    onclick="displayProfile('dadprof')">Profissional
+                                    onclick="display('dadprof', 'profile', 1)">Profissional
                         </ons-button>
                     </ons-col>
                     <ons-col>
-                        <ons-button id="dadad" class="custom-button" onclick="displayProfile('dadad')">Adicionais
+                        <ons-button id="dadad" class="custom-button" onclick="display('dadad', 'profile', 2)">Adicionais
                         </ons-button>
                     </ons-col>
                 </ons-row>
-                <div id="dadpes-view">
-                    <div style="height: 200px; padding: 1px 0 0 0;">
-                        <div class="card card--material">
-                            <div class="card__title card--material__title">Dados Pessoais
-                                <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(0)">
-                                    <ons-icon icon="ion-edit"></ons-icon>
-                                </ons-toolbar-button>
-                            </div>
-                            <div class="card__content card--material__content">
-                                <div class="profile_wrapper">
-                                    <div class="profile_info_wrapper">
-                                        <div class="profile_info_numbers">
-                                            <div>
-                                                <div class="profile_info_text">Nome</div>
-                                                <div>
-                                                    <?= $this->user['info_user_name'] ?>
+                <ons-row>
+                    <div class="swiper-container-profile">
+                        <div class="swiper-wrapper" style="width: 360px">
+                            <div id="dadpes-view" class="swiper-slide">
+                                <div style="height: 200px; padding: 1px 0 0 0;">
+                                    <div class="card card--material">
+                                        <div class="card__title card--material__title">Dados Pessoais
+                                            <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(0)">
+                                                <ons-icon icon="ion-edit"></ons-icon>
+                                            </ons-toolbar-button>
+                                        </div>
+                                        <div class="card__content card--material__content">
+                                            <div class="profile_wrapper">
+                                                <div class="profile_info_wrapper">
+                                                    <div class="profile_info_numbers">
+                                                        <div>
+                                                            <div class="profile_info_text">Nome</div>
+                                                            <div>
+                                                                <?= $this->user['info_user_name'] ?>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="profile_info_text">CPF</div>
+                                                            <div><?= $this->user['info_user_cpf'] ?></div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="profile_info_text">RG</div>
+                                                            <div><?= $this->user['info_user_rg'] ?></div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="profile_info_text">Status do Profissional</div>
+                                                            <div>Cadastro solicitado
+                                                                em: <?= date("d/m/Y", strtotime($this->user['pi_solicited_in'])) ?></div>
+                                                            <div>Cadastro verificado
+                                                                em: <?= $this->user['pi_confirmed_in'] === null ? "Aguardando verificação" : date("d/m/Y", strtotime($this->user['pi_confirmed_in'])) ?></div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <div class="profile_info_text">CPF</div>
-                                                <div><?= $this->user['info_user_cpf'] ?></div>
-                                            </div>
-                                            <div>
-                                                <div class="profile_info_text">RG</div>
-                                                <div><?= $this->user['info_user_rg'] ?></div>
-                                            </div>
-                                            <div>
-                                                <div class="profile_info_text">Status do Profissional</div>
-                                                <div>Cadastro solicitado
-                                                    em: <?= date("d/m/Y", strtotime($this->user['pi_solicited_in'])) ?></div>
-                                                <div>Cadastro verificado
-                                                    em: <?= $this->user['pi_confirmed_in'] === null ? "Aguardando verificação" : date("d/m/Y", strtotime($this->user['pi_confirmed_in'])) ?></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="dadprof-view" style="display: none">
-                    <div style="height: 200px; padding: 1px 0 0 0;">
-                        <div class="card card--material">
-                            <div class="card__title card--material__title">Dados Profissionais
-                                <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(1)">
-                                    <ons-icon icon="ion-edit"></ons-icon>
-                                </ons-toolbar-button>
-                            </div>
-                            <div class="card__content card--material__content">
-                                <div class="profile_wrapper">
-                                    <div class="profile_info_wrapper">
-                                        <div class="profile_info_numbers">
-                                            <div>
-                                                <div class="profile_info_text">Especialidade</div>
-                                                <div>
-                                                    <?= $this->user['pi_confirmed_in'] === null ?
-                                                        "Aguardando validação" :
-                                                        $this->user['esp_desc_especialidade'] ?>
+                            <div id="dadprof-view" class="swiper-slide">
+                                <div style="height: 200px; padding: 1px 0 0 0;">
+                                    <div class="card card--material">
+                                        <div class="card__title card--material__title">Dados Profissionais
+                                            <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(1)">
+                                                <ons-icon icon="ion-edit"></ons-icon>
+                                            </ons-toolbar-button>
+                                        </div>
+                                        <div class="card__content card--material__content">
+                                            <div class="profile_wrapper">
+                                                <div class="profile_info_wrapper">
+                                                    <div class="profile_info_numbers">
+                                                        <div>
+                                                            <div class="profile_info_text">Especialidade</div>
+                                                            <div>
+                                                                <?= $this->user['pi_confirmed_in'] === null ?
+                                                                    "Aguardando validação" :
+                                                                    $this->user['esp_desc_especialidade'] ?>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="profile_info_text">Conselho</div>
+                                                            <div><?= $this->user['pi_cons_registry'] ?>
+                                                                - <?= $this->user['pc_desc_conselho'] ?></div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="profile_info_text">Endereço</div>
+                                                            <div><?= $this->user['info_user_addr'] ?></div>
+                                                        </div>
+                                                        <div>
+                                                            <div class="profile_info_text">Números de contato</div>
+                                                            <div>Telefone
+                                                                Celular:<?= $this->user['info_user_ctt_phone'] ?></div>
+                                                            <div>Telefone
+                                                                Residencial:<?= $this->user['info_user_ctt_res'] ?></div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <div class="profile_info_text">Conselho</div>
-                                                <div><?= $this->user['pi_cons_registry'] ?>
-                                                    - <?= $this->user['pc_desc_conselho'] ?></div>
-                                            </div>
-                                            <div>
-                                                <div class="profile_info_text">Endereço</div>
-                                                <div><?= $this->user['info_user_addr'] ?></div>
-                                            </div>
-                                            <div>
-                                                <div class="profile_info_text">Números de contato</div>
-                                                <div>Telefone
-                                                    Celular:<?= $this->user['info_user_ctt_phone'] ?></div>
-                                                <div>Telefone
-                                                    Residencial:<?= $this->user['info_user_ctt_res'] ?></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div id="dadad-view" class="swiper-slide"></div>
                         </div>
                     </div>
-                </div>
-                <div id="dadad-view" style="display: none"></div>
+                </ons-row>
             </div>
         </div>
         <style type="text/css">
@@ -682,66 +710,74 @@
                 </div>
                 <ons-row class="profile_button_bar_pac">
                     <ons-col>
-                        <ons-button id="infos" class="custom-button active" onclick="display('infos','pac')">
+                        <ons-button id="infos" class="custom-button active" onclick="display('infos','pac',0)">
                             Informações
                         </ons-button>
                     </ons-col>
                     <ons-col>
                         <ons-button id="histo" class="custom-button" icon="fa-checkbox"
-                                    onclick="display('histo', 'pac')">Histórico
+                                    onclick="display('histo', 'pac',1)">Histórico
                         </ons-button>
                     </ons-col>
                 </ons-row>
-                <div id="infos-view">
-                    <ons-card>
-                        <div class="title">Informações do paciente</div>
-                        <div class="content">
-                            <div class="profile_wrapper">
-                                <div class="profile_info_wrapper">
-                                    <div class="profile_info_numbers">
-                                        <div>
-                                            <div class="profile_info_text">Nome</div>
-                                            <div id="u_name"></div>
-                                        </div>
-                                        <div>
-                                            <div class="profile_info_text">CPF</div>
-                                            <div id="u_cpf"></div>
-                                        </div>
-                                        <div>
-                                            <div class="profile_info_text">Plano de Saúde</div>
-                                            <div id="u_healthcare"></div>
-                                        </div>
-                                        <div>
-                                            <div class="profile_info_text">Números de contato</div>
-                                            <div id="u_ctt_phone">Telefone
-                                                Celular:
-                                            </div>
-                                            <div id="u_ctt_res">Telefone
-                                                Residencial:
+                <ons-row>
+                    <div class="swiper-container-pac">
+                        <div class="swiper-wrapper" style="width: 360px">
+                            <div class="swiper-slide" id="infos-view">
+                                <ons-card>
+                                    <div class="title">Informações do paciente</div>
+                                    <div class="content">
+                                        <div class="profile_wrapper">
+                                            <div class="profile_info_wrapper">
+                                                <div class="profile_info_numbers">
+                                                    <div>
+                                                        <div class="profile_info_text">Nome</div>
+                                                        <div id="u_name"></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">CPF</div>
+                                                        <div id="u_cpf"></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">Plano de Saúde</div>
+                                                        <div id="u_healthcare"></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">Números de contato</div>
+                                                        <div id="u_ctt_phone">Telefone
+                                                            Celular:
+                                                        </div>
+                                                        <div id="u_ctt_res">Telefone
+                                                            Residencial:
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </ons-card>
+                            </div>
+                            <div class="swiper-slide" id="histo-view">
+                                <ons-card>
+                                    <div class="title">Registros no histórico</div>
+                                    <div class="content">
+                                        <ons-row>
+                                            <ons-col width="100%">
+                                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fRegPac">
+                                                    <ons-lazy-repeat>
+
+                                                    </ons-lazy-repeat>
+                                                </ons-list>
+                                            </ons-col>
+                                        </ons-row>
+                                    </div>
+                                </ons-card>
                             </div>
                         </div>
-                    </ons-card>
-                </div>
-                <div id="histo-view" style="display: none;">
-                    <ons-card>
-                        <div class="title">Registros no histórico</div>
-                        <div class="content">
-                            <ons-row>
-                                <ons-col width="100%">
-                                    <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fRegPac">
-                                        <ons-lazy-repeat>
+                    </div>
+                </ons-row>
 
-                                        </ons-lazy-repeat>
-                                    </ons-list>
-                                </ons-col>
-                            </ons-row>
-                        </div>
-                    </ons-card>
-                </div>
+
 
             </div>
         </div>
@@ -828,9 +864,9 @@
             <ons-col>
                 <ons-card>
                     <div class="title">Preencha as informações necessárias:</div>
-                    <div id="presArea">
+                    <div id="presArea" style="display: none">
                         <form action="<?= $this->url('application_mobile_prof', ['action' => 'save-historic']) ?>"
-                              method="post" enctype="multipart/form-data" id="precFrom">
+                              method="post" enctype="multipart/form-data" id="presForm">
                             <ons-list-item class="input-items">
                                 <div class="left">
                                     <ons-icon icon="fa-pills" class="list-item__icon"></ons-icon>
@@ -872,14 +908,126 @@
                             </ons-list-item>
 
                             <div id="addPrescArea" hidden>
-                                <input type="text" name="pacId" id="pacId">
+
                             </div>
                         </form>
-
                     </div>
-                    <div id="rxArea"></div>
-                    <div id="remArea"></div>
-                    <div id="noteArea"></div>
+                    <div id="rxArea" style="display: none">
+                        <form action="<?= $this->url('application_mobile_prof', ['action' => 'save-historic']) ?>"
+                              method="post" enctype="multipart/form-data" id="rxForm">
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-file-prescription" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fExam"
+                                           type="text"
+                                           placeholder="Exame" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-barcode" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fCodigo"
+                                           type="text"
+                                           placeholder="Código do Exame" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-info" class="list-item__icon"></ons-icon>
+                                </div>
+                                <textarea class="textarea" name="fDesc" rows="3" placeholder="Mais informações"
+                                          style="width: 100%"></textarea>
+
+                            </ons-list-item>
+                            <ons-list-item>
+                                <div class="right right-label">
+                                    <button type="submit" class="button">Salvar</button>
+                                </div>
+                            </ons-list-item>
+                            <div id="rxInfos" hidden>
+
+                            </div>
+                        </form>
+                    </div>
+                    <div id="remArea" style="display: none">
+                        <form action="<?= $this->url('application_mobile_prof', ['action' => 'save-historic']) ?>"
+                              method="post" enctype="multipart/form-data" id="remForm">
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-stethoscope" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fExam"
+                                           type="text"
+                                           placeholder="Procedimento" float validate></ons-input>
+                            </ons-list-item>
+
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-file-alt" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-select style="width: 100%" id="pi_cons_name" modifier="material" name="fCons"
+                                            class="select"
+                                            float>
+                                    <select class="select-input">
+                                        <?php foreach ($this->proceds as $proc): ?>
+                                            <option value="<?= $proc['p_id_procedure'] ?>"><?= $proc['procedure_description'] ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </ons-select>
+<!--                                <ons-input style="width: 100%" id="" modifier="material"-->
+<!--                                           name="fCodigo"-->
+<!--                                           type="text"-->
+<!--                                           placeholder="Tipo de procedimento" float validate></ons-input>-->
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-calendar" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fCodigo"
+                                           type="date"
+                                           placeholder="" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-info" class="list-item__icon"></ons-icon>
+                                </div>
+                                <textarea class="textarea" name="fDesc" rows="3" placeholder="Mais informações"
+                                          style="width: 100%"></textarea>
+                            </ons-list-item>
+                            <ons-list-item>
+                                <div class="right right-label">
+                                    <button type="submit" class="button">Salvar</button>
+                                </div>
+                            </ons-list-item>
+                            <div id="remInfos" hidden>
+
+                            </div>
+                        </form>
+                    </div>
+                    <div id="noteArea" style="display: none">
+                        <form action="<?= $this->url('application_mobile_prof', ['action' => 'save-historic']) ?>"
+                              method="post" enctype="multipart/form-data" id="noteForm">
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-info" class="list-item__icon"></ons-icon>
+                                </div>
+                                <textarea class="textarea" name="fNotes" rows="4" placeholder="Descreva a nota"
+                                          style="width: 100%"></textarea>
+                            </ons-list-item>
+                            <ons-list-item>
+                                <div class="right right-label">
+                                    <button type="submit" class="button">Salvar</button>
+                                </div>
+                            </ons-list-item>
+                            <div id="remInfos" hidden>
+
+                            </div>
+                        </form>
+                    </div>
                 </ons-card>
             </ons-col>
         </ons-row>

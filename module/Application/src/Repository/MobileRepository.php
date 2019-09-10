@@ -11,6 +11,7 @@ use Application\Entity\Sis\ProfessionalConselhos;
 use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
+use Application\Entity\Sis\UserExams;
 use Application\Entity\Sis\UserHealthcare;
 use Application\Entity\Sis\UserHistoric;
 use Application\Entity\Sis\UserHistoricInformation;
@@ -321,9 +322,34 @@ class MobileRepository
                 $this->entityManager->flush();
             }
             $this->entityManager->commit();
+            return true;
         } catch (Exception $e) {
-            UtilsFile::printvardie($e->getMessage());
             $this->entityManager->rollback();
+            return false;
+        }
+    }
+
+    public function saveExams($params){
+        try{
+            $this->entityManager->beginTransaction();
+            $exam = new UserExams();
+            $exam->setExamName($params['fExam']);
+            $exam->setExamCodigo($params['fCodigo']);
+            $exam->setExamNotes($params['fDesc']);
+            $this->entityManager->persist($exam);
+            $this->entityManager->flush();
+            $historic = new UserHistoric();
+            $historic->setUserId($this->entityManager->getRepository(User::class)->find($params['pacId']));
+            $historic->setHistoricType(2);
+            $historic->setIdGenericEntry($exam->getId());
+            $this->entityManager->persist($historic);
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            return true;
+        }catch (Exception $e){
+            $this->entityManager->rollback();
+            return false;
+            UtilsFile::printvardie($e->getMessage());
         }
     }
 
