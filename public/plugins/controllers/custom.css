@@ -1,0 +1,192 @@
+.appointments {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    position: relative;
+    margin: 0;
+    padding: 40px 0
+}
+
+.appointments__slide {
+    width: calc((100% - 20px * 4 - 20px * 10) / 5);
+    padding: 20px;
+    margin-right: 20px;
+    float: left;
+    background-color: #fbfbfc
+}
+
+.appointments__slide:last-child {
+    margin-right: 0
+}
+
+.appointments__slide:hover {
+    cursor: move;
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab
+}
+
+.appointments__slide.selected .appointment__info-content,
+.appointments__slide.selected a {
+    color: #fff
+}
+
+.appointments__slide.selected--blue {
+    color: #fff
+}
+
+.appointment__time {
+    position: absolute;
+    top: 5px;
+    right: -10px;
+    z-index: 333;
+    color: #fff;
+    padding: 5px 10px
+}
+
+.appointment__header {
+    text-align: center
+}
+
+.appointment__thumb {
+    padding: 0 0 20px 0
+}
+
+.appointment__thumb img {
+    width: 120px;
+    margin: auto
+}
+
+.appointment__header-details {
+    line-height: 1.5
+}
+
+.appointment__username {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -.2px
+}
+
+.appointment__user-email a {
+    font-size: 1.4rem;
+    font-weight: 300
+}
+
+.appointment__user-phone a {
+    font-size: 1.4rem;
+    font-weight: 300
+}
+
+.appointment__content {
+    padding: 20px 0
+}
+
+.appointment__info-content {
+    background-position: center left;
+    background-repeat: no-repeat;
+    padding: 5px 0 5px 30px;
+    line-height: 20px;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: #7a7d86
+}
+
+.appointment__buttons {
+    padding: 10px 0 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+
+.appointment__button {
+    width: 45%;
+    background-repeat: no-repeat;
+    background-position: 15px 50%;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 12px 15px 12px 25px;
+    margin: 0;
+    cursor: pointer
+}
+
+.appointment__button--confirm {
+    background-color: #f2f4f8;
+    color: #5616f5;
+    background-image: url(../images/checked--blue.png)
+}
+
+.appointment__button--confirm:hover {
+    background-color: #5616f5;
+    color: #fff;
+    background-image: url(../images/checked--white.png)
+}
+
+.appointment__button--cancel {
+    background-color: #fbedf4;
+    color: #e33d55;
+    background-image: url(../images/cancel--pink.png)
+}
+
+.appointment__button--cancel:hover {
+    background-color: #e33d55;
+    color: #fff;
+    background-image: url(../images/cancel--white.png)
+}
+
+.appointments__button--prev.swiper-button-prev,
+.swiper-container-rtl .appointments__button--next.swiper-button-next {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M0%2C22L22%2C0l2.1%2C2.1L4.2%2C22l19.9%2C19.9L22%2C44L0%2C22L0%2C22L0%2C22z'%20fill%3D'%23929292'%2F%3E%3C%2Fsvg%3E");
+    right: 30px;
+    left: auto
+}
+
+.appointments__button--next.swiper-button-next,
+.swiper-container-rtl .appointments__button--prev.swiper-button-prev {
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2027%2044'%3E%3Cpath%20d%3D'M27%2C22L27%2C22L5%2C44l-2.1-2.1L22.8%2C22L2.9%2C2.1L5%2C0L27%2C22L27%2C22z'%20fill%3D'%23929292'%2F%3E%3C%2Fsvg%3E");
+    right: 0;
+    left: auto
+}
+
+.appointments__button--next.swiper-button-next,
+.appointments__button--prev.swiper-button-prev {
+    position: absolute;
+    top: 25px;
+    width: 15px;
+    height: 15px;
+    background-size: 15px 15px
+}
+
+.appointments__slide {
+    width: calc(100% - 20px * 2)
+}
+
+.appointment__time {
+    right: 5px
+}
+
+.appointment__button,
+.appointment__time,
+.appointments__slide {
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px
+}
+
+@media screen and (max-width: 1680px) {
+    .appointments__slide {
+        width: calc((100% - 20px * 3 - 20px * 8) / 4)
+    }
+}
+
+@media screen and (max-width: 1440px) {
+    .appointments__slide {
+        width: calc((100% - 20px * 2 - 20px * 6) / 3)
+    }
+}
+
+@media screen and (max-width: 1280px) {
+    .appointments__slide {
+        width: calc((100% - 20px - 20px * 4) / 2)
+    }
+}

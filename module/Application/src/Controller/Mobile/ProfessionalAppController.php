@@ -10,6 +10,7 @@ use Authentication\Service\AuthenticationManager;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use Zend\Json\Json;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
@@ -43,16 +44,27 @@ class ProfessionalAppController extends AbstractActionController
         $params['id_professional'] = $this->authManager->getActiveUser()['user_id'];
         $resp = [];
         try {
-            $resultados = $this->mobileRepository->getSchedule($params, true);
-            foreach ($resultados as $appointment) {
-                $data = new DateTime($appointment['a_solicited_for'], new DateTimeZone('America/Belem'));
-                $name = explode(' ', $appointment['user_name']);
-                $resp[] = [
-                    'title' => "{$this->mobileRepository->getAppointmentDescription($appointment['a_id_procedure'])} de {$name[0]}",
-                    'start' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
-                    'end' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00'
-                ];
+            switch ($params['type']) {
+                case 'schedule':
+                    $resultados = $this->mobileRepository->getSchedule($params, true);
+                    foreach ($resultados as $appointment) {
+                        $data = new DateTime($appointment['a_confirmed_for'] == null ? $appointment['a_solicited_for'] : $appointment['a_confirmed_for'], new DateTimeZone('America/Belem'));
+                        $name = explode(' ', $appointment['user_name']);
+                        $resp[] = [
+                            'title' => "{$this->mobileRepository->getAppointmentDescription($appointment['a_id_procedure'])} de {$name[0]}",
+                            'start' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
+                            'end' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
+                            'classNames' => $appointment['a_confirmed_for'] == null ? "pending" : "confirmed",
+//                            'color' => $appointment['a_confirmed_for'] == null ? "#d75126": "#a4d997"
+                        ];
+                    }
+                    break;
+                case 'solics':
+                    $resp = $this->mobileRepository->getSolicitacoes($params);
+//                    UtilsFile::printvardie($solics);
+                    break;
             }
+
         } catch (Exception $e) {
             $resp = ['erro' => $e->getMessage()];
         }
@@ -133,6 +145,7 @@ class ProfessionalAppController extends AbstractActionController
     public function saveHistoricAction()
     {
         $params = $this->params()->fromPost();
+        $thisProfId = $this->authManager->getActiveUser()['user_id'];
         switch ($params['op']) {
             case 'prescriptions':
                 $normPrescricoes = [];
@@ -145,7 +158,7 @@ class ProfessionalAppController extends AbstractActionController
                         "posologia" => $params['fPoso'][$i],
                     ];
                 }
-                if ($this->mobileRepository->savePrescriptions(["pacid" => $params['pacId'], "docid" => $this->authManager->getActiveUser()['user_id'], "presc" => $normPrescricoes])) {
+                if ($this->mobileRepository->savePrescriptions(["pacid" => $params['pacId'], "docid" => $thisProfId, "presc" => $normPrescricoes])) {
                     $this->mobileRepository->setMessage("Prescrição salva.", 1);
                 } else {
                     $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
@@ -153,10 +166,31 @@ class ProfessionalAppController extends AbstractActionController
                 break;
             case 'rx':
                 $params['docid'] = $this->authManager->getActiveUser()['user_id'];
-                if($this->mobileRepository->saveExams($params)){
+                if ($this->mobileRepository->saveExams($params)) {
                     $this->mobileRepository->setMessage("Exame salvo.", 1);
                 } else {
                     $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
+                }
+                break;
+            case 'rem':
+                //UtilsFile::printvardie($params);
+                switch ($params['fType']) {
+                    case 1:
+                        if ($this->mobileRepository->saveAppointment([
+                            "prof_req" => $thisProfId,
+                            'user_req' => $params["pacId"],
+                            'esp_id' => $this->mobileRepository->getProfissionalInfo($thisProfId, true)[0]['esp_id'],
+                            'proc' => $params['fType'],
+                            'datareq' => $params['fData'],
+                            'horareq' => $params['fHora'],
+                            'info' => $params['fDesc'],
+                            'titulo' => $params['fDescProc']
+                        ])) {
+                            $this->mobileRepository->setMessage("Procedimento salvo.", 1);
+                        } else {
+                            $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
+                        }
+                        break;
                 }
                 break;
             default:
@@ -166,6 +200,56 @@ class ProfessionalAppController extends AbstractActionController
 
         $this->redirect()->toRoute('application_mobile_prof');
 
+    }
+
+    public function handleSolicitacoesAction()
+    {
+        try {
+            if ($this->getRequest()->isPost()) {
+                $params = $this->params()->fromPost();
+                $response = [];
+                switch ($params['mode']) {
+                    case 'confirm':
+                        if ($this->mobileRepository->confirmAppointment($params)) {
+                            $response = [
+                                'code' => 1,
+                                'message' => 'Solicitação confirmada'
+                            ];
+                        }else{
+                            $response = [
+                                'code' => 0,
+                                'message' => 'Erro ao confirmar solicitação, tente novamente mais tarde.'
+                            ];
+                        }
+                        break;
+                    case 'cancel':
+                        if($this->mobileRepository->cancelAppointment($params)){
+                            $response = [
+                                'code' => 1,
+                                'message' => 'Solicitação cancelada'
+                            ];
+                        }else{
+                            $response = [
+                                'code' => 0,
+                                'message' => 'Erro ao cancelar solicitação, tente novamente mais tarde.'
+                            ];
+                        }
+                        break;
+                    default:
+                        throw new Exception("Requisição inválida", 0);
+                        break;
+                }
+                return new JsonModel($response);
+            }
+
+            $this->getResponse()->setStatusCode(404);
+            throw new Exception("Requisição inválida", 0);
+        } catch (Exception $e) {
+            return new JsonModel([
+                'code' => $e->getCode(),
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function getLogMessagesAction()

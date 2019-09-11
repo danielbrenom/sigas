@@ -81,5 +81,39 @@ class UserHistoricInformation
         $this->sis_user_historic_typecol = $sis_user_historic_typecol;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getIdHistoricReg()
+    {
+        return $this->id_historic_reg;
+    }
+
+    /**
+     * @param mixed $id_historic_reg
+     */
+    public function setIdHistoricReg($id_historic_reg)
+    {
+        $this->id_historic_reg = $id_historic_reg;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHistoricInformation()
+    {
+        return $this->historic_information;
+    }
+
+    /**
+     * @param mixed $historic_information
+     */
+    public function setHistoricInformation($historic_information)
+    {
+        $this->historic_information = $historic_information;
+    }
+
+
+
 
 }

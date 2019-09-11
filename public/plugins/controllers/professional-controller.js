@@ -1,57 +1,14 @@
-if (typeof (pacId) == 'undefined') {
-    var pacId;
-}
-if (typeof (swiperagenda) == 'undefined') {
-    var swiperagenda;
-    var swiperpac;
-    var swiperprofile;
+if (typeof (window.pacId) == 'undefined') {
+    window.pacId;
 }
 $().ready(function () {
     if (ons.isReady()) {
         $.get('/mobile/prof/get-log-messages', {}, function (response) {
             if (response.error) {
-                let titleT = "", icontype = "";
-                switch (response.error.code) {
-                    case 0:
-                        titleT = "Erro";
-                        icontype = "error";
-                        break;
-                    case 1:
-                        titleT = "Sucesso";
-                        icontype = "success";
-                        break;
-                    default:
-                        titleT = "Erro";
-                        icontype = "error";
-                        break;
-                }
-                // swal({
-                //     title: titleT,
-                //     text: response.error.message,
-                //     timer: 3000,
-                //     icon: icontype,
-                //     buttons: false
-                // });
-                ons.notification.toast(titleT + "! " + response.error.message, {
-                    timeout: 2000,
-                    class: 'toast-' + icontype
-                })
+                showToast(response.error);
             }
         });
     }
-    swiperagenda = new Swiper('.swiper-container-agenda', {
-        direction: 'horizontal',
-        loop: false,
-        width: screen.width,
-        allowTouchMove: false
-    });
-    swiperprofile = new Swiper('.swiper-container-profile', {
-        direction: 'horizontal',
-        loop: false,
-        allowTouchMove: false,
-        width: screen.width
-    });
-
 });
 
 
@@ -72,34 +29,35 @@ function initializeCalendar() {
             },
             allDaySlot: false,
             slotEventOverlap: false,
-            height: 600,
-            contentHeight: 550,
+            height: 700,
+            contentHeight: 580,
             displayEventTime: false,
             dateClick: function (info) {
                 if (info.view.type === 'dayGridMonth' || info.view.type === 'weekGridDay') {
                     calendar.changeView('oneGridDay');
                     calendar.gotoDate(info.date);
-                } else if (info.view.type === 'oneGridDay') {
-                    swal({
-                        title: "Confirmação",
-                        text: 'Continuar escolha para data ' + info.date.toLocaleDateString() + '?',
-                        buttons: {
-                            no: {
-                                text: "Não",
-                                value: false
-                            },
-                            yes: {
-                                text: "Sim",
-                                value: true,
-                                className: 'btn-success'
-                            }
-                        }
-                    }).then(r => {
-                        if (r) {
-                            fn.finishAppointment(info);
-                        }
-                    })
                 }
+                // else if (info.view.type === 'oneGridDay') {
+                //     swal({
+                //         title: "Confirmação",
+                //         text: 'Continuar escolha para data ' + info.date.toLocaleDateString() + '?',
+                //         buttons: {
+                //             no: {
+                //                 text: "Não",
+                //                 value: false
+                //             },
+                //             yes: {
+                //                 text: "Sim",
+                //                 value: true,
+                //                 className: 'btn-success'
+                //             }
+                //         }
+                //     }).then(r => {
+                //         if (r) {
+                //             fn.finishAppointment(info);
+                //         }
+                //     })
+                // }
             },
             views: {
                 oneGridDay: {
@@ -120,7 +78,7 @@ function initializeCalendar() {
             timeZone: "local",
             eventSources: [
                 {
-                    url: '/mobile/prof/get-schedule',
+                    url: '/mobile/prof/get-schedule?type=schedule',
                     method: 'GET',
                     failure: function (e) {
                         console.log(e);
@@ -136,7 +94,46 @@ function initializeCalendar() {
 }
 
 function initializeSolics() {
-
+    let area = $("#solic-view ons-list ons-lazy-repeat");
+    $.get('/mobile/prof/get-schedule', {type: 'solics'}, function (response) {
+        area.empty();
+        $.each(response, function (key, value) {
+            let dataShow = new Date(value.a_solicited_for);
+            let itemSolic = '<ons-list-item class="item-custom" modifier="longdivider">' +
+                '                                    <div class="left">' +
+                '                                        <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">' +
+                '                                    </div>' +
+                '                                    <div class="center">' +
+                '                                        <div class="tweet-header">' +
+                '                                            <span class="list-item__title"><b>' + value.user_name + ' </b></span>' +
+                '                                        </div>' +
+                '                                        <span class="list-item__content" style="width: 100%">' + value.procedure_description + '  </span>' +
+                '                                        <span class="list-item__content">Solicitado para: ' + dataShow.toLocaleDateString() + ' às ' + dataShow.toLocaleTimeString() + '  </span>' +
+                '                                        <ons-row class="option-buttons">' +
+                '                                            <ons-col>' +
+                '                                                <ons-button modifier="quiet" onclick="handleAppoint(' + value.a_id + ', \'confirm\')">' +
+                '                                                    <ons-icon icon="fa-check"></ons-icon>' +
+                '                                                    <span class="reaction-no">Confirmar</span>' +
+                '                                                </ons-button>' +
+                '                                            </ons-col>' +
+                '                                            <ons-col>' +
+                '                                                <ons-button modifier="quiet" onclick="handleAppoint(' + value.a_id + ', \'confirm\')"">' +
+                '                                                    <ons-icon icon="fa-clock"></ons-icon>' +
+                '                                                    <span class="reaction-no">Adiar</span>' +
+                '                                                </ons-button>' +
+                '                                            </ons-col>' +
+                '                                            <ons-col>' +
+                '                                                <ons-button modifier="quiet" onclick="handleAppoint(' + value.a_id + ', \'cancel\')"">' +
+                '                                                    <ons-icon icon="fa-times"></ons-icon>' +
+                '                                                    <span class="reaction-no">Cancelar</span>' +
+                '                                                </ons-button>' +
+                '                                            </ons-col>' +
+                '                                        </ons-row>' +
+                '                                    </div>' +
+                '                                </ons-list-item>';
+            area.append(itemSolic);
+        })
+    })
 }
 
 function loadPacientes() {
@@ -184,10 +181,10 @@ function loadPacienteInfo(id) {
     ons.notification.toast("Carregando informações, aguarde...", {
         timeout: 1000,
     });
-    pacId = id;
+    window.pacId = id;
     $.get('/mobile/prof/get-pacientes', {mode: 'details', pac_id: id}, function (response) {
         $("#mainNavigator")[0].pushPage('pacProfile.html').then(() => {
-            swiperpac = new Swiper('.swiper-container-pac', {
+            window.swiperpac = new Swiper('.swiper-container-pac', {
                 direction: 'horizontal',
                 loop: false,
                 width: screen.width,
@@ -232,7 +229,7 @@ function insertHistoric(type) {
                         if (!options.finished) {
                             ons.notification.toast("Todos os campos devem ser preenchidos ou pelo menos um registro deve ser inserido na lista", {timeout: 3000});
                         } else {
-                            $("#addPrescArea").append('<input type="text" name="pacId" id="pacId" value="' + pacId + '">');
+                            $("#addPrescArea").append('<input type="text" name="pacId" id="pacId" value="' + window.pacId + '">');
                             $("#addPrescArea").append('<input type="text" name="op" value="prescription">');
                             $(e.currentTarget).trigger('submit', {'finished': options.finished});
                         }
@@ -249,7 +246,7 @@ function insertHistoric(type) {
                         if (!options.finished) {
                             ons.notification.toast("Todos os campos devem ser preenchidos.", {timeout: 3000});
                         } else {
-                            $("#rxInfos").append('<input type="text" name="pacId" id="pacId" value="' + pacId + '">');
+                            $("#rxInfos").append('<input type="text" name="pacId" id="pacId" value="' + window.pacId + '">');
                             $("#rxInfos").append('<input type="text" name="op" value="rx">');
                             $(e.currentTarget).trigger('submit', {'finished': options.finished});
                         }
@@ -258,7 +255,7 @@ function insertHistoric(type) {
                         inputs = $("#" + areas[type] + "Form").serializeArray();
                         console.log(inputs);
                         options.finished = true;
-                        for (c = 0; c < inputs.length; c += 4) {
+                        for (c = 0; c < inputs.length; c += 5) {
                             options.finished = inputs[c].value != "";
                             options.finished = inputs[c + 1].value != "";
                             options.finished = inputs[c + 2].value != "";
@@ -266,8 +263,8 @@ function insertHistoric(type) {
                         if (!options.finished) {
                             ons.notification.toast("Todos os campos devem ser preenchidos.", {timeout: 3000});
                         } else {
-                            $("#remInfos").append('<input type="text" name="pacId" id="pacId" value="' + pacId + '">');
-                            $("#remInfos").append('<input type="text" name="op" value="rx">');
+                            $("#remInfos").append('<input type="text" name="pacId" id="pacId" value="' + window.pacId + '">');
+                            $("#remInfos").append('<input type="text" name="op" value="rem">');
                             $(e.currentTarget).trigger('submit', {'finished': options.finished});
                         }
                         break;
@@ -314,35 +311,37 @@ function display(id, tab, index) {
     if (!$(`#${id}`).hasClass('active')) {
         $.each($(".profile_button_bar_" + tab + " ons-button"), function (key, value) {
             $(value).removeClass('active');
-            // $(`#${value.id}-view`).hide('slide','left');
-            // $(`#${value.id}-view.active`).removeClass('active');
         });
-        $(`#${id}`).addClass('active');
-        switch (tab) {
-            case 'agenda':
-                swiperagenda.slideTo(index);
-                break;
-            case 'profile':
-                swiperprofile.slideTo(index);
-                break;
-            case 'pac':
-                swiperpac.slideTo(index);
-                break;
+        if (tab == 'agenda' && index == 2) {
+            $("#notf-fab").show('fade');
+        } else {
+            $("#notf-fab").hide('fade');
         }
-        // $(`#${id}-view`).show('slide','left');
-        // $(`#${id}-view`).addClass('active');
+        $(`#${id}`).addClass('active');
+        $("#carousel-" + tab)[0].setActiveIndex(index);
     }
 }
 
-function displayProfile(id) {
-    if (!$(`#${id}`).hasClass('active')) {
-        $.each($(".profile_button_bar_profile ons-button"), function (key, value) {
-            $(value).removeClass('active');
-            $(`#${value.id}-view`).hide('fast');
-        });
-        $(`#${id}`).addClass('active');
-        $(`#${id}-view`).show('fast');
-    }
+function handleAppoint(id, op) {
+    let area = $("#solic-view ons-list ons-lazy-repeat");
+    area.empty();
+    area.append('<ons-progress-circular indeterminate></ons-progress-circular>');
+    $.post('/mobile/prof/handle-solicitacoes', {ap_id: id, mode: op}, function (response) {
+        showToast(response);
+    }).then(() => {
+        initializeSolics();
+    });
+}
+
+function cancelAppoint(id) {
+    let area = $("#solic-view ons-list ons-lazy-repeat");
+    area.empty();
+    area.append('<ons-progress-circular indeterminate></ons-progress-circular>');
+    $.post('/mobile/prof/handle-solicitacoes', {ap_id: id, mode: 'confirm'}, function (response) {
+        showToast(response);
+    }).then(() => {
+        initializeSolics();
+    });
 }
 
 function addAddress() {
@@ -362,17 +361,24 @@ function removeAddress() {
     $(".addr-area ons-list-item:last-child").remove();
 }
 
-
-// ons.openActionSheet({
-//     cancelable: true,
-//     buttons: [
-//         'Share Tweet via...',
-//         'Add to Moment',
-//         'I don\'t like this Tweet',
-//         'Report Tweet',
-//         {
-//             label: 'Cancel',
-//             icon: 'md-close'
-//         }
-//     ]
-// })
+function showToast(obj) {
+    let titleT = "", icontype = "";
+    switch (obj.code) {
+        case 0:
+            titleT = "Erro";
+            icontype = "error";
+            break;
+        case 1:
+            titleT = "Sucesso";
+            icontype = "success";
+            break;
+        default:
+            titleT = "Erro";
+            icontype = "error";
+            break;
+    }
+    ons.notification.toast(titleT + "! " + obj.message, {
+        timeout: 2000,
+        class: 'toast-' + icontype
+    })
+}

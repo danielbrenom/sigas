@@ -32,6 +32,10 @@ class UserAppointment
      */
     protected $id_especiality;
     /**
+     * @ORM\Column(name="id_status")
+     */
+    protected $id_status;
+    /**
      * @ORM\Column(name="solicited_for")
      */
     protected $solicited_for;
@@ -161,5 +165,21 @@ class UserAppointment
     public function setConfirmedFor($confirmed_for)
     {
         $this->confirmed_for = $confirmed_for;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIdStatus()
+    {
+        return $this->id_status;
+    }
+
+    /**
+     * @param mixed $id_status
+     */
+    public function setIdStatus($id_status)
+    {
+        $this->id_status = $id_status;
     }
 }

@@ -14,18 +14,20 @@
             </ons-tab>
             <!--            <ons-tab page="twitter.html" label="Perfil" icon="fa-user-md">-->
             <!--            </ons-tab>-->
-            <ons-tab page="profilePage.html" label="Perfil" icon="fa-user-md">
-            </ons-tab>
+<!--            <ons-tab page="profilePage.html" label="Perfil" icon="fa-user-md">-->
+<!--            </ons-tab>-->
         </ons-tabbar>
         <style>
-            .toast{
+            .toast {
                 opacity: 100;
                 background-color: #0f6674;
             }
-            .toast-success div{
+
+            .toast-success div {
                 background-color: #467447;
             }
-            .toast-error div{
+
+            .toast-error div {
                 background-color: #a53a39;
             }
         </style>
@@ -50,29 +52,39 @@
             </ons-col>
         </ons-row>
         <ons-row>
-            <ons-col style="padding: 0">
-
-                <div class="swiper-container-agenda">
-                    <div class="swiper-wrapper" style="width: 360px">
-                        <div id="agend-view" class="swiper-slide">
-                            <div class="calendarArea" style="padding-top: 20px"></div>
-                        </div>
-                        <div id="solic-view" class="swiper-slide"></div>
-                        <div id="notif-view" class="swiper-slide">
-                            <ons-card modifier="material">
-                                <div class="content">
-                                    <ons-row>
-
-                                    </ons-row>
-                                </div>
-                            </ons-card>
-                        </div>
+            <ons-carousel fullscreen auto-scroll overscrollable id="carousel-agenda">
+                <ons-carousel-item style="">
+                    <div id="agend-view">
+                        <div class="calendarArea" style="padding-top: 20px; background-color: white"></div>
                     </div>
-                </div>
+                </ons-carousel-item>
+                <ons-carousel-item style="padding: 0">
+                    <div id="solic-view">
+                        <ons-list style="width: 100%; margin: 0;" modifier="material">
+                            <ons-lazy-repeat>
+                                <ons-progress-circular indeterminate></ons-progress-circular>
+                            </ons-lazy-repeat>
+                        </ons-list>
+                    </div>
+                </ons-carousel-item>
+                <ons-carousel-item style="">
+                    <div id="notif-view">
+                        <ons-card modifier="material">
+                            <div class="content">
+                                <ons-row>
 
+                                </ons-row>
+                            </div>
+                        </ons-card>
 
-            </ons-col>
+                    </div>
+                </ons-carousel-item>
+            </ons-carousel>
+
         </ons-row>
+        <ons-fab ripple position="bottom right" id="notf-fab" style="display: none">
+            <ons-icon icon="md-plus"></ons-icon>
+        </ons-fab>
         <style>
             .profile_button_bar_agenda, .profile_button_bar_pac,
             .profile_button_bar_profile {
@@ -104,6 +116,37 @@
             .swiper-container {
                 height: 100%;
             }
+
+            .button--quiet {
+                font-size: 15px
+            }
+
+            .fc-time-grid-event {
+                flex-grow: 1;
+                padding: 5px 0 0 5px;
+                background-color: #fbfbfc;
+                position: relative;
+                border-radius: 0;
+                border-left: 3px #f2f4f8 solid;
+                border-right: none;
+                border-top: none;
+                border-bottom: none;
+            }
+            .fc-time-grid-event.confirmed{
+                background-color: #f1ffec;
+                border-left: 3px #60934e solid;
+            }
+
+            .fc-time-grid-event.pending {
+                background-color: #ecfdff;
+                border-left: 3px #3beaf5 solid;
+            }
+
+            .fc-time-grid-event.canceld {
+                background-color: #fdf3f3;
+                border-left: 3px #fc7676 solid;
+            }
+
         </style>
         <script>
             ons.getScriptPage().onInit = function () {
@@ -239,41 +282,39 @@
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <div class="swiper-container-profile">
-                        <div class="swiper-wrapper" style="width: 360px">
-                            <div id="dadpes-view" class="swiper-slide">
-                                <div style="height: 200px; padding: 1px 0 0 0;">
-                                    <div class="card card--material">
-                                        <div class="card__title card--material__title">Dados Pessoais
-                                            <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(0)">
-                                                <ons-icon icon="ion-edit"></ons-icon>
-                                            </ons-toolbar-button>
-                                        </div>
-                                        <div class="card__content card--material__content">
-                                            <div class="profile_wrapper">
-                                                <div class="profile_info_wrapper">
-                                                    <div class="profile_info_numbers">
+                    <ons-carousel id="carousel-profile">
+                        <ons-carousel-item>
+                            <div style="padding: 1px 0 0 0;">
+                                <div class="card card--material">
+                                    <div class="card__title card--material__title">Dados Pessoais
+                                        <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(0)">
+                                            <ons-icon icon="ion-edit"></ons-icon>
+                                        </ons-toolbar-button>
+                                    </div>
+                                    <div class="card__content card--material__content">
+                                        <div class="profile_wrapper">
+                                            <div class="profile_info_wrapper">
+                                                <div class="profile_info_numbers">
+                                                    <div>
+                                                        <div class="profile_info_text">Nome</div>
                                                         <div>
-                                                            <div class="profile_info_text">Nome</div>
-                                                            <div>
-                                                                <?= $this->user['info_user_name'] ?>
-                                                            </div>
+                                                            <?= $this->user['info_user_name'] ?>
                                                         </div>
-                                                        <div>
-                                                            <div class="profile_info_text">CPF</div>
-                                                            <div><?= $this->user['info_user_cpf'] ?></div>
-                                                        </div>
-                                                        <div>
-                                                            <div class="profile_info_text">RG</div>
-                                                            <div><?= $this->user['info_user_rg'] ?></div>
-                                                        </div>
-                                                        <div>
-                                                            <div class="profile_info_text">Status do Profissional</div>
-                                                            <div>Cadastro solicitado
-                                                                em: <?= date("d/m/Y", strtotime($this->user['pi_solicited_in'])) ?></div>
-                                                            <div>Cadastro verificado
-                                                                em: <?= $this->user['pi_confirmed_in'] === null ? "Aguardando verificação" : date("d/m/Y", strtotime($this->user['pi_confirmed_in'])) ?></div>
-                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">CPF</div>
+                                                        <div><?= $this->user['info_user_cpf'] ?></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">RG</div>
+                                                        <div><?= $this->user['info_user_rg'] ?></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">Status do Profissional</div>
+                                                        <div>Cadastro solicitado
+                                                            em: <?= date("d/m/Y", strtotime($this->user['pi_solicited_in'])) ?></div>
+                                                        <div>Cadastro verificado
+                                                            em: <?= $this->user['pi_confirmed_in'] === null ? "Aguardando verificação" : date("d/m/Y", strtotime($this->user['pi_confirmed_in'])) ?></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -281,42 +322,42 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="dadprof-view" class="swiper-slide">
-                                <div style="height: 200px; padding: 1px 0 0 0;">
-                                    <div class="card card--material">
-                                        <div class="card__title card--material__title">Dados Profissionais
-                                            <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(1)">
-                                                <ons-icon icon="ion-edit"></ons-icon>
-                                            </ons-toolbar-button>
-                                        </div>
-                                        <div class="card__content card--material__content">
-                                            <div class="profile_wrapper">
-                                                <div class="profile_info_wrapper">
-                                                    <div class="profile_info_numbers">
+                        </ons-carousel-item>
+                        <ons-carousel-item>
+                            <div style="padding: 1px 0 0 0;">
+                                <div class="card card--material">
+                                    <div class="card__title card--material__title">Dados Profissionais
+                                        <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(1)">
+                                            <ons-icon icon="ion-edit"></ons-icon>
+                                        </ons-toolbar-button>
+                                    </div>
+                                    <div class="card__content card--material__content">
+                                        <div class="profile_wrapper">
+                                            <div class="profile_info_wrapper">
+                                                <div class="profile_info_numbers">
+                                                    <div>
+                                                        <div class="profile_info_text">Especialidade</div>
                                                         <div>
-                                                            <div class="profile_info_text">Especialidade</div>
-                                                            <div>
-                                                                <?= $this->user['pi_confirmed_in'] === null ?
-                                                                    "Aguardando validação" :
-                                                                    $this->user['esp_desc_especialidade'] ?>
-                                                            </div>
+                                                            <?= $this->user['pi_confirmed_in'] === null ?
+                                                                "Aguardando validação" :
+                                                                $this->user['esp_desc_especialidade'] ?>
                                                         </div>
-                                                        <div>
-                                                            <div class="profile_info_text">Conselho</div>
-                                                            <div><?= $this->user['pi_cons_registry'] ?>
-                                                                - <?= $this->user['pc_desc_conselho'] ?></div>
-                                                        </div>
-                                                        <div>
-                                                            <div class="profile_info_text">Endereço</div>
-                                                            <div><?= $this->user['info_user_addr'] ?></div>
-                                                        </div>
-                                                        <div>
-                                                            <div class="profile_info_text">Números de contato</div>
-                                                            <div>Telefone
-                                                                Celular:<?= $this->user['info_user_ctt_phone'] ?></div>
-                                                            <div>Telefone
-                                                                Residencial:<?= $this->user['info_user_ctt_res'] ?></div>
-                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">Conselho</div>
+                                                        <div><?= $this->user['pi_cons_registry'] ?>
+                                                            - <?= $this->user['pc_desc_conselho'] ?></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">Endereço</div>
+                                                        <div><?= $this->user['info_user_addr'] ?></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">Números de contato</div>
+                                                        <div>Telefone
+                                                            Celular:<?= $this->user['info_user_ctt_phone'] ?></div>
+                                                        <div>Telefone
+                                                            Residencial:<?= $this->user['info_user_ctt_res'] ?></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -324,9 +365,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="dadad-view" class="swiper-slide"></div>
-                        </div>
-                    </div>
+                        </ons-carousel-item>
+                        <ons-carousel-item></ons-carousel-item>
+                    </ons-carousel>
                 </ons-row>
             </div>
         </div>
@@ -484,6 +525,16 @@
                 width: 100%;
             }
         </style>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                window.swiperprofile = new Swiper('.swiper-container-profile', {
+                    direction: 'horizontal',
+                    loop: false,
+                    allowTouchMove: false,
+                    width: screen.width
+                });
+            }
+        </script>
     </ons-page>
 </template>
 
@@ -721,62 +772,61 @@
                     </ons-col>
                 </ons-row>
                 <ons-row>
-                    <div class="swiper-container-pac">
-                        <div class="swiper-wrapper" style="width: 360px">
-                            <div class="swiper-slide" id="infos-view">
-                                <ons-card>
-                                    <div class="title">Informações do paciente</div>
-                                    <div class="content">
-                                        <div class="profile_wrapper">
-                                            <div class="profile_info_wrapper">
-                                                <div class="profile_info_numbers">
-                                                    <div>
-                                                        <div class="profile_info_text">Nome</div>
-                                                        <div id="u_name"></div>
+                    <ons-carousel id="carousel-pac">
+                        <ons-carousel-item>
+                            <ons-card>
+                                <div class="title">Informações do paciente</div>
+                                <div class="content">
+                                    <div class="profile_wrapper">
+                                        <div class="profile_info_wrapper">
+                                            <div class="profile_info_numbers">
+                                                <div>
+                                                    <div class="profile_info_text">Nome</div>
+                                                    <div id="u_name"></div>
+                                                </div>
+                                                <div>
+                                                    <div class="profile_info_text">CPF</div>
+                                                    <div id="u_cpf"></div>
+                                                </div>
+                                                <div>
+                                                    <div class="profile_info_text">Plano de Saúde</div>
+                                                    <div id="u_healthcare"></div>
+                                                </div>
+                                                <div>
+                                                    <div class="profile_info_text">Números de contato</div>
+                                                    <div id="u_ctt_phone">Telefone
+                                                        Celular:
                                                     </div>
-                                                    <div>
-                                                        <div class="profile_info_text">CPF</div>
-                                                        <div id="u_cpf"></div>
-                                                    </div>
-                                                    <div>
-                                                        <div class="profile_info_text">Plano de Saúde</div>
-                                                        <div id="u_healthcare"></div>
-                                                    </div>
-                                                    <div>
-                                                        <div class="profile_info_text">Números de contato</div>
-                                                        <div id="u_ctt_phone">Telefone
-                                                            Celular:
-                                                        </div>
-                                                        <div id="u_ctt_res">Telefone
-                                                            Residencial:
-                                                        </div>
+                                                    <div id="u_ctt_res">Telefone
+                                                        Residencial:
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </ons-card>
-                            </div>
-                            <div class="swiper-slide" id="histo-view">
-                                <ons-card>
-                                    <div class="title">Registros no histórico</div>
-                                    <div class="content">
-                                        <ons-row>
-                                            <ons-col width="100%">
-                                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fRegPac">
-                                                    <ons-lazy-repeat>
+                                </div>
+                            </ons-card>
+                        </ons-carousel-item>
+                        <ons-carousel-item>
+                            <ons-card>
+                                <div class="title">Registros no histórico</div>
+                                <div class="content">
+                                    <ons-row>
+                                        <ons-col width="100%">
+                                            <ons-list style="width: 100%; margin: 0" modifier="inset material"
+                                                      id="fRegPac">
+                                                <ons-lazy-repeat>
 
-                                                    </ons-lazy-repeat>
-                                                </ons-list>
-                                            </ons-col>
-                                        </ons-row>
-                                    </div>
-                                </ons-card>
-                            </div>
-                        </div>
-                    </div>
+                                                </ons-lazy-repeat>
+                                            </ons-list>
+                                        </ons-col>
+                                    </ons-row>
+                                </div>
+                            </ons-card>
+                        </ons-carousel-item>
+                        <ons-carousel-item></ons-carousel-item>
+                    </ons-carousel>
                 </ons-row>
-
 
 
             </div>
@@ -959,16 +1009,16 @@
                                     <ons-icon icon="fa-stethoscope" class="list-item__icon"></ons-icon>
                                 </div>
                                 <ons-input style="width: 100%" id="" modifier="material"
-                                           name="fExam"
+                                           name="fDescProc"
                                            type="text"
-                                           placeholder="Procedimento" float validate></ons-input>
+                                           placeholder="Procedimento" float></ons-input>
                             </ons-list-item>
 
                             <ons-list-item class="input-items">
                                 <div class="left">
                                     <ons-icon icon="fa-file-alt" class="list-item__icon"></ons-icon>
                                 </div>
-                                <ons-select style="width: 100%" id="pi_cons_name" modifier="material" name="fCons"
+                                <ons-select style="width: 100%" id="pi_cons_name" modifier="material" name="fType"
                                             class="select"
                                             float>
                                     <select class="select-input">
@@ -977,18 +1027,23 @@
                                         <?php endforeach; ?>
                                     </select>
                                 </ons-select>
-<!--                                <ons-input style="width: 100%" id="" modifier="material"-->
-<!--                                           name="fCodigo"-->
-<!--                                           type="text"-->
-<!--                                           placeholder="Tipo de procedimento" float validate></ons-input>-->
                             </ons-list-item>
                             <ons-list-item class="input-items">
                                 <div class="left">
                                     <ons-icon icon="fa-calendar" class="list-item__icon"></ons-icon>
                                 </div>
-                                <ons-input style="width: 100%" id="" modifier="material"
-                                           name="fCodigo"
+                                <ons-input style="width: 50%" id="" modifier="material"
+                                           name="fData"
                                            type="date"
+                                           placeholder="" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-calendar" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 30%" id="" modifier="material"
+                                           name="fHora"
+                                           type="time"
                                            placeholder="" float validate></ons-input>
                             </ons-list-item>
                             <ons-list-item class="input-items">

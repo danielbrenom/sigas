@@ -160,6 +160,19 @@ class MobileRepository
         return $sql->getQuery()->getResult(3);
     }
 
+    public function getSolicitacoes($params)
+    {
+        return $this->entityManager->getRepository(UserAppointment::class)->createQueryBuilder('a')
+            ->leftJoin(UserHistoric::class, 'uh', 'WITH', 'a.id = uh.id_appointment_entry')
+            ->addSelect('pac_info.user_name')
+            ->addSelect('proc.procedure_description')
+            ->leftJoin(UserInfoPessoal::class, 'pac_info', 'WITH', 'pac_info.id = uh.user_id')
+            ->leftJoin(Procedures::class, 'proc', 'WITH', 'proc.id = a.id_procedure')
+            ->where('a.id_user_ps = :sId and a.confirmed_for is null and a.id_status not in (2,4)')
+            ->setParameter('sId', $params['id_professional'])
+            ->getQuery()->getResult(3);
+    }
+
     public function getAppointmentDescription($appoint_id)
     {
         return $this->entityManager->getRepository(Procedures::class)->find($appoint_id)->getProcedureDescription();
@@ -273,7 +286,7 @@ class MobileRepository
     {
         try {
             $prof = $this->getProfissionalInfo($params['prof_req'], true)[0];
-            //UtilsFile::printvardie($prof);
+            //UtilsFile::printvardie($params);
             $this->entityManager->beginTransaction();
             //Primeiro deve criar o appointment para depois criar o registro no historico
             $userAppoint = new UserAppointment();
@@ -292,10 +305,49 @@ class MobileRepository
             $userHistoric->setIdAppointmentEntry($userAppoint);
             $this->entityManager->persist($userHistoric);
             $this->entityManager->flush();
+            if (isset($params['info'])) {
+                $infoHistoric = new UserHistoricInformation();
+                $infoHistoric->setIdHistoricReg($userHistoric->getIdHistoric());
+                $infoHistoric->setHistoricInformation($params['titulo'] . ' - ' . $params['info']);
+                $this->entityManager->persist($infoHistoric);
+                $this->entityManager->flush();
+            }
             $this->entityManager->commit();
             return true;
         } catch (Exception $e) {
             //UtilsFile::printvardie($e->getMessage());
+            $this->entityManager->rollback();
+            return false;
+        }
+    }
+
+    public function confirmAppointment($params)
+    {
+        try {
+            $this->entityManager->beginTransaction();
+            /** @var UserAppointment $app */
+            $app = $this->entityManager->getRepository(UserAppointment::class)->find($params['ap_id']);
+            $app->setConfirmedFor($app->getSolicitedFor());
+            $app->setIdStatus(2);
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->entityManager->rollback();
+            return false;
+        }
+    }
+
+    public function cancelAppointment($params){
+        try {
+            $this->entityManager->beginTransaction();
+            /** @var UserAppointment $app */
+            $app = $this->entityManager->getRepository(UserAppointment::class)->find($params['ap_id']);
+            $app->setIdStatus(4);
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            return true;
+        } catch (Exception $e) {
             $this->entityManager->rollback();
             return false;
         }
@@ -329,8 +381,9 @@ class MobileRepository
         }
     }
 
-    public function saveExams($params){
-        try{
+    public function saveExams($params)
+    {
+        try {
             $this->entityManager->beginTransaction();
             $exam = new UserExams();
             $exam->setExamName($params['fExam']);
@@ -346,7 +399,7 @@ class MobileRepository
             $this->entityManager->flush();
             $this->entityManager->commit();
             return true;
-        }catch (Exception $e){
+        } catch (Exception $e) {
             $this->entityManager->rollback();
             return false;
             UtilsFile::printvardie($e->getMessage());
