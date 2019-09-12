@@ -117,10 +117,10 @@ function initializeSolics() {
                 '                                                </ons-button>' +
                 '                                            </ons-col>' +
                 '                                            <ons-col>' +
-                '                                                <ons-button modifier="quiet" onclick="handleAppoint(' + value.a_id + ', \'confirm\')"">' +
-                '                                                    <ons-icon icon="fa-clock"></ons-icon>' +
-                '                                                    <span class="reaction-no">Adiar</span>' +
-                '                                                </ons-button>' +
+                // '                                                <ons-button modifier="quiet" onclick="handleAppoint(' + value.a_id + ', \'confirm\')"">' +
+                // '                                                    <ons-icon icon="fa-clock"></ons-icon>' +
+                // '                                                    <span class="reaction-no">Adiar</span>' +
+                // '                                                </ons-button>' +
                 '                                            </ons-col>' +
                 '                                            <ons-col>' +
                 '                                                <ons-button modifier="quiet" onclick="handleAppoint(' + value.a_id + ', \'cancel\')"">' +
@@ -184,12 +184,6 @@ function loadPacienteInfo(id) {
     window.pacId = id;
     $.get('/mobile/prof/get-pacientes', {mode: 'details', pac_id: id}, function (response) {
         $("#mainNavigator")[0].pushPage('pacProfile.html').then(() => {
-            window.swiperpac = new Swiper('.swiper-container-pac', {
-                direction: 'horizontal',
-                loop: false,
-                width: screen.width,
-                allowTouchMove: false
-            });
             $.each(response, function (key, value) {
                 $("#" + key).empty().append(value);
             });
@@ -203,6 +197,69 @@ function loadPacienteInfo(id) {
             })
         });
     })
+}
+
+function loadProcedures(type) {
+    $.get('/mobile/prof/get-pacientes', {mode: 'procedure', ptype: type, user: window.pacId}, function (response) {
+        $("#mainNavigator")[0].pushPage('historicViewPage.html').then(() => {
+            let area = $("#regisList ons-lazy-repeat");
+            area.empty();
+            $.each(response, function (key, value) {
+                let title, desc, date, status, prof, able;
+                    switch (type) {
+                        case 1:
+                            title = value.procedure_description;
+                            prof = ' com: ' + value.prof_name;
+                            desc = ' de '+value.desc_especialidade;
+                            date = 'Em: ' + (value.confirmed_for == null ? new Date(value.solicited_for).toLocaleDateString() : new Date(value.confirmed_for).toLocaleDateString());
+                            status = 'Status: ' + (value.confirmed_for == null ? 'Solicitado' : 'Confirmada');
+                            able = value.procedure_description != null;
+                            break;
+                        case 2:
+                            title = value.ue_exam_name;
+                            prof = 'Código: '+value.ue_exam_codigo;
+                            desc = '';
+                            date = value.solicited_for == null ? 'Apenas registro': new Date(value.solicited_for).toLocaleDateString();
+                            status = 'Notas: ' +value.ue_exam_notes;
+                            able = true;
+                            break;
+                        case 4:
+                            title = value.up_presc_medicamento;
+                            prof = value.up_presc_posologia;
+                            date = 'Dosagem: ' + value.up_presc_dosagem;
+                            status = '';
+                            desc = '';
+                            able = value.up_presc_medicamento != null;
+                            break;
+                    }
+                if (able) {
+                    let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
+                        '                        <div class="left">' +
+                        // '                            <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">' +
+                        '                        </div>' +
+                        '                        <div class="center">' +
+                        '                            <div class="tweet-header">' +
+                        '                                <span class="list-item__title"><b>' + title + desc + '</b></span>' +
+                        '                            </div>' +
+                        '                            <span class="list-item__content">' + prof + '</span>' +
+                        '                            <ons-row class="option-buttons">' +
+                        '                                <ons-col>' + date+
+                        '                                </ons-col>' +
+                        '                                <ons-col style="margin-left: 10px">' +
+                                                            status +
+                        '                                </ons-col>' +
+                        '                                <ons-col>' +
+                        '                                </ons-col>' +
+                        '                                <ons-col>' +
+                        '                                </ons-col>' +
+                        '                            </ons-row>' +
+                        '                        </div>' +
+                        '                    </ons-list-item>';
+                    area.append(item);
+                }
+            });
+        });
+    });
 }
 
 function insertHistoric(type) {

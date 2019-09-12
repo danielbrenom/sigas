@@ -176,7 +176,6 @@
                 </ons-select>
             </ons-list-item>
         </ons-list>
-
         <ons-row>
             <ons-col style="padding: 0">
                 <ons-card modifier="material" hidden>
@@ -239,7 +238,7 @@
     <ons-page id="Tab3">
         <div id="form-area">
             <div class="content" style="width: 100%">
-                <div class="profile_upper" style="">
+                <div class="profile_upper">
                     <div class="profile_wrapper">
                         <div class="profile_image_wrapper">
                             <img src="http://placekitten.com/g/40/40">
@@ -1100,6 +1099,26 @@
                 width: 100%;
             }
         </style>
+    </ons-page>
+</template>
+
+<template id="historicViewPage.html">
+    <ons-page id="historicViewPage">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Paciente</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-col>
+                <ons-list id="regisList">
+                    <ons-lazy-repeat>
+                        <ons-progress-circular indeterminate></ons-progress-circular>
+                    </ons-lazy-repeat>
+                </ons-list>
+            </ons-col>
+        </ons-row>
     </ons-page>
 </template>
 

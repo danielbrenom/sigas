@@ -9,10 +9,10 @@ $infos = $this->prof[0];
 //\Application\Debug\UtilsFile::printvar($infos);
 ?>
 <div class="content" style="width: 100%">
-    <div style="padding: 14px 6px 14px 16px; background-color: aliceblue !important;">
+    <div class="profile_upper">
         <div class="profile_wrapper">
             <div class="profile_image_wrapper">
-                <img src="assets/img/profile-image-08.png">
+                <img src="http://placekitten.com/g/40/40">
             </div>
             <div class="profile_info_wrapper">
                 <div class="profile_info_numbers">
@@ -29,29 +29,49 @@ $infos = $this->prof[0];
             </div>
         </div>
     </div>
-
-    <ons-card>
-        <div class="title">Sobre</div>
-        <div class="content">
-            Lorem ipsum
-        </div>
-    </ons-card>
-    <ons-card>
-        <div class="title">Procedimentos disponíveis</div>
-        <div class="content">
-            <ons-list modifier="nodivider">
-                <?php foreach ($infos['procedures'] as $procedure): ?>
-                    <ons-list-item><?= $procedure['procedure_description'] ?></ons-list-item>
-                <?php endforeach; ?>
-            </ons-list>
-        </div>
-    </ons-card>
-    <ons-card>
-        <div class="title">Localização</div>
-        <div class="content">
-            <div id="mapid" style="height: 200px"></div>
-        </div>
-    </ons-card>
+    <ons-row class="profile_button_bar_profile">
+        <ons-col>
+            <ons-button id="dadpes" class="custom-button active" onclick="display('dadpes', 'profile', 0)">
+                Informações
+            </ons-button>
+        </ons-col>
+        <ons-col>
+            <ons-button id="dadprof" class="custom-button" icon="fa-checkbox"
+                        onclick="display('dadprof', 'profile', 1)">Endereço
+            </ons-button>
+        </ons-col>
+    </ons-row>
+    <ons-row>
+        <ons-carousel id="carousel-profile">
+            <ons-carousel-item>
+                <ons-card>
+                    <div class="title">Sobre</div>
+                    <div class="content">
+                        Lorem ipsum
+                    </div>
+                </ons-card>
+                <ons-card>
+                    <div class="title">Procedimentos disponíveis</div>
+                    <div class="content">
+                        <ons-list modifier="nodivider">
+                            <?php foreach ($infos['procedures'] as $procedure): ?>
+                                <ons-list-item><?= $procedure['procedure_description'] ?></ons-list-item>
+                            <?php endforeach; ?>
+                        </ons-list>
+                    </div>
+                </ons-card>
+            </ons-carousel-item>
+            <ons-carousel-item>
+                <ons-card>
+                    <div class="title">Localização</div>
+                    <div class="content">
+                        <div id="mapid" style="height: 200px"></div>
+                    </div>
+                </ons-card>
+            </ons-carousel-item>
+            <ons-carousel-item></ons-carousel-item>
+        </ons-carousel>
+    </ons-row>
 </div>
 <input type="text" readonly id="profid" value="<?=$infos['u_id']?>" hidden>
 <style type="text/css">

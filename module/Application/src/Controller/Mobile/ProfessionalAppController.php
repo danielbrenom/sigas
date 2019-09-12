@@ -91,7 +91,7 @@ class ProfessionalAppController extends AbstractActionController
                 $response['reg_types'] = $this->mobileRepository->getProceduresAvailableForUser($params['pac_id']);
                 break;
             case 'procedure':
-                $procPacInfo = "";
+                $response = $this->mobileRepository->getUserHistoric($params['user'],$params['ptype']);
                 break;
             default:
                 $response = [
@@ -210,34 +210,27 @@ class ProfessionalAppController extends AbstractActionController
                 $response = [];
                 switch ($params['mode']) {
                     case 'confirm':
-                        if ($this->mobileRepository->confirmAppointment($params)) {
-                            $response = [
-                                'code' => 1,
-                                'message' => 'Solicitação confirmada'
-                            ];
-                        }else{
-                            $response = [
-                                'code' => 0,
-                                'message' => 'Erro ao confirmar solicitação, tente novamente mais tarde.'
-                            ];
-                        }
+                        $params['status'] = 2;
+                        $result = $this->mobileRepository->handleAppointment($params);
                         break;
                     case 'cancel':
-                        if($this->mobileRepository->cancelAppointment($params)){
-                            $response = [
-                                'code' => 1,
-                                'message' => 'Solicitação cancelada'
-                            ];
-                        }else{
-                            $response = [
-                                'code' => 0,
-                                'message' => 'Erro ao cancelar solicitação, tente novamente mais tarde.'
-                            ];
-                        }
+                        $params['status'] = 4;
+                        $result = $this->mobileRepository->handleAppointment($params);
                         break;
                     default:
                         throw new Exception("Requisição inválida", 0);
                         break;
+                }
+                if ($result) {
+                    $response = [
+                        'code' => 1,
+                        'message' => 'A alteração da solicitação foi salva.'
+                    ];
+                } else {
+                    $response = [
+                        'code' => 0,
+                        'message' => 'Erro ao operar solicitação, tente novamente mais tarde.'
+                    ];
                 }
                 return new JsonModel($response);
             }

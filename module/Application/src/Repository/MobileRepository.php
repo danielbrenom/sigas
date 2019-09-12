@@ -60,40 +60,58 @@ class MobileRepository
 
         try {
             $results = [];
-            if ((int)$type === 1) {
-                $results = $this->entityManager->getRepository(UserHistoric::class)
-                    ->createQueryBuilder('h')
-                    ->select(['ap.solicited_for', 'ap.confirmed_for'])
-                    ->addSelect('proc.procedure_description')
-                    ->addSelect('ip.user_name as prof_name')
-                    ->addSelect('e.desc_especialidade')
-                    ->leftJoin(UserAppointment::class, 'ap',
-                        'WITH', 'h.id_appointment_entry = ap.id')
-                    ->leftJoin(Procedures::class, 'proc', 'WITH',
-                        'proc.id = ap.id_procedure')
-                    ->leftJoin(UserInfoPessoal::class, 'ip', 'WITH',
-                        'ip.id = ap.id_user_ps')
-                    ->leftJoin(UserEspeciality::class, 'e', 'WITH',
-                        'e.id = ap.id_especiality')
-                    ->where('h.historic_type = :sType and h.user_id = :sId')
-                    ->setParameter('sType', $type)
-                    ->setParameter('sId', $user_id)
-                    ->getQuery()->getResult(3);
-            }
-            if ((int)$type === 2) {
-                $results = $this->entityManager->getRepository(UserHistoric::class)
-                    ->createQueryBuilder('h')
-                    ->addSelect('ap')
-                    ->leftJoin(UserAppointment::class, 'ap',
-                        'WITH', 'h.id_appointment_entry = ap.id')
-                    ->where('h.historic_type = :sType and h.user_id = :sId')
-                    ->setParameter('sType', $type)
-                    ->setParameter('sId', $user_id)
-                    ->getQuery()->getResult(3);
+            switch ((int)$type) {
+                case 1:
+                    $results = $this->entityManager->getRepository(UserHistoric::class)
+                        ->createQueryBuilder('h')
+                        ->select(['ap.solicited_for', 'ap.confirmed_for'])
+                        ->addSelect('proc.procedure_description')
+                        ->addSelect('ip.user_name as prof_name')
+                        ->addSelect('e.desc_especialidade')
+                        ->leftJoin(UserAppointment::class, 'ap',
+                            'WITH', 'h.id_appointment_entry = ap.id')
+                        ->leftJoin(Procedures::class, 'proc', 'WITH',
+                            'proc.id = ap.id_procedure')
+                        ->leftJoin(UserInfoPessoal::class, 'ip', 'WITH',
+                            'ip.id = ap.id_user_ps')
+                        ->leftJoin(UserEspeciality::class, 'e', 'WITH',
+                            'e.id = ap.id_especiality')
+                        ->where('h.historic_type = :sType and h.user_id = :sId')
+                        ->setParameter('sType', $type)
+                        ->setParameter('sId', $user_id)
+                        ->getQuery()->getResult(3);
+                    break;
+                case 2:
+                    $results = $this->entityManager->getRepository(UserHistoric::class)
+                        ->createQueryBuilder('h')
+                        ->addSelect('ap')
+                        ->addSelect('ue')
+                        ->leftJoin(UserAppointment::class, 'ap',
+                            'WITH', 'h.id_appointment_entry = ap.id')
+                        ->leftJoin(UserExams::class, 'ue', 'WITH',
+                            'h.id_generic_entry = ue.id')
+                        ->where('h.historic_type = :sType and h.user_id = :sId')
+                        ->setParameter('sType', $type)
+                        ->setParameter('sId', $user_id)
+                        ->getQuery()->getResult(3);
+                    break;
+                case 4:
+                    $results = $this->entityManager->getRepository(UserHistoric::class)
+                        ->createQueryBuilder('h')
+                        ->addSelect('up')
+                        ->leftJoin(UserPrescription::class, 'up', 'WITH',
+                            'h.id_generic_entry = up.id')
+                        ->where('h.historic_type = :sType and h.user_id = :sId')
+                        ->setParameter('sType', $type)
+                        ->setParameter('sId', $user_id)
+                        ->getQuery()->getResult(3);
+                    break;
             }
             return $results;
         } catch (Exception $e) {
-            return $e->getMessage();
+            return [
+                'message' => $e->getMessage()
+            ];
         }
     }
 
@@ -197,16 +215,21 @@ class MobileRepository
             ->getQuery()->getResult(2);
     }
 
-    public function getProfissinais($esp_id)
+    public function getProfissinais()
     {
         return $this->entityManager->getRepository(User::class)
             ->createQueryBuilder('u')
             ->addSelect('info')
+            ->addSelect('ue')
             ->leftJoin('u.user_information', 'info')
             ->leftJoin(ProfessionalInfo::class, 'pi', 'WITH', 'pi.id_user = u.id')
-            ->where('pi.id_especiality = :sId')
-            ->setParameter('sId', $esp_id)
-            ->getQuery()->getResult(2);
+            ->leftJoin(UserEspeciality::class, 'ue', 'WITH', 'ue.id = pi.id_especiality')
+            ->leftJoin(ProfessionalConselhos::class, 'pc', 'WITH',
+                'pc.id = pi.cons_name')
+            ->where('u.id_user_type = 2')
+//            ->where('pi.id_especiality = :sId')
+//            ->setParameter('sId', $esp_id)
+            ->getQuery()->getResult(3);
     }
 
     public function getProfissionalInfo($prof_id, $completeInfo = false)
@@ -321,14 +344,16 @@ class MobileRepository
         }
     }
 
-    public function confirmAppointment($params)
+    public function handleAppointment($params)
     {
         try {
             $this->entityManager->beginTransaction();
             /** @var UserAppointment $app */
             $app = $this->entityManager->getRepository(UserAppointment::class)->find($params['ap_id']);
-            $app->setConfirmedFor($app->getSolicitedFor());
-            $app->setIdStatus(2);
+            if ($params['mode'] === 'confirm') {
+                $app->setConfirmedFor($app->getSolicitedFor());
+            }
+            $app->setIdStatus($params['status']);
             $this->entityManager->flush();
             $this->entityManager->commit();
             return true;
@@ -338,7 +363,8 @@ class MobileRepository
         }
     }
 
-    public function cancelAppointment($params){
+    public function cancelAppointment($params)
+    {
         try {
             $this->entityManager->beginTransaction();
             /** @var UserAppointment $app */
