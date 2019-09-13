@@ -79,12 +79,33 @@
 
 <template id="tab2.html">
     <ons-page id="Tab2">
+        <ons-row class="profile_button_bar_historic">
+            <ons-col>
+                <ons-button id="proc" class="custom-button active" onclick="display('proc', 'historic', 0)">
+                    Procedimentos
+                </ons-button>
+            </ons-col>
+            <ons-col>
+                <ons-button id="presc" class="custom-button"
+                            onclick="display('presc', 'historic', 1)">Prescrições
+                </ons-button>
+            </ons-col>
+        </ons-row>
         <ons-row>
-            <ons-col style="padding: 0 10px">
+            <ons-carousel id="carousel-historic">
+                <ons-carousel-item>
+
+                </ons-carousel-item>
+                <ons-carousel-item>
+
+                </ons-carousel-item>
+            </ons-carousel>
+            <ons-col>
                 <ons-card modifier="material">
                     <div class="title">
                         <h3 class="card__title" style="text-align: center;">Selecione um tipo de registro</h3>
                     </div>
+
                     <div class="content">
                         <ons-row>
                             <ons-col width="100%">
@@ -106,6 +127,8 @@
                 </ons-card>
             </ons-col>
         </ons-row>
+        <style>
+        </style>
         <script>
             ons.getScriptPage().onInit = function () {
                 //$.get('')
@@ -118,7 +141,7 @@
     <ons-page id="Tab3">
         <div id="form-area">
             <div class="content" style="width: 100%">
-                <div style="padding: 14px 6px 14px 16px; background-color: aliceblue !important;">
+                <div style="padding: 14px 6px 14px 16px;">
                     <div class="profile_wrapper">
                         <div class="profile_image_wrapper">
                             <img src="assets/img/profile-image-08.png">
@@ -143,51 +166,70 @@
                         </div>
                     </div>
                 </div>
+                <ons-row class="profile_button_bar_profile">
+                    <ons-col>
+                        <ons-button id="dadpes" class="custom-button active" onclick="display('dadpes', 'profile', 0)">
+                            Pessoal
+                        </ons-button>
+                    </ons-col>
+                    <ons-col>
+                        <ons-button id="dadprof" class="custom-button" icon="fa-checkbox"
+                                    onclick="display('dadprof', 'profile', 1)">Profissional
+                        </ons-button>
+                    </ons-col>
+                </ons-row>
+                <ons-carousel id="carousel-profile">
+                    <ons-carousel-item>
+                        <ons-card>
+                            <div class="title">Dados Pessoais
+                                <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo()">
+                                    <ons-icon icon="ion-edit"></ons-icon>
+                                </ons-toolbar-button>
+                            </div>
 
-                <ons-card>
-                    <div class="title">Dados Pessoais
-                        <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo()">
-                            <ons-icon icon="ion-edit"></ons-icon>
-                        </ons-toolbar-button>
-                    </div>
-
-                    <div class="content">
-                        <div class="profile_wrapper">
-                            <div class="profile_info_wrapper">
-                                <div class="profile_info_numbers">
-                                    <div>
-                                        <div class="profile_info_text">Nome</div>
-                                        <div><?= $this->user['user_information']['user_name'] === null ?
-                                                "Não informado" :
-                                                $this->user['user_information']['user_name'] ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">CPF</div>
-                                        <div><?= $this->user['user_information']['user_cpf'] ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">Endereço</div>
-                                        <div><?= $this->user['user_information']['user_addr'] ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">Plano de Saúde</div>
-                                        <div><?= $this->user['user_information']['user_healthcare'] ?></div>
-                                    </div>
-                                    <div>
-                                        <div class="profile_info_text">Números de contato</div>
-                                        <div>Telefone
-                                            Celular:<?= $this->user['user_information']['user_ctt_phone'] ?></div>
-                                        <div>Telefone
-                                            Residencial:<?= $this->user['user_information']['user_ctt_res'] ?></div>
+                            <div class="content">
+                                <div class="profile_wrapper">
+                                    <div class="profile_info_wrapper">
+                                        <div class="profile_info_numbers">
+                                            <div>
+                                                <div class="profile_info_text">Nome</div>
+                                                <div><?= $this->user['user_information']['user_name'] === null ?
+                                                        "Não informado" :
+                                                        $this->user['user_information']['user_name'] ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">CPF</div>
+                                                <div><?= $this->user['user_information']['user_cpf'] ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">Endereço</div>
+                                                <div><?= $this->user['user_information']['user_addr'] ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">Plano de Saúde</div>
+                                                <div><?= $this->user['user_information']['user_healthcare'] ?></div>
+                                            </div>
+                                            <div>
+                                                <div class="profile_info_text">Números de contato</div>
+                                                <div>Telefone
+                                                    Celular:<?= $this->user['user_information']['user_ctt_phone'] ?></div>
+                                                <div>Telefone
+                                                    Residencial:<?= $this->user['user_information']['user_ctt_res'] ?></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </ons-card>
-                <ons-card>
-                    <div class="title">Prescrições disponíveis</div>
-                </ons-card>
+                        </ons-card>
+                    </ons-carousel-item>
+                    <ons-carousel-item>
+                        <ons-card>
+                            <div class="title">Prescrições disponíveis</div>
+                        </ons-card>
+                    </ons-carousel-item>
+                </ons-carousel>
+
+
             </div>
         </div>
         <style type="text/css">
@@ -337,6 +379,30 @@
 
             .grid_thumbnail {
                 width: 100%;
+            }
+
+            .profile_button_bar_agenda, .profile_button_bar_pac,
+            .profile_button_bar_profile {
+                text-align: center;
+                font-size: 26px;
+                /*height: 50px;*/
+                line-height: 40px;
+                border-top: 1px solid rgba(187, 187, 187, 0.51);
+                background-color: #fafafa;
+            }
+            .profile_button_bar_agenda ons-col {
+                width: auto;
+            }
+            .custom-button {
+                color: #c3c3c3;
+                width: 100%;
+                background-color: #fafafa;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .custom-button.active {
+                color: #5fb4f4;
+                border-bottom: 2px solid #5fb4f4;
             }
         </style>
     </ons-page>
