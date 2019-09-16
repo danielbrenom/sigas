@@ -97,6 +97,10 @@ function initializeSolics() {
     let area = $("#solic-view ons-list ons-lazy-repeat");
     $.get('/mobile/prof/get-schedule', {type: 'solics'}, function (response) {
         area.empty();
+        if (response.length === 0) {
+            area.empty();
+            area.append("<ons-list-item>Não existem solicitações</ons-list-item>");
+        }
         $.each(response, function (key, value) {
             let dataShow = new Date(value.a_solicited_for);
             let itemSolic = '<ons-list-item class="item-custom" modifier="longdivider">' +
@@ -262,6 +266,23 @@ function loadProcedures(type) {
     });
 }
 
+function loadAttendants() {
+    $.get('/mobile/prof/attendant', {}, function (response) {
+        let area = $("#attendeeArea ons-list");
+        area.empty();
+        $.each(response, function (key, value) {
+            let check = value.is_att === true ? "checked" : "";
+            let item = '<label class="left">' +
+                '        <ons-checkbox name="fSelects[]" value="' + value.id_attendant + '" ' + check + ' input-id="check-' + key + '"></ons-checkbox>' +
+                '      </label>' +
+                '      <label for="check-' + key + '" class="center">' +
+                value.user_name +
+                '      </label>';
+            area.append(item);
+        })
+    })
+}
+
 function insertHistoric(type) {
     let areas = ['pres', 'rx', 'rem', 'note'];
     $("#mainNavigator")[0].pushPage('addHistoric.html').then(() => {
@@ -351,16 +372,22 @@ function addRem() {
 }
 
 function editInfo(type) {
-    if (type) {
-        $.get('/mobile/prof/get-profile', {type: 'prof'}, function (response) {
-            $("#mainNavigator")[0].pushPage('editInfoProfForm.html').then(() => {
-                $.each(response, function (key, value) {
-                    $("#" + key).val(value);
-                })
+    switch (type) {
+        case 1:
+            $.get('/mobile/prof/get-profile', {type: 'prof'}, function (response) {
+                $("#mainNavigator")[0].pushPage('editInfoProfForm.html').then(() => {
+                    $.each(response, function (key, value) {
+                        $("#" + key).val(value);
+                    })
+                });
             });
-        });
-    } else {
-        $("#mainNavigator")[0].pushPage('editInfoPesForm.html');
+            break;
+        case 0:
+            $("#mainNavigator")[0].pushPage('editInfoPesForm.html');
+            break;
+        case 2:
+            $("#mainNavigator")[0].pushPage('manageAttend.html');
+            break;
     }
 }
 
@@ -391,19 +418,19 @@ function handleAppoint(id, op) {
 }
 
 function handleNotifs(op) {
-    if(op) {
+    if (op) {
         $("#mainNavigator")[0].pushPage('notifPage.html');
-    }else{
+    } else {
         $.get('/mobile/prof/get-schedule', {type: 'notifs'}, function (response) {
             let area = $("#notif-view ons-list ons-lazy-repeat");
-            if(response.length == 0){
+            if (response.length == 0) {
                 area.empty();
                 area.append("<ons-list-item>Não existem registros</ons-list-item>");
-            }else{
+            } else {
                 area.empty();
                 $.each(response, function (key, value) {
-                    let start =  new Date(value.n_dt_inicio), end = new Date(value.n_dt_fim);
-                    if(value.n_dt_fim == null){
+                    let start = new Date(value.n_dt_inicio), end = new Date(value.n_dt_fim);
+                    if (value.n_dt_fim == null) {
                         end = start;
                     }
                     let item = '<ons-list-item class="item-custom" modifier="longdivider">' +

@@ -14,8 +14,8 @@
             </ons-tab>
             <!--            <ons-tab page="twitter.html" label="Perfil" icon="fa-user-md">-->
             <!--            </ons-tab>-->
-<!--            <ons-tab page="profilePage.html" label="Perfil" icon="fa-user-md">-->
-<!--            </ons-tab>-->
+            <!--            <ons-tab page="profilePage.html" label="Perfil" icon="fa-user-md">-->
+            <!--            </ons-tab>-->
         </ons-tabbar>
         <style>
             .toast {
@@ -29,6 +29,10 @@
 
             .toast-error div {
                 background-color: #a53a39;
+            }
+
+            .list-item__center, .list-item__right {
+                background-image: none;
             }
         </style>
     </ons-page>
@@ -128,7 +132,8 @@
                 border-top: none;
                 border-bottom: none;
             }
-            .fc-time-grid-event.confirmed{
+
+            .fc-time-grid-event.confirmed {
                 background-color: #f1ffec;
                 border-left: 3px #60934e solid;
             }
@@ -245,6 +250,12 @@
                                 <div><?= $this->user['info_user_name'] === null ?
                                         "Não informado" :
                                         $this->user['info_user_name'] ?></div>
+                                <div>Profissional da Saúde</div>
+                                <div class="badge <?= $this->user['pi_confirmed_in'] === null ?
+                                    "badge-rose" : "badge-success" ?>">
+                                    Usuário <?= $this->user['pi_confirmed_in'] === null ?
+                                        "aguardando verificação" : "verificado" ?>
+                                </div>
                             </div>
                         </div>
                         <div class="profile_info_wrapper">
@@ -257,9 +268,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style="padding-top: 5px">Usuário <?= $this->user['pi_confirmed_in'] === null ?
-                            "aguardando verificação" :
-                            "verificado" ?></div>
+
                 </div>
                 <ons-row class="profile_button_bar_profile">
                     <ons-col>
@@ -273,11 +282,11 @@
                         </ons-button>
                     </ons-col>
                     <ons-col>
-                        <ons-button id="dadad" class="custom-button" onclick="display('dadad', 'profile', 2)">Adicionais
+                        <ons-button id="dadad" class="custom-button" onclick="display('dadad', 'profile', 2)">Gerencial
                         </ons-button>
                     </ons-col>
                 </ons-row>
-                <ons-row >
+                <ons-row>
                     <ons-carousel fullscreen id="carousel-profile" style="width: 100%">
                         <ons-carousel-item>
                             <div style="padding: 1px 0 0 0;">
@@ -347,8 +356,8 @@
                                                     <div>
                                                         <div class="profile_info_text">Endereço</div>
                                                         <?php foreach ($this->user['pi_prof_addresses'] as $add): ?>
-                                                        <div><?=$add?></div>
-                                                        <?php endforeach;?>
+                                                            <div><?= $add ?></div>
+                                                        <?php endforeach; ?>
                                                     </div>
                                                     <div>
                                                         <div class="profile_info_text">Números de contato</div>
@@ -364,12 +373,66 @@
                                 </div>
                             </div>
                         </ons-carousel-item>
-                        <ons-carousel-item></ons-carousel-item>
+                        <ons-carousel-item>
+                            <div style="padding: 1px 0 0 0;">
+                                <div class="card card--material">
+                                    <div class="card__title card--material__title">Dados Gerenciais
+                                        <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(2)">
+                                            <ons-icon icon="ion-edit"></ons-icon>
+                                        </ons-toolbar-button>
+                                    </div>
+                                    <div class="card__content card--material__content">
+                                        <div class="profile_wrapper">
+                                            <div class="profile_info_wrapper">
+                                                <div class="profile_info_numbers">
+                                                    <div>
+                                                        <div class="profile_info_text">Atendentes registrados</div>
+                                                        <?php foreach ($this->attend as $item) : ?>
+                                                            <div>
+                                                                <?= $item['user_name'] ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ons-carousel-item>
                     </ons-carousel>
                 </ons-row>
             </div>
         </div>
         <style type="text/css">
+            .badge {
+                padding: 5px 12px;
+                text-transform: uppercase;
+                font-size: 10px;
+                color: #fff;
+                display: inline-block;
+                font-weight: 500;
+                line-height: 1;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: baseline;
+                border-radius: 1rem;
+            }
+
+            .badge.badge-success {
+                background-color: #4caf50;
+            }
+
+            .badge-pill {
+                padding-right: .6em;
+                padding-left: .6em;
+                border-radius: 10rem;
+            }
+
+            .badge.badge-rose {
+                background-color: #e91e63;
+            }
+
             .profile_upper {
                 padding: 14px 6px 14px 16px;
                 background-color: #fafafa;
@@ -553,7 +616,7 @@
                             </div>
                             <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fName"
                                        placeholder="Nome completo" type="text"
-                                       float required validate value="<?=$this->user['info_user_name']?>"></ons-input>
+                                       float required validate value="<?= $this->user['info_user_name'] ?>"></ons-input>
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
@@ -561,7 +624,8 @@
                             </div>
                             <ons-input style="width: 100%" id="info_user_cpf" modifier="material" name="fCpf"
                                        type="text"
-                                       placeholder="CPF" float validate value="<?=$this->user['info_user_cpf']?>"></ons-input>
+                                       placeholder="CPF" float validate
+                                       value="<?= $this->user['info_user_cpf'] ?>"></ons-input>
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
@@ -570,7 +634,8 @@
                             <ons-input style="width: 100%" id="info_user_rg" modifier="material"
                                        name="fRg"
                                        type="text"
-                                       placeholder="RG" float validate value="<?=$this->user['info_user_rg']?>"></ons-input>
+                                       placeholder="RG" float validate
+                                       value="<?= $this->user['info_user_rg'] ?>"></ons-input>
                         </ons-list-item>
                         <ons-list-item>
                             <div class="right right-label">
@@ -711,22 +776,37 @@
     </ons-page>
 </template>
 
-<template id="checkDatePage.html">
-    <ons-page id="checkDate">
+<template id="manageAttend.html">
+    <ons-page id="manageAttend">
         <ons-toolbar modifier="noshadow">
             <div class="left">
-                <ons-back-button>Informações</ons-back-button>
+                <ons-back-button>Perfil</ons-back-button>
             </div>
             <div class="center"></div>
         </ons-toolbar>
         <ons-row>
             <ons-col>
                 <ons-card>
-                    <div class="title">Selecione uma data abaixo:</div>
-                    <div id="callendarArea" style="margin: 10px 0"></div>
+                    <div class="title">Gerenciamento de Atendentes</div>
+                    <form action="/mobile/prof/attendant" method="post">
+                        <div id="attendeeArea" style="margin: 10px 0">
+                            <ons-list></ons-list>
+                        </div>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <input type="text" name="fOp" value="pesp" hidden>
+                                <button type="submit" class="button">Salvar</button>
+                            </div>
+                        </ons-list-item>
+                    </form>
                 </ons-card>
             </ons-col>
         </ons-row>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                loadAttendants();
+            }
+        </script>
     </ons-page>
 </template>
 
@@ -822,8 +902,6 @@
                         <ons-carousel-item></ons-carousel-item>
                     </ons-carousel>
                 </ons-row>
-
-
             </div>
         </div>
         <ons-speed-dial position="bottom right" direction="up">
@@ -842,10 +920,10 @@
                 <ons-icon icon="fa-user-md"></ons-icon>
                 <div class="speed-dial-text">Procedimento</div>
             </ons-speed-dial-item>
-<!--            <ons-speed-dial-item onclick="insertHistoric(3)">-->
-<!--                <ons-icon icon="fa-notes-medical"></ons-icon>-->
-<!--                <div class="speed-dial-text">Notas</div>-->
-<!--            </ons-speed-dial-item>-->
+            <!--            <ons-speed-dial-item onclick="insertHistoric(3)">-->
+            <!--                <ons-icon icon="fa-notes-medical"></ons-icon>-->
+            <!--                <div class="speed-dial-text">Notas</div>-->
+            <!--            </ons-speed-dial-item>-->
         </ons-speed-dial>
         <style>
             ons-speed-dial-item.speed-dial__item {
@@ -1157,11 +1235,13 @@
                             <ons-input style="width: 25%; margin-right: 10px" id="info_user_rg" modifier="material"
                                        name="fTime[]"
                                        type="time" min="08:00" max="18:00"
-                                       placeholder="" float required validate></ons-input> às
+                                       placeholder="" float required validate></ons-input>
+                            às
                             <ons-input style="width: 25%; margin-left: 20px" id="info_user_rg" modifier="material"
                                        name="fTime[]"
                                        type="time" min="08:00" max="18:00"
-                                       placeholder="" float validate></ons-input> (opcional)
+                                       placeholder="" float validate></ons-input>
+                            (opcional)
                         </ons-list-item>
                         <ons-list-item>
                             <div class="right right-label" style="background-image: none">

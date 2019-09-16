@@ -7,6 +7,7 @@ namespace Application\Repository;
 use Application\Debug\UtilsFile;
 use Application\Entity\Seg\User;
 use Application\Entity\Sis\Procedures;
+use Application\Entity\Sis\ProfessionalAttendee;
 use Application\Entity\Sis\ProfessionalConselhos;
 use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\ProfessionalNotif;
@@ -262,6 +263,63 @@ class MobileRepository
         return $sql->getQuery()->getResult(3);
     }
 
+    public function getProfessionalAttendants($params)
+    {
+        return $this->entityManager->getRepository(ProfessionalAttendee::class)
+            ->createQueryBuilder('pa')
+            ->addSelect('ui.user_name')
+            ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
+                'pa.id_attendant = ui.id')
+            ->where('pa.id_professional = :sId and pa.dt_fim is null')
+            ->setParameter('sId', $params['idp'])
+            ->getQuery()->getResult(3);
+    }
+
+    public function saveProfessionalAttendants($params)
+    {
+        try {
+            $this->entityManager->beginTransaction();
+            $attendants = $this->entityManager->getRepository(ProfessionalAttendee::class)
+                ->createQueryBuilder('pa')
+                ->where('pa.id_professional = :sId and pa.dt_fim is null')
+                ->setParameter('sId', $params['idp'])
+                ->getQuery()->getResult();
+            foreach ($attendants as $att) {
+                $this->entityManager->remove($att);
+            }
+            $this->entityManager->flush();
+            foreach ($params['fSelects'] as $natt) {
+                $nattendant = new ProfessionalAttendee();
+                $nattendant->setIdAttendant($natt);
+                $nattendant->setIdProfessional($params['idp']);
+                $nattendant->setDtInicio(date('Y-m-d'));
+                $this->entityManager->persist($nattendant);
+            }
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->entityManager->rollback();
+            return false;
+            throw $e;
+        }
+    }
+
+    public function isProfessionalAtendant($params)
+    {
+        try {
+            return count($this->entityManager->getRepository(ProfessionalAttendee::class)
+                    ->createQueryBuilder('pa')
+                    ->select(['pa.id_attendant'])
+                    ->where('pa.id_professional = :sId and pa.id_attendant = :sAt and pa.dt_fim is null')
+                    ->setParameter('sId', $params['pid'])
+                    ->setParameter('sAt', $params['aid'])
+                    ->getQuery()->getResult(3)) > 0;
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
     public function updateProfissionalJobInfo($info, $prof_id)
     {
         try {
@@ -374,20 +432,33 @@ class MobileRepository
             ->getQuery()->getResult(3);
     }
 
+    public function getAttendants()
+    {
+        return $this->entityManager->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->select(['u.id as id_attendant'])
+            ->addSelect('ui.user_name')
+            ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
+                'ui.id = u.id')
+            ->where('u.id_user_type = 3')
+            ->getQuery()->getResult(3);
+    }
+
     //Operações no banco
     public function saveAppointment($params)
     {
         try {
             $prof = $this->getProfissionalInfo($params['prof_req'], true)[0];
-            //UtilsFile::printvardie($params);
+            //UtilsFile::printvardie($params, $prof);
             $this->entityManager->beginTransaction();
             //Primeiro deve criar o appointment para depois criar o registro no historico
             $userAppoint = new UserAppointment();
             $userAppoint->setIdUserPs($params['prof_req']);
             $userAppoint->setCreatedOn(date("Y-m-d H:i:s"));
             $userAppoint->setSolicitedFor(date("Y-m-d H:i:s", strtotime("{$params['datareq']} {$params['horareq']}")));
-            $userAppoint->setIdEspeciality($prof['esp_id']);
+            $userAppoint->setIdEspeciality($prof['pi_id_especiality']);
             $userAppoint->setIdProcedure($params['proc']);
+            $userAppoint->setIdStatus(1);
             //UtilsFile::printvardie($userAppoint);
             $this->entityManager->persist($userAppoint);
             $this->entityManager->flush();
@@ -408,7 +479,7 @@ class MobileRepository
             $this->entityManager->commit();
             return true;
         } catch (Exception $e) {
-            //UtilsFile::printvardie($e->getMessage());
+            UtilsFile::printvardie($e->getMessage());
             $this->entityManager->rollback();
             return false;
         }
@@ -472,6 +543,7 @@ class MobileRepository
             $this->entityManager->commit();
             return true;
         } catch (Exception $e) {
+            UtilsFile::printvardie($e->getMessage());
             $this->entityManager->rollback();
             return false;
         }

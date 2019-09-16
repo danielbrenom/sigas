@@ -35,7 +35,8 @@ class ProfessionalAppController extends AbstractActionController
         return new ViewModel([
             'user' => $profInfo,
             'cons' => $this->mobileRepository->getConselhos(),
-            'proceds' => $this->mobileRepository->getProceduresProfessional($this->authManager->getActiveUser()['user_id'])
+            'proceds' => $this->mobileRepository->getProceduresProfessional($this->authManager->getActiveUser()['user_id']),
+            'attend' => $this->mobileRepository->getProfessionalAttendants(['idp' => $this->authManager->getActiveUser()['user_id']])
         ]);
     }
 
@@ -158,6 +159,42 @@ class ProfessionalAppController extends AbstractActionController
         return new JsonModel($response);
     }
 
+    public function attendantAction()
+    {
+        try {
+            if ($this->getRequest()->isPost()) {
+                $params = $this->params()->fromPost();
+                $params['idp'] = $this->authManager->getActiveUser()['user_id'];
+                if ($this->mobileRepository->saveProfessionalAttendants($params)) {
+                    $this->mobileRepository->setMessage('Atendentes registrados.', 1);
+                    $this->redirect()->toRoute('application_mobile_prof');
+                    return $this->getResponse();
+                }
+
+                $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
+                $this->redirect()->toRoute('application_mobile_prof');
+                return $this->getResponse();
+            }
+            if ($this->getRequest()->isGet()) {
+                $params = $this->params()->fromQuery();
+                $params['id_professional'] = $this->authManager->getActiveUser()['user_id'];
+                $allAtt = $this->mobileRepository->getAttendants();
+                foreach ($allAtt as $key => $att) {
+                    $allAtt[$key]['is_att'] = $this->mobileRepository->isProfessionalAtendant(
+                        ['pid' => $params['id_professional'],
+                            'aid' => $att['id_attendant']]);
+                }
+                return new JsonModel($allAtt);
+            }
+            throw new Exception("Requisição inválida", 0);
+        } catch (Exception $e) {
+            return new JsonModel([$e->getMessage()]);
+            $this->mobileRepository->setMessage($e->getMessage(), $e->getCode());
+            $this->redirect()->toRoute('application_mobile_prof');
+            return $this->getResponse();
+        }
+    }
+
     public function saveHistoricAction()
     {
         $params = $this->params()->fromPost();
@@ -195,7 +232,6 @@ class ProfessionalAppController extends AbstractActionController
                         if ($this->mobileRepository->saveAppointment([
                             "prof_req" => $thisProfId,
                             'user_req' => $params["pacId"],
-                            'esp_id' => $this->mobileRepository->getProfissionalInfo($thisProfId, true)[0]['esp_id'],
                             'proc' => $params['fType'],
                             'datareq' => $params['fData'],
                             'horareq' => $params['fHora'],
