@@ -29,6 +29,11 @@ class ProfessionalInfo
     protected $especiality_solicited;
 
     /**
+     * @ORM\Column(name="prof_addresses")
+     */
+    protected $prof_addresses;
+
+    /**
      * @ORM\Column(name="cons_name")
      */
     protected $cons_name;
@@ -160,5 +165,19 @@ class ProfessionalInfo
         $this->confirmed_in = $confirmed_in;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getProfAddresses()
+    {
+        return $this->prof_addresses;
+    }
 
+    /**
+     * @param mixed $prof_addresses
+     */
+    public function setProfAddresses($prof_addresses)
+    {
+        $this->prof_addresses = $prof_addresses;
+    }
 }

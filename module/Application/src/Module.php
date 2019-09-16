@@ -44,7 +44,7 @@ class Module
     {
         $mobileDetect = new Mobile_Detect();
         $controller = $event->getTarget();
-        if ($mobileDetect->isMobile()) {
+        //if ($mobileDetect->isMobile()) {
             $controller->layout('layout/mobile');
             if ($this->authManager->userState()) {
                 $userType = (int)$this->authManager->getActiveUser()['user_type'] === 1 ? 'user' : 'prof';
@@ -54,12 +54,12 @@ class Module
             } else if ($event->getRouteMatch()->getMatchedRouteName() !== 'application_mobile_front') {
                 return $controller->redirect()->toRoute('application_mobile_front');
             }
-        } else {
-            $controller->layout('layout/browser');
-            if ($event->getRouteMatch()->getMatchedRouteName() !== 'application_browser') {
-                return $controller->redirect()->toRoute('application_browser');
-            }
-        }
+//        } else {
+//            $controller->layout('layout/browser');
+//            if ($event->getRouteMatch()->getMatchedRouteName() !== 'application_browser') {
+//                return $controller->redirect()->toRoute('application_browser');
+//            }
+//        }
         return $event;
         //@TODO: Fazer com que erros 404 redirecionem para o front
     }

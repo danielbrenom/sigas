@@ -206,32 +206,32 @@ function loadProcedures(type) {
             area.empty();
             $.each(response, function (key, value) {
                 let title, desc, date, status, prof, able;
-                    switch (type) {
-                        case 1:
-                            title = value.procedure_description;
-                            prof = ' com: ' + value.prof_name;
-                            desc = ' de '+value.desc_especialidade;
-                            date = 'Em: ' + (value.confirmed_for == null ? new Date(value.solicited_for).toLocaleDateString() : new Date(value.confirmed_for).toLocaleDateString());
-                            status = 'Status: ' + (value.confirmed_for == null ? 'Solicitado' : 'Confirmada');
-                            able = value.procedure_description != null;
-                            break;
-                        case 2:
-                            title = value.ue_exam_name;
-                            prof = 'Código: '+value.ue_exam_codigo;
-                            desc = '';
-                            date = value.solicited_for == null ? 'Apenas registro': new Date(value.solicited_for).toLocaleDateString();
-                            status = 'Notas: ' +value.ue_exam_notes;
-                            able = true;
-                            break;
-                        case 4:
-                            title = value.up_presc_medicamento;
-                            prof = value.up_presc_posologia;
-                            date = 'Dosagem: ' + value.up_presc_dosagem;
-                            status = '';
-                            desc = '';
-                            able = value.up_presc_medicamento != null;
-                            break;
-                    }
+                switch (type) {
+                    case 1:
+                        title = value.procedure_description;
+                        prof = ' com: ' + value.prof_name;
+                        desc = ' de ' + value.desc_especialidade;
+                        date = 'Em: ' + (value.confirmed_for == null ? new Date(value.solicited_for).toLocaleDateString() : new Date(value.confirmed_for).toLocaleDateString());
+                        status = 'Status: ' + (value.confirmed_for == null ? 'Solicitado' : 'Confirmada');
+                        able = value.procedure_description != null;
+                        break;
+                    case 2:
+                        title = value.ue_exam_name;
+                        prof = 'Código: ' + value.ue_exam_codigo;
+                        desc = '';
+                        date = value.solicited_for == null ? 'Apenas registro' : new Date(value.solicited_for).toLocaleDateString();
+                        status = 'Notas: ' + value.ue_exam_notes;
+                        able = true;
+                        break;
+                    case 4:
+                        title = value.up_presc_medicamento;
+                        prof = value.up_presc_posologia;
+                        date = 'Dosagem: ' + value.up_presc_dosagem;
+                        status = '';
+                        desc = '';
+                        able = value.up_presc_medicamento != null;
+                        break;
+                }
                 if (able) {
                     let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
                         '                        <div class="left">' +
@@ -243,10 +243,10 @@ function loadProcedures(type) {
                         '                            </div>' +
                         '                            <span class="list-item__content">' + prof + '</span>' +
                         '                            <ons-row class="option-buttons">' +
-                        '                                <ons-col>' + date+
+                        '                                <ons-col>' + date +
                         '                                </ons-col>' +
                         '                                <ons-col style="margin-left: 10px">' +
-                                                            status +
+                        status +
                         '                                </ons-col>' +
                         '                                <ons-col>' +
                         '                                </ons-col>' +
@@ -390,15 +390,46 @@ function handleAppoint(id, op) {
     });
 }
 
-function cancelAppoint(id) {
-    let area = $("#solic-view ons-list ons-lazy-repeat");
-    area.empty();
-    area.append('<ons-progress-circular indeterminate></ons-progress-circular>');
-    $.post('/mobile/prof/handle-solicitacoes', {ap_id: id, mode: 'confirm'}, function (response) {
-        showToast(response);
-    }).then(() => {
-        initializeSolics();
-    });
+function handleNotifs(op) {
+    if(op) {
+        $("#mainNavigator")[0].pushPage('notifPage.html');
+    }else{
+        $.get('/mobile/prof/get-schedule', {type: 'notifs'}, function (response) {
+            let area = $("#notif-view ons-list ons-lazy-repeat");
+            if(response.length == 0){
+                area.empty();
+                area.append("<ons-list-item>Não existem registros</ons-list-item>");
+            }else{
+                area.empty();
+                $.each(response, function (key, value) {
+                    let start =  new Date(value.n_dt_inicio), end = new Date(value.n_dt_fim);
+                    if(value.n_dt_fim == null){
+                        end = start;
+                    }
+                    let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
+                        '           <div class="left">' +
+                        '           </div>' +
+                        '           <div class="center">' +
+                        '                <div class="tweet-header">' +
+                        '                      <span class="list-item__title"><b>' + value.n_notif_motivo + '</b></span>' +
+                        '                </div>' +
+                        '                <ons-row class="option-buttons">' +
+                        '                     <ons-col>Em: ' + start.toLocaleDateString() + ' ' + start.toLocaleTimeString() +
+                        '                     </ons-col>' +
+                        '                     <ons-col>às ' + end.toLocaleDateString() + ' 18:00:00' +
+                        '                     </ons-col>' +
+                        '                     <ons-col>' +
+                        '                     </ons-col>' +
+                        '                     <ons-col>' +
+                        '                    </ons-col>' +
+                        '                 </ons-row>' +
+                        '           </div>' +
+                        '        </ons-list-item>';
+                    area.append(item);
+                })
+            }
+        })
+    }
 }
 
 function addAddress() {

@@ -69,20 +69,16 @@
                 </ons-carousel-item>
                 <ons-carousel-item style="">
                     <div id="notif-view">
-                        <ons-card modifier="material">
-                            <div class="content">
-                                <ons-row>
-
-                                </ons-row>
-                            </div>
-                        </ons-card>
-
+                        <ons-list style="width: 100%; margin: 0;" modifier="material">
+                            <ons-lazy-repeat>
+                                <ons-progress-circular indeterminate></ons-progress-circular>
+                            </ons-lazy-repeat>
+                        </ons-list>
                     </div>
                 </ons-carousel-item>
             </ons-carousel>
-
         </ons-row>
-        <ons-fab ripple position="bottom right" id="notf-fab" style="display: none">
+        <ons-fab ripple position="bottom right" id="notf-fab" onclick="handleNotifs(true)" style="display: none">
             <ons-icon icon="md-plus"></ons-icon>
         </ons-fab>
         <style>
@@ -152,6 +148,7 @@
             ons.getScriptPage().onInit = function () {
                 initializeCalendar();
                 initializeSolics();
+                handleNotifs(false);
             }
         </script>
     </ons-page>
@@ -241,7 +238,7 @@
                 <div class="profile_upper">
                     <div class="profile_wrapper">
                         <div class="profile_image_wrapper">
-                            <img src="http://placekitten.com/g/40/40">
+                            <img src="/img/profile/placeholder.png">
                         </div>
                         <div class="profile_info_wrapper">
                             <div class="profile_info_numbers">
@@ -280,8 +277,8 @@
                         </ons-button>
                     </ons-col>
                 </ons-row>
-                <ons-row>
-                    <ons-carousel id="carousel-profile">
+                <ons-row >
+                    <ons-carousel fullscreen id="carousel-profile" style="width: 100%">
                         <ons-carousel-item>
                             <div style="padding: 1px 0 0 0;">
                                 <div class="card card--material">
@@ -349,7 +346,9 @@
                                                     </div>
                                                     <div>
                                                         <div class="profile_info_text">Endereço</div>
-                                                        <div><?= $this->user['info_user_addr'] ?></div>
+                                                        <?php foreach ($this->user['pi_prof_addresses'] as $add): ?>
+                                                        <div><?=$add?></div>
+                                                        <?php endforeach;?>
                                                     </div>
                                                     <div>
                                                         <div class="profile_info_text">Números de contato</div>
@@ -526,12 +525,7 @@
         </style>
         <script>
             ons.getScriptPage().onInit = function () {
-                window.swiperprofile = new Swiper('.swiper-container-profile', {
-                    direction: 'horizontal',
-                    loop: false,
-                    allowTouchMove: false,
-                    width: screen.width
-                });
+
             }
         </script>
     </ons-page>
@@ -549,7 +543,7 @@
         </ons-toolbar>
 
         <ons-card>
-            <form action="<?= $this->url('application_mobile_prof', ["action" => "user-profile"]) ?>" method="post"
+            <form action="<?= $this->url('application_mobile_prof', ["action" => "get-profile"]) ?>" method="post"
                   enctype="multipart/form-data">
                 <ons-row>
                     <ons-col width="100%">
@@ -559,7 +553,7 @@
                             </div>
                             <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fName"
                                        placeholder="Nome completo" type="text"
-                                       float required validate></ons-input>
+                                       float required validate value="<?=$this->user['info_user_name']?>"></ons-input>
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
@@ -567,7 +561,7 @@
                             </div>
                             <ons-input style="width: 100%" id="info_user_cpf" modifier="material" name="fCpf"
                                        type="text"
-                                       placeholder="CPF" float validate></ons-input>
+                                       placeholder="CPF" float validate value="<?=$this->user['info_user_cpf']?>"></ons-input>
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
@@ -576,10 +570,11 @@
                             <ons-input style="width: 100%" id="info_user_rg" modifier="material"
                                        name="fRg"
                                        type="text"
-                                       placeholder="RG" float validate></ons-input>
+                                       placeholder="RG" float validate value="<?=$this->user['info_user_rg']?>"></ons-input>
                         </ons-list-item>
                         <ons-list-item>
                             <div class="right right-label">
+                                <input type="text" name="fOp" value="pesp" hidden>
                                 <button type="submit" class="button">Salvar</button>
                             </div>
                         </ons-list-item>
@@ -689,6 +684,7 @@
                         </ons-list-item>
                         <ons-list-item>
                             <div class="right right-label">
+                                <input type="text" name="fOp" value="profp" hidden>
                                 <button type="submit" class="button">Salvar</button>
                             </div>
                         </ons-list-item>
@@ -846,10 +842,10 @@
                 <ons-icon icon="fa-user-md"></ons-icon>
                 <div class="speed-dial-text">Procedimento</div>
             </ons-speed-dial-item>
-            <ons-speed-dial-item onclick="insertHistoric(3)">
-                <ons-icon icon="fa-notes-medical"></ons-icon>
-                <div class="speed-dial-text">Notas</div>
-            </ons-speed-dial-item>
+<!--            <ons-speed-dial-item onclick="insertHistoric(3)">-->
+<!--                <ons-icon icon="fa-notes-medical"></ons-icon>-->
+<!--                <div class="speed-dial-text">Notas</div>-->
+<!--            </ons-speed-dial-item>-->
         </ons-speed-dial>
         <style>
             ons-speed-dial-item.speed-dial__item {
@@ -1119,6 +1115,64 @@
                 </ons-list>
             </ons-col>
         </ons-row>
+    </ons-page>
+</template>
+
+<template id="notifPage.html">
+    <ons-page id="notifPage">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Home</ons-back-button>
+            </div>
+            <div class="center">
+                Nova notificação
+            </div>
+        </ons-toolbar>
+        <ons-card>
+            <form action="<?= $this->url('application_mobile_prof', ["action" => "save-historic"]) ?>" method="post"
+                  enctype="multipart/form-data">
+                <ons-row>
+                    <ons-col width="100%">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-bell" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fMotiv"
+                                       placeholder="Aviso (opcional)" type="text"
+                                       float validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-calendar" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 50%" id="info_user_cpf" modifier="material" name="fDate"
+                                       type="date"
+                                       placeholder="" float required validate></ons-input>
+
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-clock" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 25%; margin-right: 10px" id="info_user_rg" modifier="material"
+                                       name="fTime[]"
+                                       type="time" min="08:00" max="18:00"
+                                       placeholder="" float required validate></ons-input> às
+                            <ons-input style="width: 25%; margin-left: 20px" id="info_user_rg" modifier="material"
+                                       name="fTime[]"
+                                       type="time" min="08:00" max="18:00"
+                                       placeholder="" float validate></ons-input> (opcional)
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label" style="background-image: none">
+                                <input type="text" name="op" value="notif" hidden>
+                                <button type="submit" class="button">Salvar</button>
+                            </div>
+                        </ons-list-item>
+                    </ons-col>
+                </ons-row>
+            </form>
+        </ons-card>
     </ons-page>
 </template>
 

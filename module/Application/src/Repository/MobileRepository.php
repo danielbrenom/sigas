@@ -9,6 +9,7 @@ use Application\Entity\Seg\User;
 use Application\Entity\Sis\Procedures;
 use Application\Entity\Sis\ProfessionalConselhos;
 use Application\Entity\Sis\ProfessionalInfo;
+use Application\Entity\Sis\ProfessionalNotif;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserExams;
@@ -18,10 +19,13 @@ use Application\Entity\Sis\UserHistoricInformation;
 use Application\Entity\Sis\UserHistoricType;
 use Application\Entity\Sis\UserInfoPessoal;
 use Application\Entity\Sis\UserPrescription;
+use DateTime;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Exception;
+use Zend\Json\Json;
 use Zend\Session\Container;
 use Zend\Session\SessionManager;
 use Application\Entity\Sis\ProfessionalProcedures;
@@ -160,7 +164,6 @@ class MobileRepository
     }
 
     //Profissional
-
     public function getSchedule($params, $for_prof = false)
     {
         $sql = $this->entityManager->getRepository(UserAppointment::class)
@@ -187,6 +190,14 @@ class MobileRepository
             ->leftJoin(UserInfoPessoal::class, 'pac_info', 'WITH', 'pac_info.id = uh.user_id')
             ->leftJoin(Procedures::class, 'proc', 'WITH', 'proc.id = a.id_procedure')
             ->where('a.id_user_ps = :sId and a.confirmed_for is null and a.id_status not in (2,4)')
+            ->setParameter('sId', $params['id_professional'])
+            ->getQuery()->getResult(3);
+    }
+
+    public function getNotificacoes($params){
+        return $this->entityManager->getRepository(ProfessionalNotif::class)
+            ->createQueryBuilder('n')
+            ->where('n.id_professional = :sId')
             ->setParameter('sId', $params['id_professional'])
             ->getQuery()->getResult(3);
     }
@@ -254,12 +265,14 @@ class MobileRepository
     public function updateProfissionalJobInfo($info, $prof_id)
     {
         try {
+            $end = Json::encode($info['fEnd']);
             $this->entityManager->beginTransaction();
             $date = new \DateTime('now', new \DateTimeZone('America/Belem'));
             /** @var ProfessionalInfo $profInfo */
             $profInfo = $this->entityManager->getRepository(ProfessionalInfo::class)->find($prof_id);
             $profInfo->setConsName($info['fCons']);
             $profInfo->setEspecialitySolicited($info['fEspSoc']);
+            $profInfo->setProfAddresses($end);
             $profInfo->setConsRegistry($info['fNumIns']);
             $profInfo->setConfirmedIn(null);
             $profInfo->setSolicitedIn($date->format('Y-m-d H:i:s'));
@@ -280,10 +293,67 @@ class MobileRepository
 
     public function updateProfissionalPesInfo($info, $prof_id)
     {
+        try {
+            $this->entityManager->beginTransaction();
+            /** @var UserInfoPessoal $pesInfo */
+            $pesInfo = $this->entityManager->getRepository(UserInfoPessoal::class)->find($prof_id);
+            $pesInfo->setUserName($info['fName']);
+            $pesInfo->setUserCpf($info['fCpf']);
+            $pesInfo->setUserRg($info['fRg']);
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->entityManager->rollback();
+            UtilsFile::printvardie($e->getMessage());
+            return false;
+        }
+    }
+
+    public function saveNotifis($params)
+    {
+
+        try {
+            $this->entityManager->beginTransaction();
+            $notif = new ProfessionalNotif();
+            $notif->setIdProfessional($params['idprof']);
+            $notif->setNotifMotivo($params['fMotiv'] == "" ? "Ausência" : $params['fMotiv']);
+            $start = new DateTime($params['fDate'] . ' ' . $params['fTime'][0], new \DateTimeZone('America/Belem'));
+            $notif->setDtInicio($start->format('Y-m-d H:i:s'));
+            if ($params['fTime'][1] != "") {
+                $end = new DateTime($params['fDate'] . ' ' . $params['fTime'][1], new \DateTimeZone('America/Belem'));
+                $notif->setDtFim($end->format('Y-m-d H:i:s'));
+            }
+            $this->entityManager->persist($notif);
+            $this->entityManager->flush();
+            //Procura os appointments e altera os status
+            $sql = $this->entityManager->getRepository(UserAppointment::class)
+                ->createQueryBuilder('a');
+            if (isset($end)) {
+                $sql->where('a.confirmed_for between :sIni and :sEnd')
+                    ->setParameter('sIni', $start->format('Y-m-d H:i:s'))
+                    ->setParameter('sEnd', $end->format('Y-m-d H:i:s'));
+            } else {
+                $sql->where('a.confirmed_for between :sIni and :sEnd')
+                    ->setParameter('sIni', $start->format('Y-m-d H:i:s'))
+                    ->setParameter('sEnd', $start->format('Y-m-d 23:59:59'));
+            }
+            $appt = $sql->getQuery()->getResult();
+            /** @var $apt UserAppointment */
+            foreach ($appt as $apt) {
+                $apt->setIdStatus(4);
+            }
+            $this->entityManager->flush();
+            //@TODO: Deve notificar do cancelamento do appointment, por email ou alguma forma
+            $this->entityManager->commit();
+            return true;
+        } catch (ORMException $e) {
+            $this->entityManager->rollback();
+            return false;
+        }
     }
 
     //Buscas gerais
-
     public function getProceduresAvailableForUser($pac_id)
     {
         return $this->entityManager->getRepository(UserHistoric::class)

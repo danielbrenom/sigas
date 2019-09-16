@@ -30,7 +30,8 @@ class ProfessionalAppController extends AbstractActionController
     public function homeAction()
     {
         $profInfo = $this->mobileRepository->getProfissionalInfo($this->authManager->getActiveUser()['user_id'], true)[0];
-        //UtilsFile::printvardie($this->mobileRepository->getProceduresProfessional($this->authManager->getActiveUser()['user_id']));
+        $profInfo['pi_prof_addresses'] = Json::decode($profInfo['pi_prof_addresses']);
+        //UtilsFile::printvardie($profInfo);
         return new ViewModel([
             'user' => $profInfo,
             'cons' => $this->mobileRepository->getConselhos(),
@@ -63,6 +64,10 @@ class ProfessionalAppController extends AbstractActionController
                     $resp = $this->mobileRepository->getSolicitacoes($params);
 //                    UtilsFile::printvardie($solics);
                     break;
+                case 'notifs':
+                    $resp = $this->mobileRepository->getNotificacoes($params);
+//                    UtilsFile::printvardie($solics);
+                    break;
             }
 
         } catch (Exception $e) {
@@ -91,7 +96,7 @@ class ProfessionalAppController extends AbstractActionController
                 $response['reg_types'] = $this->mobileRepository->getProceduresAvailableForUser($params['pac_id']);
                 break;
             case 'procedure':
-                $response = $this->mobileRepository->getUserHistoric($params['user'],$params['ptype']);
+                $response = $this->mobileRepository->getUserHistoric($params['user'], $params['ptype']);
                 break;
             default:
                 $response = [
@@ -108,36 +113,47 @@ class ProfessionalAppController extends AbstractActionController
         $userId = $this->authManager->getActiveUser()['user_id'];
         if ($this->getRequest()->isPost()) {
             $params = $this->params()->fromPost();
-            if ($this->mobileRepository->updateProfissionalJobInfo($params, $userId)) {
-                $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
-                $this->redirect()->toRoute('application_mobile_prof');
-            } else {
-                $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
-                $this->redirect()->toRoute('application_mobile_prof');
+            if ($params['fOp'] == 'profp') {
+                if ($this->mobileRepository->updateProfissionalJobInfo($params, $userId)) {
+                    $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
+                    $this->redirect()->toRoute('application_mobile_prof');
+                } else {
+                    $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
+                    $this->redirect()->toRoute('application_mobile_prof');
+                }
+            } elseif ($params['fOp'] == 'pesp') {
+                if ($this->mobileRepository->updateProfissionalPesInfo($params, $userId)) {
+                    $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
+                    $this->redirect()->toRoute('application_mobile_prof');
+                } else {
+                    $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
+                    $this->redirect()->toRoute('application_mobile_prof');
+                }
             }
-        } else {
-            $params = $this->params()->fromQuery();
-            switch ($params['type']) {
-                case 'pes':
-                    break;
-                case 'prof':
-                    $profInfo = $this->mobileRepository->getProfissionalInfo($userId, true)[0];
-                    $response = [
-                        'info_user_addr' => $profInfo['info_user_addr'],
-                        'info_user_ctt_phone' => $profInfo['info_user_ctt_phone'],
-                        'info_user_ctt_res' => $profInfo['info_user_ctt_res'],
-                        'pi_cons_name' => $profInfo['pi_cons_name'],
-                        'pi_cons_registry' => $profInfo['pi_cons_registry'],
-                        'pi_especiality_solicited' => $profInfo['pi_especiality_solicited'],
-                    ];
-                    break;
-                default:
-                    $response = [
-                        'code' => 0,
-                        'message' => 'Solicitação inválida'
-                    ];
-                    break;
-            }
+            return $this->getResponse();
+        }
+
+        $params = $this->params()->fromQuery();
+        switch ($params['type']) {
+            case 'pes':
+                break;
+            case 'prof':
+                $profInfo = $this->mobileRepository->getProfissionalInfo($userId, true)[0];
+                $response = [
+                    'info_user_addr' => $profInfo['info_user_addr'],
+                    'info_user_ctt_phone' => $profInfo['info_user_ctt_phone'],
+                    'info_user_ctt_res' => $profInfo['info_user_ctt_res'],
+                    'pi_cons_name' => $profInfo['pi_cons_name'],
+                    'pi_cons_registry' => $profInfo['pi_cons_registry'],
+                    'pi_especiality_solicited' => $profInfo['pi_especiality_solicited'],
+                ];
+                break;
+            default:
+                $response = [
+                    'code' => 0,
+                    'message' => 'Solicitação inválida'
+                ];
+                break;
         }
         return new JsonModel($response);
     }
@@ -193,13 +209,19 @@ class ProfessionalAppController extends AbstractActionController
                         break;
                 }
                 break;
+            case 'notif':
+                $params['idprof'] = $thisProfId;
+                if ($this->mobileRepository->saveNotifis($params)) {
+                    $this->mobileRepository->setMessage("Notificação salva. Os compromissos existentes no período foram cancelados.", 1);
+                } else {
+                    $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
+                }
+                break;
             default:
                 $this->redirect()->toRoute('home');
                 break;
         }
-
         $this->redirect()->toRoute('application_mobile_prof');
-
     }
 
     public function handleSolicitacoesAction()
