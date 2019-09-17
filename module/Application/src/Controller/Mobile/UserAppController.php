@@ -23,6 +23,7 @@ use DateTime;
 use DateTimeZone;
 use Doctrine\ORM\EntityManager;
 use Exception;
+use Zend\Json\Json;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Session\SessionManager;
 use Zend\View\Model\JsonModel;
@@ -50,8 +51,11 @@ class UserAppController extends AbstractActionController
 
     public function homeAction()
     {
+        $activeUser = $this->authManager->getActiveUser();
+//        UtilsFile::printvardie($this->mobileManager->getUserInformation($activeUser['user_id'],3));
         return new ViewModel([
-            'userstate' => $this->authManager->userState()
+            'userstate' => $this->authManager->userState(),
+            'user' => $this->mobileManager->getUserInformation($activeUser['user_id'],3)[0]
         ]);
     }
 
@@ -65,6 +69,8 @@ class UserAppController extends AbstractActionController
             ]);
         }
         $infos = $this->mobileManager->getProfissionalInfo($params['id_user'], true);
+        $infos[0]['pi_prof_addresses'] = Json::decode($infos[0]['pi_prof_addresses']);
+        $infos[0]['esp_desc_especialidade'] = $infos[0]['pi_id_especiality'] == null ? "Aguardando verificação" : $infos[0]['esp_desc_especialidade'];
         $infos[0]['procedures'] = $this->mobileManager->getProceduresProfessional($params['id_user']);
         $view = new ViewModel([
             'prof' => $infos
@@ -81,16 +87,12 @@ class UserAppController extends AbstractActionController
             $results[] = [
                 'u_id' => $info['u_id'],
                 'info_user_name' => $info['info_user_name'],
-                'info_user_addr' => $info['info_user_addr'],
-                'ue_desc_especialidade' => $info['ue_desc_especialidade']
+                'info_user_addr' => Json::decode($info['pi_prof_addresses'])[0],
+                'ue_desc_especialidade' => $info['pi_id_especiality'] == null ? "Aguardando verificação" : $info['ue_desc_especialidade'],
+                'confirmed' => $info['pi_confirmed_in'] == null ? false : true
             ];
         }
         return new JsonModel($results);
-//        $view = new ViewModel([
-//            'profissionais' => $this->mobileManager->getProfissinais()
-//        ]);
-//        $view->setTerminal(true);
-//        return $view;
     }
 
     public function getEspecialidadesAction()
@@ -123,7 +125,7 @@ class UserAppController extends AbstractActionController
         );
     }
 
-    public function getUserHistoricAction()
+    public function historicAction()
     {
         $params = $this->params()->fromQuery();
         $results = $this->mobileManager->getUserHistoric($this->authManager->getActiveUser()['user_id'], $params['type']);
@@ -137,8 +139,10 @@ class UserAppController extends AbstractActionController
     {
         $activeUser = $this->authManager->getActiveUser();
         if ($this->getRequest()->isPost()) {
-            $this->mobileManager->updateUserInfo($this->params()->fromPost(), $activeUser['user_id']);
-            $this->redirect()->toRoute('home');
+            if($this->mobileManager->updateUserInfo($this->params()->fromPost(), $activeUser['user_id'])){
+                $this->mobileManager->setMessage('Informações alteradas.', 1);
+            }
+            return $this->redirect()->toRoute('home');
         }
         if ($this->params()->fromQuery('json')) {
             $data = $this->mobileManager->getUserInformation($activeUser['user_id'], 3)[0];
@@ -153,12 +157,7 @@ class UserAppController extends AbstractActionController
             ];
             return new JsonModel($info);
         }
-        $userInfo = $this->mobileManager->getUserInformation($activeUser['user_id']);
-        $view = new ViewModel([
-            'user' => $userInfo[0]
-        ]);
-        $view->setTerminal(true);
-        return $view;
+        return new JsonModel(['Solicitação inválida']);
     }
 
     public function saveAppointAction()

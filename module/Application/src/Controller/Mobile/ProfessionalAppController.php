@@ -195,6 +195,44 @@ class ProfessionalAppController extends AbstractActionController
         }
     }
 
+    public function procedureAction()
+    {
+        try {
+            if($this->getRequest()->isGet()){
+                $params = $this->params()->fromQuery();
+                $params['id_professional'] = $this->authManager->getActiveUser()['user_id'];
+                $allProc = $this->mobileRepository->getProcedures();
+                //UtilsFile::printvardie($allProc);
+                foreach ($allProc as $key => $proc){
+                    $allProc[$key]['is_proc'] = $this->mobileRepository->isProfessionalProcedures(
+                        [
+                            'idproc' => $proc['p_id'],
+                            'idprof'=> $params['id_professional']
+                        ]
+                    );
+                }
+                return new JsonModel($allProc);
+            }
+            if($this->getRequest()->isPost()){
+                $params = $this->params()->fromPost();
+                $params['id_professional'] = $this->authManager->getActiveUser()['user_id'];
+                if($this->mobileRepository->saveProfessionalProcedures($params)){
+                    $this->mobileRepository->setMessage('Procedimentos registrados.', 1);
+                    $this->redirect()->toRoute('application_mobile_prof');
+                    return $this->getResponse();
+                }
+                $this->mobileRepository->setMessage('Ocorreu um erro, tente novamente mais tarde', 0);
+                $this->redirect()->toRoute('application_mobile_prof');
+                return $this->getResponse();
+            }
+            throw new Exception("Requisição inválida", 0);
+        } catch (Exception $e) {
+            return new JsonModel([$e->getMessage()]);
+            $this->mobileRepository->setMessage($e->getMessage(), $e->getCode());
+            return $this->redirect()->toRoute('application_mobile_prof');
+        }
+    }
+
     public function saveHistoricAction()
     {
         $params = $this->params()->fromPost();

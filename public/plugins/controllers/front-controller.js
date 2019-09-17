@@ -13,6 +13,12 @@ function profissionaisList() {
         let area = $("#list-profs ons-lazy-repeat");
         area.empty();
         $.each(response, function (key, value) {
+            let badge = '';
+            if(value.confirmed){
+                badge = '<span class="badge badge-pill badge-success">Verificado</span>';
+            }else{
+                badge = '<span class="badge badge-pill badge-warning">Não verificado</span>';
+            }
             $("#fSelectEsp ons-lazy-repeat").append('<ons-list-item modifier="chevron longdivider" onclick="selectP(' + value.id + ')" tappable>' + value.desc_especialidade + '</ons-list-item>');
             let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
                 '                        <div class="left">' +
@@ -25,7 +31,7 @@ function profissionaisList() {
                 '                            <span class="list-item__content" style="width: 100%;">' + value.ue_desc_especialidade + '</span>' +
                 '                            <span class="list-item__content">' + value.info_user_addr + '</span>' +
                 '                            <ons-row class="option-buttons">' +
-                '                                <ons-col>' +
+                '                                <ons-col>' + badge +
                 '                                </ons-col>' +
                 '                                <ons-col>' +
                 '                                </ons-col>' +

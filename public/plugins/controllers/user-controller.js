@@ -14,6 +14,12 @@ function profissionaisList() {
         let area = $("#list-profs ons-lazy-repeat");
         area.empty();
         $.each(response, function (key, value) {
+            let badge = '';
+            if(value.confirmed){
+                badge = '<span class="badge badge-pill badge-success">Verificado</span>';
+            }else{
+                badge = '<span class="badge badge-pill badge-warning">Não verificado</span>';
+            }
             $("#fSelectEsp ons-lazy-repeat").append('<ons-list-item modifier="chevron longdivider" onclick="selectP(' + value.id + ')" tappable>' + value.desc_especialidade + '</ons-list-item>');
             let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
                 '                        <div class="left">' +
@@ -26,7 +32,7 @@ function profissionaisList() {
                 '                            <span class="list-item__content" style="width: 100%;">' + value.ue_desc_especialidade + '</span>' +
                 '                            <span class="list-item__content">' + value.info_user_addr + '</span>' +
                 '                            <ons-row class="option-buttons">' +
-                '                                <ons-col>' +
+                '                                <ons-col>' + badge +
                 '                                </ons-col>' +
                 '                                <ons-col>' +
                 '                                </ons-col>' +
@@ -103,7 +109,7 @@ function viewDetails(id) {
 
 function viewHistory(type_id) {
     $("#mainNavigator")[0].pushPage('userHistory.html').then(() => {
-        $.get('/mobile/user/get-user-historic', {type: type_id}, function (response) {
+        $.get('/mobile/user/historic', {type: type_id}, function (response) {
             let list = $("#historyList>ons-lazy-repeat");
             list.empty();
             if (response.length === 0) {
@@ -129,6 +135,50 @@ function viewHistory(type_id) {
             }
         })
     });
+}
+
+function loadPrescription(){
+    $.get('/mobile/user/historic', {type: 4}, function (respose) {
+        let area = $("#list-presc ons-lazy-repeat");
+        area.empty();
+        if(respose.length == 0){
+            area.append("<ons-list-item>Não existem prescrições disponíveis.</ons-list-item>")
+        }
+        $.each(respose, function (key, value) {
+            let title, desc, date, status, prof, able;
+            title = value.up_presc_medicamento;
+            prof = value.up_presc_posologia;
+            date = 'Dosagem: ' + value.up_presc_dosagem;
+            status = '';
+            desc = '';
+            able = value.up_presc_medicamento != null;
+            if (able) {
+                let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
+                    '                        <div class="left">' +
+                    // '                            <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">' +
+                    '                        </div>' +
+                    '                        <div class="center">' +
+                    '                            <div class="tweet-header">' +
+                    '                                <span class="list-item__title"><b>' + title + desc + '</b></span>' +
+                    '                            </div>' +
+                    '                            <span class="list-item__content">' + prof + '</span>' +
+                    '                            <ons-row class="option-buttons">' +
+                    '                                <ons-col>' + date +
+                    '                                </ons-col>' +
+                    '                                <ons-col style="margin-left: 10px">' +
+                    status +
+                    '                                </ons-col>' +
+                    '                                <ons-col>' +
+                    '                                </ons-col>' +
+                    '                                <ons-col>' +
+                    '                                </ons-col>' +
+                    '                            </ons-row>' +
+                    '                        </div>' +
+                    '                    </ons-list-item>';
+                area.append(item);
+            }
+        })
+    })
 }
 
 function checkDates(id) {
@@ -307,11 +357,6 @@ function display(id, tab, index) {
         $.each($(".profile_button_bar_" + tab + " ons-button"), function (key, value) {
             $(value).removeClass('active');
         });
-        if (tab == 'agenda' && index == 2) {
-            $("#notf-fab").show('fade');
-        } else {
-            $("#notf-fab").hide('fade');
-        }
         $(`#${id}`).addClass('active');
         $("#carousel-" + tab)[0].setActiveIndex(index);
     }

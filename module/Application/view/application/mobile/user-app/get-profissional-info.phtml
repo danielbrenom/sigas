@@ -6,7 +6,7 @@
  * Time: 09:22
  */
 $infos = $this->prof[0];
-//\Application\Debug\UtilsFile::printvardie($infos);
+//\Application\Debug\UtilsFile::printvar($infos);
 ?>
 <div class="content" style="width: 100%">
     <div class="profile_upper">
@@ -23,26 +23,26 @@ $infos = $this->prof[0];
                         <div><?= $infos['esp_desc_especialidade'] ?></div>
                     </div>
                     <div>
-                        <div id="addr_text"><?= $infos['info_user_addr'] ?></div>
+                        <div id="addr_text"><?= $infos['pi_prof_addresses'][0] ?></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <ons-row class="profile_button_bar_profile">
+    <ons-row class="profile_button_bar_profprofile">
         <ons-col>
-            <ons-button id="dadpes" class="custom-button active" onclick="display('dadpes', 'profile', 0)">
+            <ons-button id="dadpesp" class="custom-button active" onclick="display('dadpesp', 'profprofile', 0)">
                 Informações
             </ons-button>
         </ons-col>
         <ons-col>
-            <ons-button id="dadprof" class="custom-button" icon="fa-checkbox"
-                        onclick="display('dadprof', 'profile', 1)">Endereço
+            <ons-button id="dadprofp" class="custom-button" icon="fa-checkbox"
+                        onclick="display('dadprofp', 'profprofile', 1)">Endereço
             </ons-button>
         </ons-col>
     </ons-row>
     <ons-row>
-        <ons-carousel id="carousel-profile">
+        <ons-carousel id="carousel-profprofile">
             <ons-carousel-item>
                 <ons-card>
                     <div class="title">Sobre</div>
@@ -64,6 +64,11 @@ $infos = $this->prof[0];
             <ons-carousel-item>
                 <ons-card>
                     <div class="title">Localização</div>
+                    <?php foreach ($infos['pi_prof_addresses'] as $add): ?>
+                        <div>
+                            <?= $add ?>
+                        </div>
+                    <?php endforeach; ?>
                     <div class="content">
                         <div id="mapid" style="height: 200px"></div>
                     </div>

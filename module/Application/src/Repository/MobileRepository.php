@@ -7,7 +7,7 @@ namespace Application\Repository;
 use Application\Debug\UtilsFile;
 use Application\Entity\Seg\User;
 use Application\Entity\Sis\Procedures;
-use Application\Entity\Sis\ProfessionalAttendee;
+use Application\Entity\Sis\ProfessionalAttendants;
 use Application\Entity\Sis\ProfessionalConselhos;
 use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\ProfessionalNotif;
@@ -62,7 +62,6 @@ class MobileRepository
 
     public function getUserHistoric($user_id, $type)
     {
-
         try {
             $results = [];
             switch ((int)$type) {
@@ -138,11 +137,13 @@ class MobileRepository
             $this->entityManager->flush();
             $this->entityManager->commit();
             $this->setMessage('Informações salvas com sucesso', 1);
+            return true;
             //UtilsFile::printvardie($userData->toArray());
         } catch (Exception $e) {
             $this->entityManager->rollback();
             $this->setMessage("Um erro ocorreu ao alterar as informações. \n 
             Tente novamente mais tarde.", 2);
+            return false;
             //UtilsFile::printvardie($e->getMessage(),$e->getTraceAsString());
         }
     }
@@ -195,7 +196,8 @@ class MobileRepository
             ->getQuery()->getResult(3);
     }
 
-    public function getNotificacoes($params){
+    public function getNotificacoes($params)
+    {
         return $this->entityManager->getRepository(ProfessionalNotif::class)
             ->createQueryBuilder('n')
             ->where('n.id_professional = :sId')
@@ -233,6 +235,7 @@ class MobileRepository
             ->createQueryBuilder('u')
             ->addSelect('info')
             ->addSelect('ue')
+            ->addSelect('pi')
             ->leftJoin('u.user_information', 'info')
             ->leftJoin(ProfessionalInfo::class, 'pi', 'WITH', 'pi.id_user = u.id')
             ->leftJoin(UserEspeciality::class, 'ue', 'WITH', 'ue.id = pi.id_especiality')
@@ -265,7 +268,7 @@ class MobileRepository
 
     public function getProfessionalAttendants($params)
     {
-        return $this->entityManager->getRepository(ProfessionalAttendee::class)
+        return $this->entityManager->getRepository(ProfessionalAttendants::class)
             ->createQueryBuilder('pa')
             ->addSelect('ui.user_name')
             ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
@@ -279,7 +282,7 @@ class MobileRepository
     {
         try {
             $this->entityManager->beginTransaction();
-            $attendants = $this->entityManager->getRepository(ProfessionalAttendee::class)
+            $attendants = $this->entityManager->getRepository(ProfessionalAttendants::class)
                 ->createQueryBuilder('pa')
                 ->where('pa.id_professional = :sId and pa.dt_fim is null')
                 ->setParameter('sId', $params['idp'])
@@ -289,7 +292,7 @@ class MobileRepository
             }
             $this->entityManager->flush();
             foreach ($params['fSelects'] as $natt) {
-                $nattendant = new ProfessionalAttendee();
+                $nattendant = new ProfessionalAttendants();
                 $nattendant->setIdAttendant($natt);
                 $nattendant->setIdProfessional($params['idp']);
                 $nattendant->setDtInicio(date('Y-m-d'));
@@ -305,10 +308,39 @@ class MobileRepository
         }
     }
 
+    public function saveProfessionalProcedures($params)
+    {
+        try {
+            $this->entityManager->beginTransaction();
+            $procedures = $this->entityManager->getRepository(ProfessionalProcedures::class)
+                ->createQueryBuilder('pp')
+                ->where('pp.id_professional = :sId')
+                ->setParameter('sId', $params['id_professional'])
+                ->getQuery()->getResult();
+            foreach ($procedures as $procedure){
+                $this->entityManager->remove($procedure);
+            }
+            $this->entityManager->flush();
+            foreach ($params['fSelects'] as $proc){
+                $tproc = new ProfessionalProcedures();
+                $tproc->setIdProfessional($params['id_professional']);
+                $tproc->setIdProcedure($proc);
+                $this->entityManager->persist($tproc);
+            }
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->entityManager->rollback();
+            return false;
+            throw $e;
+        }
+    }
+
     public function isProfessionalAtendant($params)
     {
         try {
-            return count($this->entityManager->getRepository(ProfessionalAttendee::class)
+            return count($this->entityManager->getRepository(ProfessionalAttendants::class)
                     ->createQueryBuilder('pa')
                     ->select(['pa.id_attendant'])
                     ->where('pa.id_professional = :sId and pa.id_attendant = :sAt and pa.dt_fim is null')
@@ -318,6 +350,17 @@ class MobileRepository
         } catch (Exception $e) {
             throw $e;
         }
+    }
+
+    public function isProfessionalProcedures($params)
+    {
+        return count($this->entityManager->getRepository(ProfessionalProcedures::class)
+                ->createQueryBuilder('pp')
+                ->where('pp.id_procedure = :sIdP and pp.id_professional = :sId')
+                ->setParameter('sIdP', $params['idproc'])
+                ->setParameter('sId', $params['idprof'])
+                ->getQuery()->getResult(3))
+            > 0;
     }
 
     public function updateProfissionalJobInfo($info, $prof_id)
@@ -441,6 +484,13 @@ class MobileRepository
             ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
                 'ui.id = u.id')
             ->where('u.id_user_type = 3')
+            ->getQuery()->getResult(3);
+    }
+
+    public function getProcedures()
+    {
+        return $this->entityManager->getRepository(Procedures::class)
+            ->createQueryBuilder('p')
             ->getQuery()->getResult(3);
     }
 

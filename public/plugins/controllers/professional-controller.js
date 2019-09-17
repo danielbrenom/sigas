@@ -272,15 +272,36 @@ function loadAttendants() {
         area.empty();
         $.each(response, function (key, value) {
             let check = value.is_att === true ? "checked" : "";
-            let item = '<label class="left">' +
+            let item = '<ons-list-item>' +
+                '<label class="left">' +
                 '        <ons-checkbox name="fSelects[]" value="' + value.id_attendant + '" ' + check + ' input-id="check-' + key + '"></ons-checkbox>' +
                 '      </label>' +
                 '      <label for="check-' + key + '" class="center">' +
                 value.user_name +
-                '      </label>';
+                '      </label>' +
+                '</ons-list-item>';
             area.append(item);
         })
     })
+}
+
+function loadProcedureGer() {
+    $.get('/mobile/prof/procedure', {}, function (response) {
+        let area = $("#procedureGArea ons-list");
+        area.empty();
+        $.each(response, function (key, value) {
+            let check = value.is_proc === true ? "checked" : "";
+            let item = '<ons-list-item tappable>' +
+                '       <label class="left">' +
+                '        <ons-checkbox name="fSelects[]" value="' + value.p_id + '" ' + check + ' input-id="check-' + key + '"></ons-checkbox>' +
+                '      </label>' +
+                '      <label for="check-' + key + '" class="center">' +
+                value.p_procedure_description +
+                '      </label>' +
+                '</ons-list-item>';
+            area.append(item);
+        });
+    });
 }
 
 function insertHistoric(type) {
@@ -369,7 +390,7 @@ function addRem() {
         })
     }
 
-}
+}''
 
 function editInfo(type) {
     switch (type) {
@@ -387,6 +408,9 @@ function editInfo(type) {
             break;
         case 2:
             $("#mainNavigator")[0].pushPage('manageAttend.html');
+            break;
+        case 3:
+            $("#mainNavigator")[0].pushPage('manageProced.html');
             break;
     }
 }

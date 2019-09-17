@@ -44,31 +44,6 @@
                 </ons-list>
             </ons-col>
         </ons-row>
-        <style>
-            .search-input {
-                background-color: transparent;
-            }
-
-            .header-custom, .list {
-                background-position: bottom;
-            }
-
-            .list-item--longdivider {
-                background-image: linear-gradient(0deg, #e3e3e3, #e3e3e3 100%);
-            }
-
-            ons-progress-circular {
-                width: 50px;
-                height: 50px;
-                position: absolute;
-                left: 42%;
-                top: 50%;
-            }
-
-            .tweet-header {
-                width: 100%;
-            }
-        </style>
         <script>
             ons.getScriptPage().onInit = function () {
                 profissionaisList();
@@ -92,46 +67,50 @@
             </ons-col>
         </ons-row>
         <ons-row>
-            <ons-carousel id="carousel-historic">
+            <ons-carousel fullscreen id="carousel-historic" style="width: 100%">
                 <ons-carousel-item>
+                    <ons-card modifier="material">
+                        <div class="title">
+                            <h3 class="card__title" style="text-align: center;">Selecione um tipo de registro</h3>
+                        </div>
 
+                        <div class="content">
+                            <ons-row>
+                                <ons-col width="100%">
+                                    <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fHist">
+                                        <ons-lazy-repeat>
+                                            <ons-list-item modifier="chevron longdivider"
+                                                           onclick="viewHistory(1)" tappable>
+                                                Consulta
+                                            </ons-list-item>
+                                            <ons-list-item modifier="chevron longdivider"
+                                                           onclick="viewHistory(2)" tappable>
+                                                Exame
+                                            </ons-list-item>
+                                        </ons-lazy-repeat>
+                                    </ons-list>
+                                </ons-col>
+                            </ons-row>
+                        </div>
+                    </ons-card>
                 </ons-carousel-item>
                 <ons-carousel-item>
-
+                    <ons-row>
+                        <ons-col style="padding: 0">
+                            <ons-list id="list-presc">
+                                <ons-lazy-repeat>
+                                    <ons-progress-circular indeterminate></ons-progress-circular>
+                                </ons-lazy-repeat>
+                            </ons-list>
+                        </ons-col>
+                    </ons-row>
                 </ons-carousel-item>
             </ons-carousel>
-            <ons-col>
-                <ons-card modifier="material">
-                    <div class="title">
-                        <h3 class="card__title" style="text-align: center;">Selecione um tipo de registro</h3>
-                    </div>
 
-                    <div class="content">
-                        <ons-row>
-                            <ons-col width="100%">
-                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fHist">
-                                    <ons-lazy-repeat>
-                                        <ons-list-item modifier="chevron longdivider"
-                                                       onclick="viewHistory(1)" tappable>
-                                            Consulta
-                                        </ons-list-item>
-                                        <ons-list-item modifier="chevron longdivider"
-                                                       onclick="viewHistory(2)" tappable>
-                                            Exame
-                                        </ons-list-item>
-                                    </ons-lazy-repeat>
-                                </ons-list>
-                            </ons-col>
-                        </ons-row>
-                    </div>
-                </ons-card>
-            </ons-col>
         </ons-row>
-        <style>
-        </style>
         <script>
             ons.getScriptPage().onInit = function () {
-                //$.get('')
+                loadPrescription();
             }
         </script>
     </ons-page>
@@ -141,7 +120,7 @@
     <ons-page id="Tab3">
         <div id="form-area">
             <div class="content" style="width: 100%">
-                <div style="padding: 14px 6px 14px 16px;">
+                <div class="profile_upper" style="padding: 14px 6px 14px 16px;">
                     <div class="profile_wrapper">
                         <div class="profile_image_wrapper">
                             <img src="assets/img/profile-image-08.png">
@@ -149,9 +128,9 @@
                         <div class="profile_info_wrapper">
                             <div class="profile_info_numbers">
                                 <div>
-                                    <div><?= $this->user['user_information']['user_name'] === null ?
+                                    <div><?= $this->user['info_user_name'] === null ?
                                             "Não informado" :
-                                            $this->user['user_information']['user_name'] ?></div>
+                                            $this->user['info_user_name']  ?></div>
                                 </div>
                             </div>
                         </div>
@@ -166,7 +145,7 @@
                         </div>
                     </div>
                 </div>
-                <ons-row class="profile_button_bar_profile">
+                <ons-row class="profile_button_bar_profile" hidden>
                     <ons-col>
                         <ons-button id="dadpes" class="custom-button active" onclick="display('dadpes', 'profile', 0)">
                             Pessoal
@@ -193,28 +172,28 @@
                                         <div class="profile_info_numbers">
                                             <div>
                                                 <div class="profile_info_text">Nome</div>
-                                                <div><?= $this->user['user_information']['user_name'] === null ?
+                                                <div><?= $this->user['info_user_name'] === null ?
                                                         "Não informado" :
-                                                        $this->user['user_information']['user_name'] ?></div>
+                                                        $this->user['info_user_name'] ?></div>
                                             </div>
                                             <div>
                                                 <div class="profile_info_text">CPF</div>
-                                                <div><?= $this->user['user_information']['user_cpf'] ?></div>
+                                                <div><?= $this->user['info_user_cpf'] ?></div>
                                             </div>
                                             <div>
                                                 <div class="profile_info_text">Endereço</div>
-                                                <div><?= $this->user['user_information']['user_addr'] ?></div>
+                                                <div><?= $this->user['info_user_addr'] ?></div>
                                             </div>
                                             <div>
                                                 <div class="profile_info_text">Plano de Saúde</div>
-                                                <div><?= $this->user['user_information']['user_healthcare'] ?></div>
+                                                <div><?= $this->user['desc_healthcare'] ?></div>
                                             </div>
                                             <div>
                                                 <div class="profile_info_text">Números de contato</div>
                                                 <div>Telefone
-                                                    Celular:<?= $this->user['user_information']['user_ctt_phone'] ?></div>
+                                                    Celular:<?= $this->user['info_user_ctt_phone'] ?></div>
                                                 <div>Telefone
-                                                    Residencial:<?= $this->user['user_information']['user_ctt_res'] ?></div>
+                                                    Residencial:<?= $this->user['info_user_ctt_res'] ?></div>
                                             </div>
                                         </div>
                                     </div>

@@ -8,9 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Doctrine entity
  * @ORM\Entity
- * @ORM\Table(name="sis_professional_attendee")
+ * @ORM\Table(name="sis_professional_attendants")
  */
-class ProfessionalAttendee
+class ProfessionalAttendants
 {
     /**
      * @ORM\Id

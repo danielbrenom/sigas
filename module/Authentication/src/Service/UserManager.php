@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Zend\Crypt\Password\Bcrypt;
+use Zend\Json\Json;
 
 class UserManager
 {
@@ -143,6 +144,7 @@ class UserManager
                 $profInfo->setIdUser($lastId);
                 $profInfo->setEspecialitySolicited($data['fEspeciality']);
                 $profInfo->setConsName($data['fCons']);
+                $profInfo->setProfAddresses(Json::encode($data['fAddress']));
                 $profInfo->setConsRegistry($data['fNumCons']);
                 $profInfo->setSolicitedIn($timeSolicited);
                 $this->entityManager->persist($profInfo);

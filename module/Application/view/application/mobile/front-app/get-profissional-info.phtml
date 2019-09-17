@@ -23,7 +23,7 @@ $infos = $this->prof[0];
                         <div><?= $infos['esp_desc_especialidade'] ?></div>
                     </div>
                     <div>
-                        <div id="addr_text"><?= $infos['info_user_addr'] ?></div>
+                        <div id="addr_text"><?= $infos['pi_prof_addresses'][0] ?></div>
                     </div>
                 </div>
             </div>
@@ -64,6 +64,11 @@ $infos = $this->prof[0];
             <ons-carousel-item>
                 <ons-card>
                     <div class="title">Localização</div>
+                    <?php foreach ($infos['pi_prof_addresses'] as $add): ?>
+                        <div>
+                            <?= $add ?>
+                        </div>
+                    <?php endforeach; ?>
                     <div class="content">
                         <div id="mapid" style="height: 200px"></div>
                     </div>
@@ -73,7 +78,7 @@ $infos = $this->prof[0];
         </ons-carousel>
     </ons-row>
 </div>
-<input type="text" readonly id="profid" value="<?=$infos['u_id']?>" hidden>
+<input type="text" readonly id="profid" value="<?= $infos['u_id'] ?>" hidden>
 <style type="text/css">
     .profile_wrapper {
         display: inline-flex;
@@ -135,7 +140,7 @@ $infos = $this->prof[0];
         line-height: 25px !important;
     }
 
-    .profile_button_bar{
+    .profile_button_bar {
         text-align: center;
         font-size: 26px;
         height: 50px;
@@ -143,7 +148,7 @@ $infos = $this->prof[0];
         border-top: 1px solid rgba(187, 187, 187, 0.51)
     }
 
-    .profile_button_bar ons-col{
+    .profile_button_bar ons-col {
         width: 25%;
     }
 

@@ -1,3 +1,357 @@
+/*Main page*/
+.search-input {
+    background-color: transparent;
+}
+
+.header-custom, .list {
+    background-position: bottom;
+}
+
+.list-item--longdivider {
+    background-image: linear-gradient(0deg, #e3e3e3, #e3e3e3 100%);
+}
+
+ons-progress-circular {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    left: 42%;
+    top: 50%;
+}
+
+.tweet-header {
+    width: 100%;
+}
+
+.nomarg{
+    margin: 0 !important;
+}
+/*Badge*/
+.badge {
+    padding: 5px 12px;
+    text-transform: uppercase;
+    font-size: 10px;
+    color: #fff;
+    display: inline-block;
+    font-weight: 500;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25rem;
+}
+.badge-pill {
+    padding-right: .6em;
+    padding-left: .6em;
+    border-radius: 10rem;
+}
+.badge.badge-success {
+    background-color: #4caf50;
+}
+.badge.badge-rose {
+    background-color: #e91e63;
+}
+.badge.badge-warning {
+    background-color: #ff9800;
+}
+/*Speed dial*/
+ons-speed-dial-item.speed-dial__item {
+    /*width: 150px;*/
+    /*border-radius: 10%;*/
+}
+
+.speed-dial-text {
+    font-size: 14pt;
+    line-height: 20px;
+}
+
+.speed-dial__item div {
+    position: absolute;
+    background: rgba(0, 0, 0, 0);
+    font-size: 15px;
+    padding: 0 5px;
+    border-radius: 10px;
+    top: 3px;
+    right: 45px;
+    color: #5fb4f4;
+    width: 100px;
+    text-align: right;
+}
+
+.speed-dial__item {
+    overflow: visible !important;
+}
+
+ons-speed-dial:before {
+    content: '';
+    display: block;
+    position: fixed;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+ons-speed-dial.open:before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/*Custom list*/
+.list-item__center, .list-item__right {
+    background-image: none;
+}
+
+.icon-spacer::before,
+.icon-blank::before {
+    width: 1em;
+    content: ' ';
+}
+
+/*Profile bar*/
+.profile_button_bar_agenda, .profile_button_bar_pac,
+.profile_button_bar_profile, .profile_button_bar_historic,
+.profile_button_bar_profprofile{
+    text-align: center;
+    font-size: 26px;
+    /*height: 50px;*/
+    line-height: 40px;
+    border-top: 1px solid rgba(187, 187, 187, 0.51);
+    background-color: #fafafa;
+}
+
+.profile_button_bar_agenda ons-col {
+    width: auto;
+}
+
+.custom-button {
+    color: #c3c3c3;
+    width: 100%;
+    background-color: #fafafa;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.custom-button.active {
+    color: #5fb4f4;
+    border-bottom: 2px solid #5fb4f4;
+}
+
+/*Profile page*/
+.profile_upper {
+    padding: 14px 6px 14px 16px;
+    background-color: #fafafa;
+}
+
+.profile_wrapper {
+    display: inline-flex;
+    width: 100%;
+}
+
+.profile_image_wrapper {
+    margin-right: 10px;
+    width: 35%;
+    position: relative;
+}
+
+.profile_image_wrapper img {
+    width: 100%;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+
+.profile_info_wrapper {
+    width: 100%;
+    text-align: center;
+}
+
+.profile_extra_wrapper {
+    margin: 5px 0 0 0;
+    font-size: 14px;
+}
+
+.profile_info_numbers {
+    font-size: 14px;
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.profile_info_numbers div {
+    text-align: left;
+    margin: 0 7% 1% 7%;
+}
+
+.profile_info_text {
+    opacity: 0.5;
+    margin-top: -5px;
+}
+
+.profile_info_button {
+    height: 25px;
+    background: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 7px;
+    color: black;
+    line-height: 13px;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.profile_info_button.button--material {
+    min-height: 25px;
+    line-height: 25px !important;
+}
+
+.profile_button_bar {
+    text-align: center;
+    font-size: 26px;
+    height: 50px;
+    line-height: 40px;
+    border-top: 1px solid rgba(187, 187, 187, 0.51)
+}
+
+.profile_button_bar ons-col {
+    width: 25%;
+}
+
+.post {
+    margin: 0px;
+    padding: 0px 0px 15px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(175, 175, 175, 0.43);
+    border-radius: 0;
+}
+
+.post_title {
+    padding-left: 10px;
+}
+
+.post-caption {
+    padding-left: 10px;
+}
+
+.post-like-info {
+    margin-bottom: 5px;
+    padding-left: 10px;
+}
+
+.post-image {
+    width: 100%;
+}
+
+.post-time {
+    font-size: 10px;
+    opacity: 0.7;
+    margin-top: 5px;
+    padding-left: 10px;
+}
+
+.post-like {
+    opacity: 0;
+    width: 100%;
+    position: absolute;
+    top: 25%;
+    color: white;
+    transition: opacity 0.4s;
+}
+
+.post-button-bar {
+    height: 40px;
+    padding-left: 0px;
+}
+
+.post-button {
+    font-size: 26px;
+    color: #1f1f21;
+    line-height: 26px;
+}
+
+.corner-button {
+    color: black;
+    font-size: 25px;
+    padding-right: 0;
+}
+
+.like {
+    color: red;
+}
+
+.list-item__thumbnail {
+    border-radius: 50%;
+}
+
+.grid_wrapper {
+    width: 33%;
+    margin-left: 0.25%;
+    margin-right: 0.25%;
+}
+
+.grid_thumbnail {
+    width: 100%;
+}
+
+.swiper-container {
+    height: 100%;
+}
+
+.button--quiet {
+    font-size: 15px
+}
+
+/*Calendar*/
+
+.fc-time-grid-event {
+    flex-grow: 1;
+    padding: 5px 0 0 5px;
+    background-color: #fbfbfc;
+    position: relative;
+    border-radius: 0;
+    border-left: 3px #f2f4f8 solid;
+    border-right: none;
+    border-top: none;
+    border-bottom: none;
+}
+
+.fc-time-grid-event.confirmed {
+    background-color: #f1ffec;
+    border-left: 3px #60934e solid;
+}
+
+.fc-time-grid-event.pending {
+    background-color: #ecfdff;
+    border-left: 3px #3beaf5 solid;
+}
+
+.fc-time-grid-event.canceld {
+    background-color: #fdf3f3;
+    border-left: 3px #fc7676 solid;
+}
+
+.fc-next-button, .fc-prev-button, .fc-dayGridMonth-button, .fc.weekGridDay-button {
+    padding: 8px;
+}
+
+/*Toaster*/
+.toast {
+    opacity: 100 !important;
+    background-color: #0f6674;
+}
+
+.toast-success div {
+    background-color: #467447;
+}
+
+.toast-error div {
+    background-color: #a53a39;
+}
+
+/*Appointment*/
+
 .appointments {
     width: 100%;
     height: auto;

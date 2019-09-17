@@ -11,20 +11,6 @@
             <ons-tab page="tab3.html" label="Login" icon="fa-user-circle">
             </ons-tab>
         </ons-tabbar>
-        <style>
-            .toast {
-                opacity: 100;
-                background-color: #0f6674;
-            }
-
-            .toast-success div {
-                background-color: #467447;
-            }
-
-            .toast-error div {
-                background-color: #a53a39;
-            }
-        </style>
     </ons-page>
 </template>
 
@@ -56,31 +42,6 @@
                 </ons-list>
             </ons-col>
         </ons-row>
-        <style>
-            .search-input {
-                background-color: transparent;
-            }
-
-            .header-custom, .list {
-                background-position: bottom;
-            }
-
-            .list-item--longdivider {
-                background-image: linear-gradient(0deg, #e3e3e3, #e3e3e3 100%);
-            }
-
-            ons-progress-circular {
-                width: 50px;
-                height: 50px;
-                position: absolute;
-                left: 42%;
-                top: 50%;
-            }
-
-            .tweet-header {
-                width: 100%;
-            }
-        </style>
         <script>
             ons.getScriptPage().onInit = function () {
                 profissionaisList();
@@ -190,11 +151,6 @@
                 </ons-row>
             </form>
         </ons-card>
-        <style>
-            .list-item__center, .list-item__right {
-                background-image: none;
-            }
-        </style>
     </ons-page>
 </template>
 
@@ -269,6 +225,13 @@
                         </ons-list-item>
                         <ons-list-item class="input-items">
                             <div class="left">
+                                <ons-icon icon="" class="list-item__icon icon-spacer"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="num_reg" modifier="material" name="fAddress" type="text"
+                                       placeholder="Endereço" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
                                 <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
                             </div>
                             <ons-input style="width: 100%" id="num_reg" modifier="material" name="fNumCons" type="text"
@@ -291,11 +254,6 @@
                 </ons-row>
             </form>
         </ons-card>
-        <style>
-            .list-item__center, .list-item__right {
-                background-image: none;
-            }
-        </style>
     </ons-page>
 </template>
 
@@ -330,38 +288,6 @@
 
             </ons-row>
         </ons-bottom-toolbar>
-        <style>
-            .profile_button_bar_agenda, .profile_button_bar_pac,
-            .profile_button_bar_profile {
-                text-align: center;
-                font-size: 26px;
-                /*height: 50px;*/
-                line-height: 40px;
-                border-top: 1px solid rgba(187, 187, 187, 0.51);
-                background-color: #fafafa;
-            }
-
-            .profile_button_bar_agenda ons-col {
-                width: auto;
-            }
-            .profile_upper {
-                padding: 14px 6px 14px 16px;
-                background-color: #fafafa;
-            }
-
-            .custom-button {
-                color: #c3c3c3;
-                width: 100%;
-                background-color: #fafafa;
-                border-radius: 0;
-                box-shadow: none;
-            }
-
-            .custom-button.active {
-                color: #5fb4f4;
-                border-bottom: 2px solid #5fb4f4;
-            }
-        </style>
         <script>
             ons.getScriptPage().onInit = function () {
 

@@ -97,8 +97,12 @@ class AuthenticationController extends AbstractActionController
 
     public function logoutAction()
     {
-        $this->authManager->logout();
-        return $this->redirect()->toRoute('home');
+        try {
+            $this->authManager->logout();
+            return $this->redirect()->toRoute('application_mobile_front');
+        } catch (Exception $e) {
+            return $this->redirect()->toRoute('application_mobile_front');
+        }
     }
 
     public function singupAction()
