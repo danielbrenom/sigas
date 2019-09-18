@@ -160,4 +160,32 @@ class AuthenticationController extends AbstractActionController
         }
         return $this->getResponse();
     }
+
+    public function singupAttendantAction()
+    {
+        try {
+            if ($this->getRequest()->isPost()) {
+                $emailValidator = new EmailAddress([
+                    "allow" => Hostname::ALLOW_DNS | Hostname::ALLOW_IP | Hostname::ALLOW_LOCAL,
+                    "mxCheck" => true,
+                    'deepMxCheck' => true
+                ]);
+                $data = $this->params()->fromPost();
+                if (!$emailValidator->isValid($data['fEmail'])) {
+                    throw new Exception('Email inválido');
+                }
+                if ($this->userManager->createAttendant($data))
+                    $this->mobileRepository->setMessage("Solicitação enviada com sucesso.", 1);
+                else
+                    $this->mobileRepository->setMessage("Não foi possível processar sua solicitação. \n Tente novamente mais tarde", 0);
+                $this->redirect()->toRoute('home');
+            } else {
+                $this->redirect()->toRoute('home');
+            }
+        } catch (Exception $e) {
+            $this->mobileRepository->setMessage($e->getMessage(), $e->getCode());
+            $this->redirect()->toRoute('home');
+        }
+        return $this->getResponse();
+    }
 }

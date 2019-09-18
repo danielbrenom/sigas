@@ -47,7 +47,17 @@ class Module
         //if ($mobileDetect->isMobile()) {
             $controller->layout('layout/mobile');
             if ($this->authManager->userState()) {
-                $userType = (int)$this->authManager->getActiveUser()['user_type'] === 1 ? 'user' : 'prof';
+                switch ((int)$this->authManager->getActiveUser()['user_type']){
+                    case 1:
+                        $userType = 'user';
+                        break;
+                    case 2:
+                        $userType = 'prof';
+                        break;
+                    case 3:
+                        $userType = 'attendant';
+                        break;
+                }
                 if ($event->getRouteMatch()->getMatchedRouteName() !== "application_mobile_{$userType}") {
                     return $controller->redirect()->toRoute("application_mobile_{$userType}");
                 }

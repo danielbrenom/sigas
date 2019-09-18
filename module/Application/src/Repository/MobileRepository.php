@@ -317,11 +317,11 @@ class MobileRepository
                 ->where('pp.id_professional = :sId')
                 ->setParameter('sId', $params['id_professional'])
                 ->getQuery()->getResult();
-            foreach ($procedures as $procedure){
+            foreach ($procedures as $procedure) {
                 $this->entityManager->remove($procedure);
             }
             $this->entityManager->flush();
-            foreach ($params['fSelects'] as $proc){
+            foreach ($params['fSelects'] as $proc) {
                 $tproc = new ProfessionalProcedures();
                 $tproc->setIdProfessional($params['id_professional']);
                 $tproc->setIdProcedure($proc);
@@ -454,7 +454,29 @@ class MobileRepository
         }
     }
 
+    //Atendente
+    public function getAttendantProfessionals($params)
+    {
+        return $this->entityManager->getRepository(ProfessionalAttendants::class)
+            ->createQueryBuilder('pa')
+            ->select(['ui.user_name', 'pa.id_professional'])
+            ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
+                'ui.id = pa.id_professional')
+            ->where('pa.id_attendant = :sId')
+            ->setParameter('sId', $params['ida'])
+            ->getQuery()->getResult(3);
+    }
+
     //Buscas gerais
+    public function getPacientes(){
+        return $this->entityManager->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->select(['u.id', 'ui.user_name'])
+            ->leftJoin(UserInfoPessoal::class, 'ui','WITH',
+                'ui.id = u.id')
+            ->getQuery()->getResult(3);
+    }
+
     public function getProceduresAvailableForUser($pac_id)
     {
         return $this->entityManager->getRepository(UserHistoric::class)
@@ -543,6 +565,16 @@ class MobileRepository
             $app = $this->entityManager->getRepository(UserAppointment::class)->find($params['ap_id']);
             if ($params['mode'] === 'confirm') {
                 $app->setConfirmedFor($app->getSolicitedFor());
+            }
+            if ($params['mode'] === 'reschedule') {
+                if (array_key_exists('fDate', $params)) {
+                    $app->setSolicitedFor(date("Y-m-d H:i:s", strtotime("{$params['fDate']} {$params['fHour']}")));
+                }
+                if (array_key_exists('postpone', $params)) {
+                    $date = new Datetime($app->getSolicitedFor(), new \DateTimeZone('America/Belem'));
+                    $date->modify("+{$params['postpone']} days");
+                    $app->setSolicitedFor($date->format('Y-m-d H:i:s'));
+                }
             }
             $app->setIdStatus($params['status']);
             $this->entityManager->flush();

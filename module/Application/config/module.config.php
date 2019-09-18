@@ -7,10 +7,12 @@
 
 namespace Application;
 
+use Application\Controller\Factory\AttendantAppControllerFactory;
 use Application\Controller\Factory\FrontAppControllerFactory;
 use Application\Controller\Factory\IndexControllerFactory;
 use Application\Controller\Factory\ProfessionalAppControllerFactory;
 use Application\Controller\Factory\UserAppControllerFactory;
+use Application\Controller\Mobile\AttendantAppController;
 use Application\Controller\Mobile\FrontAppController;
 use Application\Controller\Mobile\ProfessionalAppController;
 use Application\Controller\Mobile\UserAppController;
@@ -75,6 +77,16 @@ return [
                     ]
                 ]
             ],
+            'application_mobile_attendant' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/mobile/attendant[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\Mobile\AttendantAppController::class,
+                        'action' => 'home'
+                    ]
+                ]
+            ],
         ],
     ],
     'doctrine' => [
@@ -107,6 +119,7 @@ return [
             Controller\BrowserController::class => InvokableFactory::class,
             UserAppController::class => UserAppControllerFactory::class,
             ProfessionalAppController::class => ProfessionalAppControllerFactory::class,
+            AttendantAppController::class => AttendantAppControllerFactory::class,
             FrontAppController::class => FrontAppControllerFactory::class
         ],
     ],

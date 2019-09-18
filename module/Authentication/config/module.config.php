@@ -71,6 +71,16 @@ return [
                                 'action' => 'singup-prof'
                             ]
                         ]
+                    ],
+                    'singup-attendant' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/singup-attendant',
+                            'defaults' => [
+                                'controller' => Controller\AuthenticationController::class,
+                                'action' => 'singup-attendant'
+                            ]
+                        ]
                     ]
                 ]
         ],

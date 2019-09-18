@@ -1,0 +1,830 @@
+<ons-navigator swipeable id="mainNavigator" page="mainPage.html"></ons-navigator>
+
+<template id="mainPage.html">
+    <ons-page id="mainPage">
+        <ons-toolbar>
+            <div class="center">SIGAS</div>
+        </ons-toolbar>
+        <ons-tabbar swipeable position="bottom" id="mainTabbar">
+            <ons-tab page="tab1.html" label="Agenda" icon="fa-calendar" active>
+            </ons-tab>
+            <ons-tab page="tab2.html" label="Pacientes" icon="fa-user">
+            </ons-tab>
+            <ons-tab page="tab3.html" label="Perfil" icon="fa-user-md">
+            </ons-tab>
+            <!--            <ons-tab page="twitter.html" label="Perfil" icon="fa-user-md">-->
+            <!--            </ons-tab>-->
+            <!--            <ons-tab page="profilePage.html" label="Perfil" icon="fa-user-md">-->
+            <!--            </ons-tab>-->
+        </ons-tabbar>
+    </ons-page>
+</template>
+
+<template id="tab1.html">
+    <ons-page id="Tab1">
+        <ons-list class="header-custom" style="background-color: #fafafa">
+            <ons-list-item class="input-items">
+                <div>Gerenciando:</div>
+                <ons-select id="prof-input" onchange="reload()" style="width: 60%; margin-left: 10px">
+                    <?php foreach ($this->attend as $att): ?>
+                        <option value="<?= $att['id_professional'] ?>">
+                            <?= $att['user_name'] ?>
+                        </option>
+                    <?php endforeach; ?>
+                </ons-select>
+            </ons-list-item>
+        </ons-list>
+        <ons-row class="profile_button_bar_agenda">
+            <ons-col>
+                <ons-button id="agend" class="custom-button active" onclick="display('agend','agenda',0)">Agenda
+                </ons-button>
+            </ons-col>
+            <ons-col>
+                <ons-button id="solic" class="custom-button" icon="fa-checkbox"
+                            onclick="display('solic','agenda',1)">Solicitações
+                </ons-button>
+            </ons-col>
+            <ons-col>
+                <ons-button id="notif" class="custom-button" onclick="display('notif','agenda',2)">Notificações
+                </ons-button>
+            </ons-col>
+        </ons-row>
+        <ons-row>
+            <ons-carousel fullscreen auto-scroll overscrollable id="carousel-agenda">
+                <ons-carousel-item style="">
+                    <div id="agend-view">
+                        <div class="calendarArea" style="padding-top: 20px; background-color: white"></div>
+                    </div>
+                </ons-carousel-item>
+                <ons-carousel-item style="padding: 0">
+                    <div id="solic-view">
+                        <ons-list style="width: 100%; margin: 0;" modifier="material">
+                            <ons-lazy-repeat>
+                                <ons-progress-circular indeterminate></ons-progress-circular>
+                            </ons-lazy-repeat>
+                        </ons-list>
+                    </div>
+                </ons-carousel-item>
+                <ons-carousel-item style="">
+                    <div id="notif-view">
+                        <ons-list style="width: 100%; margin: 0;" modifier="material">
+                            <ons-lazy-repeat>
+                                <ons-progress-circular indeterminate></ons-progress-circular>
+                            </ons-lazy-repeat>
+                        </ons-list>
+                    </div>
+                </ons-carousel-item>
+            </ons-carousel>
+        </ons-row>
+        <ons-fab ripple position="bottom right" id="sched-fab" onclick="newAppointment()" style="">
+            <ons-icon icon="md-plus"></ons-icon>
+        </ons-fab>
+
+        <ons-fab ripple position="bottom right" id="notf-fab" onclick="handleNotifs(true)" style="display: none">
+            <ons-icon icon="fa-bell"></ons-icon>
+        </ons-fab>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                initializeCalendar();
+                initializeSolics();
+                handleNotifs(false);
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="tab2.html">
+    <ons-page id="Tab2">
+        <ons-list class="header-custom" style="background-color: #fafafa">
+            <ons-list-item class="input-items">
+                <ons-search-input id="search-input" maxlength="20" placeholder="Buscar paciente"
+                                  style="width: 70%"></ons-search-input>
+                <ons-select id="select-input" style="width: 20%; margin-left: 10px">
+                    <option value="name">
+                        Nome
+                    </option>
+                    <option value="React">
+                        React
+                    </option>
+                    <option value="Angular">
+                        Angular
+                    </option>
+                </ons-select>
+            </ons-list-item>
+        </ons-list>
+        <ons-row>
+            <ons-col style="padding: 0">
+                <ons-card modifier="material" hidden>
+                    <div class="title">
+                        <h3 class="card__title" style="text-align: center;">Pacientes atendidos</h3>
+                    </div>
+                    <div class="content">
+                        <ons-row>
+                            <ons-col width="100%">
+                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fHistPac">
+                                    <ons-lazy-repeat>
+
+                                    </ons-lazy-repeat>
+                                </ons-list>
+                            </ons-col>
+                        </ons-row>
+                    </div>
+                </ons-card>
+                <ons-list id="fHistPac">
+                    <ons-lazy-repeat>
+                        <ons-progress-circular indeterminate></ons-progress-circular>
+                    </ons-lazy-repeat>
+                </ons-list>
+            </ons-col>
+        </ons-row>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                loadPacientes();
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="tab3.html">
+    <ons-page id="Tab3">
+        <div id="form-area">
+            <div class="content" style="width: 100%">
+                <div class="profile_upper">
+                    <div class="profile_wrapper">
+                        <div class="profile_image_wrapper">
+                            <img src="/img/profile/placeholder.png">
+                        </div>
+                        <div class="profile_info_wrapper">
+                            <div class="profile_info_numbers">
+                                <div class="nomarg"><?= $this->user['info_user_name'] === null ?
+                                        "Não informado" :
+                                        $this->user['info_user_name'] ?></div>
+                                <div class="nomarg">Profissional da Saúde</div>
+                                <span class="badge <?= $this->user['pi_confirmed_in'] === null ?
+                                    "badge-rose" : "badge-success" ?>">
+                                    <?= $this->user['pi_confirmed_in'] === null ?
+                                        "Aguardando verificação" : "Verificado" ?>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="profile_info_wrapper">
+                            <div class="logoff">
+                                <a href="<?= $this->url('logout') ?>">
+                                    <ons-toolbar-button style="float: right; ">
+                                        <ons-icon icon="ion-log-out"></ons-icon>
+                                    </ons-toolbar-button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <ons-row class="profile_button_bar_profile" hidden>
+                    <ons-col>
+                        <ons-button id="dadpes" class="custom-button active" onclick="display('dadpes', 'profile', 0)">
+                            Pessoal
+                        </ons-button>
+                    </ons-col>
+                    <ons-col>
+                        <ons-button id="dadad" class="custom-button" onclick="display('dadad', 'profile', 2)">Gerencial
+                        </ons-button>
+                    </ons-col>
+                </ons-row>
+                <ons-row>
+                    <ons-carousel fullscreen id="carousel-profile" style="width: 100%">
+                        <ons-carousel-item>
+                            <div style="padding: 1px 0 0 0;">
+                                <div class="card card--material">
+                                    <div class="card__title card--material__title">Dados Pessoais
+                                        <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(0)">
+                                            <ons-icon icon="ion-edit"></ons-icon>
+                                        </ons-toolbar-button>
+                                    </div>
+                                    <div class="card__content card--material__content">
+                                        <div class="profile_wrapper">
+                                            <div class="profile_info_wrapper">
+                                                <div class="profile_info_numbers">
+                                                    <div>
+                                                        <div class="profile_info_text">Nome</div>
+                                                        <div>
+                                                            <?= $this->user['info_user_name'] ?>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">CPF</div>
+                                                        <div><?= $this->user['info_user_cpf'] ?></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">RG</div>
+                                                        <div><?= $this->user['info_user_rg'] ?></div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="profile_info_text">Status do Profissional</div>
+                                                        <div>Cadastro solicitado
+                                                            em: <?= date("d/m/Y", strtotime($this->user['pi_solicited_in'])) ?></div>
+                                                        <div>Cadastro verificado
+                                                            em: <?= $this->user['pi_confirmed_in'] === null ? "Aguardando verificação" : date("d/m/Y", strtotime($this->user['pi_confirmed_in'])) ?></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ons-carousel-item>
+                        <ons-carousel-item>
+                            <div style="padding: 1px 0 0 0;">
+                                <div class="card card--material">
+                                    <div class="card__title card--material__title">Dados Gerenciais
+
+                                    </div>
+                                    <div class="card__content card--material__content">
+                                        <div class="profile_wrapper">
+                                            <div class="profile_info_wrapper">
+                                                <div class="profile_info_numbers">
+                                                    <div>
+                                                        <ons-toolbar-button style="float: right; padding: 0"
+                                                                            onclick="editInfo(2)">
+                                                            <ons-icon icon="ion-edit"></ons-icon>
+                                                        </ons-toolbar-button>
+                                                        <div class="profile_info_text">Atendentes registrados</div>
+                                                        <?php foreach ($this->attend as $item) : ?>
+                                                            <div>
+                                                                <?= $item['user_name'] ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                    <div style="margin-top: 20px">
+                                                        <ons-toolbar-button style="float: right; padding: 0"
+                                                                            onclick="editInfo(3)">
+                                                            <ons-icon icon="ion-edit"></ons-icon>
+                                                        </ons-toolbar-button>
+                                                        <div class="profile_info_text">Procedimentos registrados</div>
+                                                        <?php foreach ($this->proceds as $proced) : ?>
+                                                            <div>
+                                                                <?= $proced['procedure_description'] ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </ons-carousel-item>
+                    </ons-carousel>
+                </ons-row>
+            </div>
+        </div>
+        <script>
+            ons.getScriptPage().onInit = function () {
+
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="newAppoint.html">
+    <ons-page id="newAppoint">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Agenda</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-col>
+                <ons-card>
+                    <div class="card-title">Preencha as informações para cadastro:</div>
+                    <ons-list>
+                        <form action="<?= $this->url('application_mobile_attendant', ["action" => "appointment"]) ?>"
+                              method="post" enctype="multipart/form-data" id="form-appoint">
+                            <ons-list-header>Paciente</ons-list-header>
+                            <ons-list-item class="input-items">
+                                <div>
+                                    <select class="select-input select-input--material" name="fPacReq" id="req-pac">
+                                    </select>
+                                </div>
+                            </ons-list-item>
+                            <ons-list-header>Data</ons-list-header>
+                            <ons-list-item class="input-items">
+                                <div>
+                                    <input type="date" class="text-input text-input--material" name="fDataReq" id="req-date">
+                                </div>
+                            </ons-list-item>
+                            <ons-list-header hidden>Procedimento desejado:</ons-list-header>
+                            <ons-list-item class="input-items" hidden>
+                                <div>
+                                    <select class="select-input select-input--material" name="fProcdReq" id="req-procd">
+                                        <option value="1" selected>Consulta</option>
+                                    </select>
+                                </div>
+                            </ons-list-item>
+                            <ons-list-header>Horário desejado</ons-list-header>
+                            <ons-list-item class="input-items">
+                                <div>
+                                    <input type="time" class="text-input text-input--material" name="fHoraReq"
+                                           id="req-hour">
+                                </div>
+                            </ons-list-item>
+                            <div class="form-params" style="display: none">
+                                <input type="text" id="idProf" name="fIdProf">
+                            </div>
+                        </form>
+                    </ons-list>
+                </ons-card>
+            </ons-col>
+        </ons-row>
+        <ons-bottom-toolbar onclick="sendAppointment()">
+            <ons-row>
+                <ons class="col"></ons>
+                <ons class="col" style="padding-top: 10px">FINALIZAR SOLICITAÇÃO</ons>
+                <ons class="col"></ons>
+            </ons-row>
+        </ons-bottom-toolbar>
+    </ons-page>
+</template>
+
+<template id="editInfoPesForm.html">
+    <ons-page id="editInfoPesForm">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Perfil</ons-back-button>
+            </div>
+            <div class="center">
+                Editar informações
+            </div>
+        </ons-toolbar>
+
+        <ons-card>
+            <form action="<?= $this->url('application_mobile_prof', ["action" => "get-profile"]) ?>" method="post"
+                  enctype="multipart/form-data">
+                <ons-row>
+                    <ons-col width="100%">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-user" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fName"
+                                       placeholder="Nome completo" type="text"
+                                       float required validate value="<?= $this->user['info_user_name'] ?>"></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-address-card" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="info_user_cpf" modifier="material" name="fCpf"
+                                       type="text"
+                                       placeholder="CPF" float validate
+                                       value="<?= $this->user['info_user_cpf'] ?>"></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="" class="list-item__icon icon-spacer"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="info_user_rg" modifier="material"
+                                       name="fRg"
+                                       type="text"
+                                       placeholder="RG" float validate
+                                       value="<?= $this->user['info_user_rg'] ?>"></ons-input>
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <input type="text" name="fOp" value="pesp" hidden>
+                                <button type="submit" class="button">Salvar</button>
+                            </div>
+                        </ons-list-item>
+                    </ons-col>
+                </ons-row>
+            </form>
+        </ons-card>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                // $.get('/mobile/user-profile', {json: true}, function (response) {
+                //     $.each(response, function (key, value) {
+                //         if (value !== " " || value !== "" || value !== null) {
+                //             $("#" + key).val(value);
+                //         }
+                //     })
+                // })
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="pacProfile.html">
+    <ons-page>
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Pacientes</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <div id="form-area">
+            <div class="content" style="width: 100%">
+                <div class="profile_upper">
+                    <div class="profile_wrapper">
+                        <div class="profile_image_wrapper">
+                            <img src="http://placekitten.com/g/40/40">
+                        </div>
+                        <div class="profile_info_wrapper">
+                            <div class="profile_info_numbers">
+                                <div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <ons-row class="profile_button_bar_pac">
+                    <ons-col>
+                        <ons-button id="infos" class="custom-button active" onclick="display('infos','pac',0)">
+                            Informações
+                        </ons-button>
+                    </ons-col>
+                    <ons-col>
+                        <ons-button id="histo" class="custom-button" icon="fa-checkbox"
+                                    onclick="display('histo', 'pac',1)">Histórico
+                        </ons-button>
+                    </ons-col>
+                </ons-row>
+                <ons-row>
+                    <ons-carousel id="carousel-pac">
+                        <ons-carousel-item>
+                            <ons-card>
+                                <div class="title">Informações do paciente</div>
+                                <div class="content">
+                                    <div class="profile_wrapper">
+                                        <div class="profile_info_wrapper">
+                                            <div class="profile_info_numbers">
+                                                <div>
+                                                    <div class="profile_info_text">Nome</div>
+                                                    <div id="u_name"></div>
+                                                </div>
+                                                <div>
+                                                    <div class="profile_info_text">CPF</div>
+                                                    <div id="u_cpf"></div>
+                                                </div>
+                                                <div>
+                                                    <div class="profile_info_text">Plano de Saúde</div>
+                                                    <div id="u_healthcare"></div>
+                                                </div>
+                                                <div>
+                                                    <div class="profile_info_text">Números de contato</div>
+                                                    <div id="u_ctt_phone">Telefone
+                                                        Celular:
+                                                    </div>
+                                                    <div id="u_ctt_res">Telefone
+                                                        Residencial:
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ons-card>
+                        </ons-carousel-item>
+                        <ons-carousel-item>
+                            <ons-card>
+                                <div class="title">Registros no histórico</div>
+                                <div class="content">
+                                    <ons-row>
+                                        <ons-col width="100%">
+                                            <ons-list style="width: 100%; margin: 0" modifier="inset material"
+                                                      id="fRegPac">
+                                                <ons-lazy-repeat>
+
+                                                </ons-lazy-repeat>
+                                            </ons-list>
+                                        </ons-col>
+                                    </ons-row>
+                                </div>
+                            </ons-card>
+                        </ons-carousel-item>
+                        <ons-carousel-item></ons-carousel-item>
+                    </ons-carousel>
+                </ons-row>
+            </div>
+        </div>
+    </ons-page>
+</template>
+
+<template id="addHistoric.html">
+    <ons-page id="add-Historic">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Paciente</ons-back-button>
+            </div>
+            <div class="center">Inserir no histórico</div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-col>
+                <ons-card>
+                    <div class="title">Preencha as informações necessárias:</div>
+                    <div id="presArea" style="display: none">
+                        <form action="<?= $this->url('application_mobile_prof', ['action' => 'save-historic']) ?>"
+                              method="post" enctype="multipart/form-data" id="presForm">
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-pills" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fMedic[]"
+                                           type="text"
+                                           placeholder="Medicamento" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-prescription-bottle" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fDose[]"
+                                           type="text"
+                                           placeholder="Dosagem" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-clock" class="list-item__icon"></ons-icon>
+                                </div>
+                                <textarea class="textarea" name="fPoso[]" rows="3" placeholder="Posologia"
+                                          style="width: 100%"></textarea>
+
+                            </ons-list-item>
+                            <div id="prescList" style="display: none;">
+                                <div class="left">
+                                    Nesta prescrição:
+                                </div>
+                            </div>
+                            <ons-list-item>
+                                <div class="left left-label">
+                                    <button type="button" class="button" onclick="addRem()">+</button>
+                                </div>
+                                <div class="right right-label">
+                                    <button type="submit" class="button">Salvar</button>
+                                </div>
+                            </ons-list-item>
+
+                            <div id="addPrescArea" hidden>
+
+                            </div>
+                        </form>
+                    </div>
+                    <div id="rxArea" style="display: none">
+                        <form action="<?= $this->url('application_mobile_prof', ['action' => 'save-historic']) ?>"
+                              method="post" enctype="multipart/form-data" id="rxForm">
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-file-prescription" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fExam"
+                                           type="text"
+                                           placeholder="Exame" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-barcode" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fCodigo"
+                                           type="text"
+                                           placeholder="Código do Exame" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-info" class="list-item__icon"></ons-icon>
+                                </div>
+                                <textarea class="textarea" name="fDesc" rows="3" placeholder="Mais informações"
+                                          style="width: 100%"></textarea>
+
+                            </ons-list-item>
+                            <ons-list-item>
+                                <div class="right right-label">
+                                    <button type="submit" class="button">Salvar</button>
+                                </div>
+                            </ons-list-item>
+                            <div id="rxInfos" hidden>
+
+                            </div>
+                        </form>
+                    </div>
+                    <div id="remArea" style="display: none">
+                        <form action="<?= $this->url('application_mobile_prof', ['action' => 'save-historic']) ?>"
+                              method="post" enctype="multipart/form-data" id="remForm">
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-stethoscope" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 100%" id="" modifier="material"
+                                           name="fDescProc"
+                                           type="text"
+                                           placeholder="Procedimento" float></ons-input>
+                            </ons-list-item>
+
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-file-alt" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-select style="width: 100%" id="pi_cons_name" modifier="material" name="fType"
+                                            class="select"
+                                            float>
+                                    <select class="select-input">
+                                        <?php foreach ($this->proceds as $proc): ?>
+                                            <option value="<?= $proc['p_id_procedure'] ?>"><?= $proc['procedure_description'] ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </ons-select>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-calendar" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 50%" id="" modifier="material"
+                                           name="fData"
+                                           type="date"
+                                           placeholder="" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-calendar" class="list-item__icon"></ons-icon>
+                                </div>
+                                <ons-input style="width: 30%" id="" modifier="material"
+                                           name="fHora"
+                                           type="time"
+                                           placeholder="" float validate></ons-input>
+                            </ons-list-item>
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-info" class="list-item__icon"></ons-icon>
+                                </div>
+                                <textarea class="textarea" name="fDesc" rows="3" placeholder="Mais informações"
+                                          style="width: 100%"></textarea>
+                            </ons-list-item>
+                            <ons-list-item>
+                                <div class="right right-label">
+                                    <button type="submit" class="button">Salvar</button>
+                                </div>
+                            </ons-list-item>
+                            <div id="remInfos" hidden>
+
+                            </div>
+                        </form>
+                    </div>
+                    <div id="noteArea" style="display: none">
+                        <form action="<?= $this->url('application_mobile_prof', ['action' => 'save-historic']) ?>"
+                              method="post" enctype="multipart/form-data" id="noteForm">
+                            <ons-list-item class="input-items">
+                                <div class="left">
+                                    <ons-icon icon="fa-info" class="list-item__icon"></ons-icon>
+                                </div>
+                                <textarea class="textarea" name="fNotes" rows="4" placeholder="Descreva a nota"
+                                          style="width: 100%"></textarea>
+                            </ons-list-item>
+                            <ons-list-item>
+                                <div class="right right-label">
+                                    <button type="submit" class="button">Salvar</button>
+                                </div>
+                            </ons-list-item>
+                            <div id="remInfos" hidden>
+
+                            </div>
+                        </form>
+                    </div>
+                </ons-card>
+            </ons-col>
+        </ons-row>
+        <style>
+            p {
+                width: 100%;
+            }
+        </style>
+    </ons-page>
+</template>
+
+<template id="historicViewPage.html">
+    <ons-page id="historicViewPage">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Paciente</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-col>
+                <ons-list id="regisList">
+                    <ons-lazy-repeat>
+                        <ons-progress-circular indeterminate></ons-progress-circular>
+                    </ons-lazy-repeat>
+                </ons-list>
+            </ons-col>
+        </ons-row>
+    </ons-page>
+</template>
+
+<template id="notifPage.html">
+    <ons-page id="notifPage">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Home</ons-back-button>
+            </div>
+            <div class="center">
+                Nova notificação
+            </div>
+        </ons-toolbar>
+        <ons-card>
+            <form action="<?= $this->url('application_mobile_prof', ["action" => "save-historic"]) ?>" method="post"
+                  enctype="multipart/form-data">
+                <ons-row>
+                    <ons-col width="100%">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-bell" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fMotiv"
+                                       placeholder="Aviso (opcional)" type="text"
+                                       float validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-calendar" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 50%" id="info_user_cpf" modifier="material" name="fDate"
+                                       type="date"
+                                       placeholder="" float required validate></ons-input>
+
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-clock" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 25%; margin-right: 10px" id="info_user_rg" modifier="material"
+                                       name="fTime[]"
+                                       type="time" min="08:00" max="18:00"
+                                       placeholder="" float required validate></ons-input>
+                            às
+                            <ons-input style="width: 25%; margin-left: 20px" id="info_user_rg" modifier="material"
+                                       name="fTime[]"
+                                       type="time" min="08:00" max="18:00"
+                                       placeholder="" float validate></ons-input>
+                            (opcional)
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label" style="background-image: none">
+                                <input type="text" name="op" value="notif" hidden>
+                                <button type="submit" class="button">Salvar</button>
+                            </div>
+                        </ons-list-item>
+                    </ons-col>
+                </ons-row>
+            </form>
+        </ons-card>
+    </ons-page>
+</template>
+
+<template id="postponeCustom.html">
+    <ons-page id="postponeCustom">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Solicitações</ons-back-button>
+            </div>
+            <div class="center">Adiar solicitação</div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-card style="width: 100%">
+                <div class="card-title">Informe para quando adiar a solicitação</div>
+                <form action="<?= $this->url('application_mobile_attendant', ['action' => 'solicitacoes']) ?>"
+                      method="post" enctype="multipart/form-data" id="presForm">
+                    <ons-list-item class="input-items">
+                        <div class="left">
+                            <ons-icon icon="fa-calendar" class="list-item__icon"></ons-icon>
+                        </div>
+                        <ons-input style="width: 50%" id="" modifier="material"
+                                   name="fDate"
+                                   type="date"
+                                   float required validate></ons-input>
+                    </ons-list-item>
+                    <ons-list-item class="input-items">
+                        <div class="left">
+                            <ons-icon icon="fa-clock" class="list-item__icon"></ons-icon>
+                        </div>
+                        <ons-input style="width: 40%" id="" modifier="material"
+                                   name="fHour"
+                                   type="time"
+                                   float required validate></ons-input>
+                    </ons-list-item>
+                    <ons-list-item>
+                        <input type="text" name="origin" value="form" hidden>
+                        <input type="text" id="solic-id" name="ap_id" hidden>
+                        <input type="text" id="solic-op" name="mode" hidden>
+                        <div class="right right-label">
+                            <button type="submit" class="button">Salvar</button>
+                        </div>
+                    </ons-list-item>
+                </form>
+            </ons-card>
+        </ons-row>
+    </ons-page>
+</template>
+
+<?= $this->headScript()->appendFile($this->basePath('plugins/controllers/attendant-controller.js')) ?>

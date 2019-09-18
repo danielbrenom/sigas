@@ -83,31 +83,32 @@
                                         <div class="checkbox__checkmark checkbox--material__checkmark"></div>
                                         Lembrar de min
                                     </label>
-                                    <p style="margin-top: 30px;">
+                                    <p style="margin-top: 20px;">
                                         <button type="submit" class="button">Login</button>
                                     </p>
                                 </div>
                             </ons-col>
                         </ons-row>
-                        <ons-row>
-                            <ons-col width="100%">
-                                <div style="text-align: center">
-                                    <p>Ainda não possui cadastro?</p>
-                                    <ons-button onclick="singupForm(1)">Cadastre-se aqui!</ons-button>
-                                </div>
-                            </ons-col>
-                        </ons-row>
-                        <ons-row>
-                            <ons-col width="100%">
-                                <div style="text-align: center; margin-top: 30px">
-                                    <p>Profissional da Saúde?</p>
-                                    <ons-button onclick="singupForm(2)">Solicite seu cadastro aqui!</ons-button>
-                                </div>
-                            </ons-col>
-                        </ons-row>
                     </div>
                 </ons-card>
-
+                <ons-card>
+                    <ons-row>
+                        <ons-col width="100%">
+                            <div style="text-align: center">
+                                <p>Ainda não possui cadastro?</p>
+                                <ons-button onclick="singupForm(1)">Cadastre-se aqui!</ons-button>
+                            </div>
+                        </ons-col>
+                    </ons-row>
+                    <ons-row>
+                        <ons-col width="100%">
+                            <div style="text-align: center; margin-top: 30px">
+                                <p>Atendente ou Profissional da Saúde?</p>
+                                <ons-button onclick="singupForm(2)">Solicite seu cadastro aqui!</ons-button>
+                            </div>
+                        </ons-col>
+                    </ons-row>
+                </ons-card>
             </form>
         </div>
     </ons-page>
@@ -165,7 +166,26 @@
             </div>
         </ons-toolbar>
         <ons-card>
-            <form action="<?= $this->url('singup-prof') ?>" method="post" enctype="multipart/form-data">
+            <ons-list>
+                Selecione o tipo de cadastro:
+                <ons-list-item tappable>
+                    <label class="left">
+                        <ons-radio name="fType" input-id="radio-1" value="2" checked></ons-radio>
+                    </label>
+                    <label for="radio-1" class="center">
+                        Profissional da Saúde
+                    </label>
+                </ons-list-item>
+                <ons-list-item tappable>
+                    <label class="left">
+                        <ons-radio name="fType" input-id="radio-2" value="3"></ons-radio>
+                    </label>
+                    <label for="radio-2" class="center">
+                        Atendente
+                    </label>
+                </ons-list-item>
+            </ons-list>
+            <form action="<?= $this->url('singup-prof') ?>" id="prof_form" method="post" enctype="multipart/form-data">
                 <ons-row>
                     <ons-col width="100%">
                         <ons-list-item class="input-items">
@@ -253,7 +273,82 @@
                     </ons-col>
                 </ons-row>
             </form>
+            <form action="<?= $this->url('singup-attendant') ?>" style="display: none" id="atend_form" method="post"
+                  enctype="multipart/form-data">
+                <ons-row>
+                    <ons-col width="100%">
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-user" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="info_user_name" name="fName"
+                                       placeholder="Nome completo" type="text"
+                                       float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="md-email" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" modifier="material" id="username" name="fEmail"
+                                       placeholder="Email" type="email"
+                                       float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="password" modifier="material" name="fPass"
+                                       type="password"
+                                       placeholder="Senha" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-map-marker" class="list-item__icon"></ons-icon>
+                            </div>
+                            <ons-select style="width: 100%" id="info_user_healthcare" modifier="material"
+                                        name="fConsRegion"
+                                        class="select"
+                                        float>
+                                <select class="select-input">
+                                    <option value="">Selecione seu estado</option>
+                                    <option value="1">AP</option>
+                                    <option value="2">PA</option>
+                                </select>
+                            </ons-select>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="" class="list-item__icon icon-spacer"></ons-icon>
+                            </div>
+                            <ons-input style="width: 100%" id="num_reg" modifier="material" name="fAddress" type="text"
+                                       placeholder="Endereço" float required validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <button type="submit" class="button">Efetuar solicitação</button>
+                            </div>
+                        </ons-list-item>
+                    </ons-col>
+                </ons-row>
+            </form>
         </ons-card>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                $("input[name='fType']").change(function () {
+                    console.log($(this).val());
+                    switch (parseInt($(this).val())) {
+                        case 2:
+                            $("#prof_form").show('fast');
+                            $("#atend_form").hide('fast');
+                            break;
+                        case 3:
+                            $("#prof_form").hide('fast');
+                            $("#atend_form").show('fast');
+                            break;
+                    }
+                })
+            }
+        </script>
     </ons-page>
 </template>
 
