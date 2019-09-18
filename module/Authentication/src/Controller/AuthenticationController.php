@@ -175,7 +175,7 @@ class AuthenticationController extends AbstractActionController
                     throw new Exception('Email inválido');
                 }
                 if ($this->userManager->createAttendant($data))
-                    $this->mobileRepository->setMessage("Solicitação enviada com sucesso.", 1);
+                    $this->mobileRepository->setMessage("Usuário criado com sucesso, seu perfil será confirmado assim que possível.", 1);
                 else
                     $this->mobileRepository->setMessage("Não foi possível processar sua solicitação. \n Tente novamente mais tarde", 0);
                 $this->redirect()->toRoute('home');

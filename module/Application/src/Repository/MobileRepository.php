@@ -175,12 +175,19 @@ class MobileRepository
             ->setParameter("sIni", explode("T", $params['start'])[0])
             ->setParameter("sFim", explode("T", $params['end'])[0])
             ->setParameter("sId", $params['id_professional']);
-        if ($for_prof) {
-            $sql->leftJoin(UserHistoric::class, 'uh', 'WITH', 'a.id = uh.id_appointment_entry')
-                ->addSelect('pac_info.user_name')->leftJoin(UserInfoPessoal::class, 'pac_info', 'WITH', 'pac_info.id = uh.user_id')
-                ->andWhere("uh.historic_type = 1");
-        }
         return $sql->getQuery()->getResult(3);
+    }
+
+    public function getScheduleInformations($params)
+    {
+        return $this->entityManager->getRepository(UserHistoric::class)
+            ->createQueryBuilder('uh')
+            ->addSelect('pac_info.user_name')
+            ->leftJoin(UserInfoPessoal::class, 'pac_info', 'WITH', 'pac_info.id = uh.user_id')
+            ->where('uh.id_appointment_entry = :sId')
+            ->andWhere('uh.historic_type = 1')
+            ->setParameter('sId', $params['id'])
+            ->getQuery()->getResult(3);
     }
 
     public function getSolicitacoes($params)
@@ -467,6 +474,25 @@ class MobileRepository
             ->getQuery()->getResult(3);
     }
 
+    public function updateAttendantInfo($info, $att_id)
+    {
+        try {
+            $this->entityManager->beginTransaction();
+            /** @var UserInfoPessoal $pesInfo */
+            $pesInfo = $this->entityManager->getRepository(UserInfoPessoal::class)->find($att_id);
+            $pesInfo->setUserName($info['fName']);
+            $pesInfo->setUserCpf($info['fCpf']);
+            $pesInfo->setUserRg($info['fRg']);
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->entityManager->rollback();
+            UtilsFile::printvardie($e->getMessage());
+            return false;
+        }
+    }
+
     //Buscas gerais
     public function getPacientes(){
         return $this->entityManager->getRepository(User::class)
@@ -474,6 +500,7 @@ class MobileRepository
             ->select(['u.id', 'ui.user_name'])
             ->leftJoin(UserInfoPessoal::class, 'ui','WITH',
                 'ui.id = u.id')
+            ->where('u.id_user_type = 1')
             ->getQuery()->getResult(3);
     }
 
@@ -548,6 +575,32 @@ class MobileRepository
                 $this->entityManager->persist($infoHistoric);
                 $this->entityManager->flush();
             }
+            $this->entityManager->commit();
+            return true;
+        } catch (Exception $e) {
+            UtilsFile::printvardie($e->getMessage());
+            $this->entityManager->rollback();
+            return false;
+        }
+    }
+
+    public function saveGenericAppointment($params)
+    {
+        try {
+            $prof = $this->getProfissionalInfo($params['prof_req'], true)[0];
+            //UtilsFile::printvardie($params, $prof);
+            $this->entityManager->beginTransaction();
+            //Cria o appointment
+            $userAppoint = new UserAppointment();
+            $userAppoint->setIdUserPs($params['prof_req']);
+            $userAppoint->setCreatedOn(date("Y-m-d H:i:s"));
+            $userAppoint->setSolicitedFor(date("Y-m-d H:i:s", strtotime("{$params['datareq']} {$params['horareq']}")));
+            $userAppoint->setIdEspeciality($prof['pi_id_especiality']);
+            $userAppoint->setIdProcedure($params['proc']);
+            $userAppoint->setIdStatus(1);
+//            UtilsFile::printvardie($userAppoint);
+            $this->entityManager->persist($userAppoint);
+            $this->entityManager->flush();
             $this->entityManager->commit();
             return true;
         } catch (Exception $e) {

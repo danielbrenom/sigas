@@ -48,16 +48,20 @@ class ProfessionalAppController extends AbstractActionController
         try {
             switch ($params['type']) {
                 case 'schedule':
-                    $resultados = $this->mobileRepository->getSchedule($params, true);
+                    $resultados = $this->mobileRepository->getSchedule($params);
                     foreach ($resultados as $appointment) {
-                        $data = new DateTime($appointment['a_confirmed_for'] == null ? $appointment['a_solicited_for'] : $appointment['a_confirmed_for'], new DateTimeZone('America/Belem'));
-                        $name = explode(' ', $appointment['user_name']);
+                        $data = new DateTime($appointment['a_confirmed_for'] === null ? $appointment['a_solicited_for'] : $appointment['a_confirmed_for'], new DateTimeZone('America/Belem'));
+                        $pacinfo = $this->mobileRepository->getScheduleInformations(['id' => $appointment['a_id']]);
+                        if (array_key_exists(0, $pacinfo)) {
+                            $name = explode(' ', $pacinfo[0]['user_name']);
+                        } else {
+                            $name = ['Usuário não cadastrado'];
+                        }
                         $resp[] = [
                             'title' => "{$this->mobileRepository->getAppointmentDescription($appointment['a_id_procedure'])} de {$name[0]}",
                             'start' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
                             'end' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
                             'classNames' => $appointment['a_confirmed_for'] == null ? "pending" : "confirmed",
-//                            'color' => $appointment['a_confirmed_for'] == null ? "#d75126": "#a4d997"
                         ];
                     }
                     break;
@@ -117,21 +121,17 @@ class ProfessionalAppController extends AbstractActionController
             if ($params['fOp'] == 'profp') {
                 if ($this->mobileRepository->updateProfissionalJobInfo($params, $userId)) {
                     $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
-                    $this->redirect()->toRoute('application_mobile_prof');
                 } else {
                     $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
-                    $this->redirect()->toRoute('application_mobile_prof');
                 }
             } elseif ($params['fOp'] == 'pesp') {
                 if ($this->mobileRepository->updateProfissionalPesInfo($params, $userId)) {
                     $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
-                    $this->redirect()->toRoute('application_mobile_prof');
                 } else {
                     $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
-                    $this->redirect()->toRoute('application_mobile_prof');
                 }
             }
-            return $this->getResponse();
+            return $this->redirect()->toRoute('application_mobile_prof');
         }
 
         $params = $this->params()->fromQuery();
@@ -198,25 +198,25 @@ class ProfessionalAppController extends AbstractActionController
     public function procedureAction()
     {
         try {
-            if($this->getRequest()->isGet()){
+            if ($this->getRequest()->isGet()) {
                 $params = $this->params()->fromQuery();
                 $params['id_professional'] = $this->authManager->getActiveUser()['user_id'];
                 $allProc = $this->mobileRepository->getProcedures();
                 //UtilsFile::printvardie($allProc);
-                foreach ($allProc as $key => $proc){
+                foreach ($allProc as $key => $proc) {
                     $allProc[$key]['is_proc'] = $this->mobileRepository->isProfessionalProcedures(
                         [
                             'idproc' => $proc['p_id'],
-                            'idprof'=> $params['id_professional']
+                            'idprof' => $params['id_professional']
                         ]
                     );
                 }
                 return new JsonModel($allProc);
             }
-            if($this->getRequest()->isPost()){
+            if ($this->getRequest()->isPost()) {
                 $params = $this->params()->fromPost();
                 $params['id_professional'] = $this->authManager->getActiveUser()['user_id'];
-                if($this->mobileRepository->saveProfessionalProcedures($params)){
+                if ($this->mobileRepository->saveProfessionalProcedures($params)) {
                     $this->mobileRepository->setMessage('Procedimentos registrados.', 1);
                     $this->redirect()->toRoute('application_mobile_prof');
                     return $this->getResponse();

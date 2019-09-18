@@ -104,13 +104,14 @@ function initializeSolics() {
         }
         $.each(response, function (key, value) {
             let dataShow = new Date(value.a_solicited_for);
+            let name = value.user_name == null ? "Usuário não cadastrado" : value.user_name;
             let itemSolic = '<ons-list-item class="item-custom" modifier="longdivider">' +
                 '                                    <div class="left">' +
                 '                                        <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">' +
                 '                                    </div>' +
                 '                                    <div class="center">' +
                 '                                        <div class="tweet-header">' +
-                '                                            <span class="list-item__title"><b>' + value.user_name + ' </b></span>' +
+                '                                            <span class="list-item__title"><b>' + name + ' </b></span>' +
                 '                                        </div>' +
                 '                                        <span class="list-item__content" style="width: 100%">' + value.procedure_description + '  </span>' +
                 '                                        <span class="list-item__content">Solicitado para: ' + dataShow.toLocaleDateString() + ' às ' + dataShow.toLocaleTimeString() + '  </span>' +

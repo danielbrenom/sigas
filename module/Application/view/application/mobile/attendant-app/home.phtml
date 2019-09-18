@@ -159,12 +159,7 @@
                                 <div class="nomarg"><?= $this->user['info_user_name'] === null ?
                                         "Não informado" :
                                         $this->user['info_user_name'] ?></div>
-                                <div class="nomarg">Profissional da Saúde</div>
-                                <span class="badge <?= $this->user['pi_confirmed_in'] === null ?
-                                    "badge-rose" : "badge-success" ?>">
-                                    <?= $this->user['pi_confirmed_in'] === null ?
-                                        "Aguardando verificação" : "Verificado" ?>
-                                </span>
+                                <div class="nomarg">Atendente</div>
                             </div>
                         </div>
                         <div class="profile_info_wrapper">
@@ -177,7 +172,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <ons-row class="profile_button_bar_profile" hidden>
                     <ons-col>
@@ -217,13 +211,6 @@
                                                     <div>
                                                         <div class="profile_info_text">RG</div>
                                                         <div><?= $this->user['info_user_rg'] ?></div>
-                                                    </div>
-                                                    <div>
-                                                        <div class="profile_info_text">Status do Profissional</div>
-                                                        <div>Cadastro solicitado
-                                                            em: <?= date("d/m/Y", strtotime($this->user['pi_solicited_in'])) ?></div>
-                                                        <div>Cadastro verificado
-                                                            em: <?= $this->user['pi_confirmed_in'] === null ? "Aguardando verificação" : date("d/m/Y", strtotime($this->user['pi_confirmed_in'])) ?></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -301,16 +288,26 @@
                         <form action="<?= $this->url('application_mobile_attendant', ["action" => "appointment"]) ?>"
                               method="post" enctype="multipart/form-data" id="form-appoint">
                             <ons-list-header>Paciente</ons-list-header>
-                            <ons-list-item class="input-items">
+                            <ons-list-item class="input-items" id="pacselect">
                                 <div>
                                     <select class="select-input select-input--material" name="fPacReq" id="req-pac">
+                                        <option value="">Selecione um paciente</option>
                                     </select>
                                 </div>
+                            </ons-list-item>
+                            <ons-list-item tappable>
+                                <label class="right">
+                                    <ons-checkbox input-id="check-1" name="generic"></ons-checkbox>
+                                </label>
+                                <label for="check-1" class="center">
+                                    Paciente não consta na lista?
+                                </label>
                             </ons-list-item>
                             <ons-list-header>Data</ons-list-header>
                             <ons-list-item class="input-items">
                                 <div>
-                                    <input type="date" class="text-input text-input--material" name="fDataReq" id="req-date">
+                                    <input type="date" class="text-input text-input--material" required name="fDataReq"
+                                           id="req-date">
                                 </div>
                             </ons-list-item>
                             <ons-list-header hidden>Procedimento desejado:</ons-list-header>
@@ -324,8 +321,13 @@
                             <ons-list-header>Horário desejado</ons-list-header>
                             <ons-list-item class="input-items">
                                 <div>
-                                    <input type="time" class="text-input text-input--material" name="fHoraReq"
+                                    <input type="time" class="text-input text-input--material" required name="fHoraReq"
                                            id="req-hour">
+                                </div>
+                            </ons-list-item>
+                            <ons-list-item>
+                                <div class="right right-label">
+                                    <button type="submit" class="button">Salvar</button>
                                 </div>
                             </ons-list-item>
                             <div class="form-params" style="display: none">
@@ -336,18 +338,23 @@
                 </ons-card>
             </ons-col>
         </ons-row>
-        <ons-bottom-toolbar onclick="sendAppointment()">
-            <ons-row>
-                <ons class="col"></ons>
-                <ons class="col" style="padding-top: 10px">FINALIZAR SOLICITAÇÃO</ons>
-                <ons class="col"></ons>
-            </ons-row>
-        </ons-bottom-toolbar>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                $("#check-1").change(function () {
+                    if ($(this)[0].checked) {
+                        $('#pacselect').slideUp();
+                        $("#req-pac").val('');
+                    } else {
+                        $('#pacselect').slideDown();
+                    }
+                })
+            }
+        </script>
     </ons-page>
 </template>
 
-<template id="editInfoPesForm.html">
-    <ons-page id="editInfoPesForm">
+<template id="editInfoForm.html">
+    <ons-page id="editInfoForm">
         <ons-toolbar modifier="noshadow">
             <div class="left">
                 <ons-back-button>Perfil</ons-back-button>
@@ -356,9 +363,8 @@
                 Editar informações
             </div>
         </ons-toolbar>
-
         <ons-card>
-            <form action="<?= $this->url('application_mobile_prof', ["action" => "get-profile"]) ?>" method="post"
+            <form action="<?= $this->url('application_mobile_attendant', ["action" => "profile"]) ?>" method="post"
                   enctype="multipart/form-data">
                 <ons-row>
                     <ons-col width="100%">

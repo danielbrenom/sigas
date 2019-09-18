@@ -35,7 +35,47 @@ class AttendantAppController extends AbstractActionController
         ]);
     }
 
-    public function pacientesAction(){
+    public function appointmentAction()
+    {
+        if ($this->getRequest()->isPost()) {
+            $params = $this->params()->fromPost();
+//            UtilsFile::printvardie($params);
+            if ($params['fPacReq'] !== '') {
+                $result = $this->mobileRepository->saveAppointment([
+                    'datareq' => $params['fDataReq'],
+                    'horareq' => $params['fHoraReq'],
+                    'prof_req' => $params['fIdProf'],
+                    'user_req' => $params['fPacReq'],
+                    'proc' => $params['fProcdReq']
+                ]);
+            } else {
+                $result = $this->mobileRepository->saveGenericAppointment([
+                    'datareq' => $params['fDataReq'],
+                    'horareq' => $params['fHoraReq'],
+                    'prof_req' => $params['fIdProf'],
+                    'user_req' => $params['fPacReq'],
+                    'proc' => $params['fProcdReq']
+                ]);
+            }
+            if ($result) {
+                $response = [
+                    'code' => 1,
+                    'message' => 'A solicitação foi salva.'
+                ];
+            } else {
+                $response = [
+                    'code' => 0,
+                    'message' => 'Erro ao operar solicitação, tente novamente mais tarde.'
+                ];
+            }
+            $this->mobileRepository->setMessage($response['message'], $response['code']);
+            return $this->redirect()->toRoute('application_mobile_attendant');
+        }
+        return $this->response->setStatusCode(400);
+    }
+
+    public function pacientesAction()
+    {
         $params = $this->params()->fromQuery();
         $response = [];
         switch ($params['mode']) {
@@ -67,6 +107,21 @@ class AttendantAppController extends AbstractActionController
         return new JsonModel($response);
     }
 
+    public function profileAction()
+    {
+        if ($this->getRequest()->isPost()) {
+            $params = $this->params()->fromPost();
+            //UtilsFile::printvardie($params);
+            if ($this->mobileRepository->updateAttendantInfo($params, $this->authManager->getActiveUser()['user_id'])) {
+                $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
+            } else {
+                $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
+            }
+            return $this->redirect()->toRoute('application_mobile_attendant');
+        }
+        return $this->getResponse()->setStatusCode(400);
+    }
+
     public function scheduleAction()
     {
         try {
@@ -76,10 +131,15 @@ class AttendantAppController extends AbstractActionController
                 $resp = [];
                 switch ($params['type']) {
                     case 'schedule':
-                        $resultados = $this->mobileRepository->getSchedule($params, true);
+                        $resultados = $this->mobileRepository->getSchedule($params);
                         foreach ($resultados as $appointment) {
-                            $data = new DateTime($appointment['a_confirmed_for'] == null ? $appointment['a_solicited_for'] : $appointment['a_confirmed_for'], new DateTimeZone('America/Belem'));
-                            $name = explode(' ', $appointment['user_name']);
+                            $data = new DateTime($appointment['a_confirmed_for'] === null ? $appointment['a_solicited_for'] : $appointment['a_confirmed_for'], new DateTimeZone('America/Belem'));
+                            $pacinfo = $this->mobileRepository->getScheduleInformations(['id' => $appointment['a_id']]);
+                            if (array_key_exists(0, $pacinfo)) {
+                                $name = explode(' ', $pacinfo[0]['user_name']);
+                            } else {
+                                $name = ['Usuário não cadastrado'];
+                            }
                             $resp[] = [
                                 'title' => "{$this->mobileRepository->getAppointmentDescription($appointment['a_id_procedure'])} de {$name[0]}",
                                 'start' => $data->format('Y-m-d') . 'T' . $data->format('H:i:s') . '-03:00',
@@ -140,7 +200,7 @@ class AttendantAppController extends AbstractActionController
                         'message' => 'Erro ao operar solicitação, tente novamente mais tarde.'
                     ];
                 }
-                if(isset($params['origin'])){
+                if (isset($params['origin'])) {
                     $this->mobileRepository->setMessage($response['message'], $response['code']);
                     return $this->redirect()->toRoute('application_mobile_attendant');
                 }
