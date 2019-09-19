@@ -146,11 +146,7 @@ function loadPacientes() {
     $.get('/mobile/prof/get-pacientes', {mode: 'list'}, function (response) {
         let list = $("#fHistPac ons-lazy-repeat");
         list.empty();
-        // for (let i = 0; i < 50; i++) {
         $.each(response, function (key, value) {
-            // let item = '<ons-list-item modifier="chevron longdivider" tappable onclick="fn.loadPacienteInfo(' + value.id + ')">' +
-            //     value.user_name +
-            //     '</ons-list-item>';
             let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
                 '                        <div class="left">' +
                 '                            <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">' +
@@ -178,7 +174,6 @@ function loadPacientes() {
                 '                    </ons-list-item>';
             list.append(item);
         })
-        // }
 
     })
 }

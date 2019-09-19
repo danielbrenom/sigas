@@ -1,0 +1,52 @@
+<ons-navigator swipeable id="mainNavigator" page="mainPage.html"></ons-navigator>
+<template id="mainPage.html">
+    <ons-page id="mainPage">
+        <ons-toolbar>
+            <div class="center">SIGAS</div>
+        </ons-toolbar>
+        <ons-card modifier="material">
+            <div class="title">Informe a nova senha do usuário</div>
+            <div class="content">
+                <ons-row>
+                    <ons-col width="100%">
+                        <form action="<?=$this->url('reseta')?>" method="post" enctype="multipart/form-data">
+                            <div style="text-align: center; margin-top: 30px;">
+                                <ons-list-item class="input-items">
+                                    <div class="left">
+                                        <ons-icon icon="fa-envelope" class="list-item__icon"></ons-icon>
+                                    </div>
+                                    <ons-input style="width: 80%" modifier="material" id="username"
+                                               name="fEm" value="<?=$this->email?>"
+                                               placeholder="Email cadastrado"
+                                               float readonly required></ons-input>
+                                </ons-list-item>
+                                <ons-list-item class="input-items">
+                                    <div class="left">
+                                        <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
+                                    </div>
+                                    <ons-input style="width: 80%" modifier="material" id="fSenha"
+                                               name="fSenha" type="password"
+                                               placeholder="Inserir nova senha"
+                                               float required></ons-input>
+                                </ons-list-item>
+                                <ons-list-item class="input-items">
+                                    <div class="left">
+                                        <ons-icon icon="" class="list-item__icon icon-spacer"></ons-icon>
+                                    </div>
+                                    <ons-input style="width: 80%" modifier="material" id="fSenhaConf"
+                                               name="fSenhaConf" type="password"
+                                               placeholder="Confirmar senha"
+                                               float required></ons-input>
+                                </ons-list-item>
+                                <p style="margin-top: 20px;">
+                                    <input type="hidden" name="fToken" value="<?=$this->token?>"/>
+                                    <button type="submit" class="button">Enviar</button>
+                                </p>
+                            </div>
+                        </form>
+                    </ons-col>
+                </ons-row>
+            </div>
+        </ons-card>
+    </ons-page>
+</template>

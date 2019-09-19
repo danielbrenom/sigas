@@ -81,6 +81,26 @@ return [
                                 'action' => 'singup-attendant'
                             ]
                         ]
+                    ],
+                    'recupera' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/recupera',
+                            'defaults' => [
+                                'controller' => Controller\AuthenticationController::class,
+                                'action' => 'recupera'
+                            ]
+                        ]
+                    ],
+                    'reseta' => [
+                        'type' => Literal::class,
+                        'options' => [
+                            'route' => '/reseta',
+                            'defaults' => [
+                                'controller' => Controller\AuthenticationController::class,
+                                'action' => 'reseta'
+                            ]
+                        ]
                     ]
                 ]
         ],
@@ -115,5 +135,14 @@ return [
             AuthenticationManager::class => AuthenticationManagerFactory::class,
             UserManager::class => UserManagerFactory::class
         ]
-    ]
+    ],
+    'view_manager' => [
+        'template_map' => [
+            "authentication/email/reset-password" => __DIR__ . '/../view/email/reset-password.phtml',
+            'reseta' => __DIR__ . '/../view/authentication/reseta.phtml',
+        ],
+        'template_path_stack' => [
+            __DIR__ . '/../view',
+        ],
+    ],
 ];

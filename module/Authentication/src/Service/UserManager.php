@@ -7,12 +7,20 @@ use Application\Debug\UtilsFile;
 use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserInfoPessoal;
+use Auth\Entity\Seg\Usuario;
 use Authentication\Entity\Seg\User;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Exception;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Json\Json;
+use Zend\Mail\Message;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
+use Zend\Mail\Transport\SmtpOptions;
+use Zend\Math\Rand;
+use Zend\Mime\Message as MimeMessage;
+use Zend\Mime\Part as MimePart;
 
 class UserManager
 {
@@ -21,13 +29,16 @@ class UserManager
      */
     private $entityManager;
 
+    private $viewRenderer;
+
     /**
      * UserManager constructor.
      * @param EntityManager $entityManager
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(EntityManager $entityManager, $viewRenderer)
     {
         $this->entityManager = $entityManager;
+        $this->viewRenderer = $viewRenderer;
     }
 
 
@@ -209,5 +220,114 @@ class UserManager
             throw new \Exception($e->getMessage());
         }
         return false;
+    }
+
+    public function generatePasswordResetToken($params)
+    {
+        try {
+            $this->entityManager->beginTransaction();
+            /**@var $user User */
+            $user = $this->entityManager->getRepository(User::class)->findOneBy(["email" => $params['fEmail']]);
+            if ($user === null) {
+                throw new \Exception("Usuário não encontrado");
+            }
+//            if ($user->getAtivo() != User::STATUS_ACTIVE) {
+//                throw new \Exception('Não é possível gera um token para usuário inativo.');
+//            }
+            $token = Rand::getString(32, '0123456789abcdefghijklmnopqrstuvwxyz');
+            $bcrypt = new Bcrypt();
+            $tokenHash = $bcrypt->create($token);
+            $user->setPwdResetToken($tokenHash);
+            $tokenDate = new \DateTime('now', new \DateTimeZone('America/Belem'));
+            $user->setPwdResetCreationDate($tokenDate->format('Y-m-d H:i:s'));
+            $this->entityManager->flush();
+            $assunto = "Redefinição de senha";
+            $httpHost = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+            $passwordResetUrl = "http://{$httpHost}/reseta?token={$token}&email={$user->getEmail()}";
+            $bodyHtml = $this->viewRenderer->render('authentication/email/reset-password',
+                ['passwordResetUrl' => $passwordResetUrl,]);
+            $html = new MimePart($bodyHtml);
+            $html->type = "text/html";
+            $body = new MimeMessage();
+            $body->addPart($html);
+            $mail = new Message();
+            $mail->setEncoding('UTF-8');
+            $mail->setBody($body);
+            $mail->setFrom('no-reply@sigas.com', 'Administrador');
+            $mail->setSubject($assunto);
+            $mail->addTo($user->getEmail(), "Usuário do SIGAS");
+            $transport = new SmtpTransport();
+            $config = new SmtpOptions([
+                'name' => 'gmail',
+                'host' => 'smtp.gmail.com',
+                'port' => 587,
+                'connection_class' => 'plain',
+                'connection_config' => [
+                    'username' => 'mpcontaspa@gmail.com',
+                    'password' => 'Empc2016',
+                    'ssl' => 'tls'
+                ]
+            ]);
+            $transport->setOptions($config);
+            $transport->send($mail);
+            $this->entityManager->commit();
+            return true;
+            UtilsFile::printvardie("Email enviado",$user, $params);
+        } catch (Exception $e) {
+            $this->entityManager->rollback();
+            return false;
+            UtilsFile::printvardie($e->getMessage());
+        }
+    }
+
+    public function validatePasswordResetToken($email, $token){
+
+        try {
+            /**@var $user User */
+            $user = $this->entityManager->getRepository(User::class)->findOneBy(["email" => $email]);
+//            if ($user === null || $user->getAtivo() != User::STATUS_ACTIVE) {
+//                return false;
+//            }
+            $bcrypt = new Bcrypt();
+            $tokenHash = $user->getPwdResetToken();
+            if (!$bcrypt->verify($token, $tokenHash)) {
+                return false;
+            }
+            $tokenCreationDate = $user->getPwdResetCreationDate();
+            $tokenCreationDate = new \DateTime($tokenCreationDate, new \DateTimeZone("America/Belem"));
+            $currentDate = new \DateTime('now', new \DateTimeZone("America/Belem"));
+            $diff = $currentDate->diff($tokenCreationDate);
+//            UtilsFile::printvardie($tokenCreationDate,$currentDate,$diff);
+            if ($diff->d > 1) {
+                return false; // expired
+            }
+            return true;
+        } catch (Exception $e) {
+            return $e->getMessage();
+            return false;
+        }
+    }
+
+    public function resetPasswordFromToken($email,$token, $newPassword){
+        try {
+            if (!$this->validatePasswordResetToken($email, $token)) {
+                return false;
+            }
+            /**@var $user User */
+            $user = $this->entityManager->getRepository(User::class)->findOneBy(["email" => $email]);
+//            if ($user == null || $user->getAtivo() != Usuario::STATUS_ACTIVE) {
+//                return false;
+//            }
+            $bcrypt = new Bcrypt();
+            $passwordHash = $bcrypt->create($newPassword);
+            $user->setUserPassword($passwordHash);
+            $user->setPwdResetToken(null);
+            $user->setPwdResetCreationDate(null);
+            $this->entityManager->flush();
+            return true;
+        } catch (Exception $e) {
+            return $e->getMessage();
+            throw $e;
+        }
     }
 }

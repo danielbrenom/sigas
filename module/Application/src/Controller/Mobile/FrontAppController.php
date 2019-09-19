@@ -6,6 +6,7 @@ namespace Application\Controller\Mobile;
 
 use Application\Debug\UtilsFile;
 use Application\Repository\MobileRepository;
+use Exception;
 use Zend\Json\Json;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;

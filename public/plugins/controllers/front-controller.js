@@ -4,7 +4,8 @@ $().ready(function () {
             if (response.error) {
                 showToast(response.error);
             }
-        })
+        });
+
     }
 });
 

@@ -63,20 +63,23 @@
                         <ons-row>
                             <ons-col width="100%">
                                 <div style="text-align: center; margin-top: 30px;">
-                                    <ons-if plataform="ios other">
-                                        <p>
-                                            <ons-input style="width: 80%" modifier="material" id="username"
-                                                       name="fEmail"
-                                                       placeholder="Email"
-                                                       float required></ons-input>
-                                        </p>
-                                        <p>
-                                            <ons-input style="width: 80%" id="password" modifier="material" name="fPass"
-                                                       type="password"
-                                                       placeholder="Senha" float required></ons-input>
-                                        </p>
-                                    </ons-if>
-
+                                    <ons-list-item class="input-items">
+                                        <div class="left">
+                                            <ons-icon icon="fa-envelope" class="list-item__icon"></ons-icon>
+                                        </div>
+                                        <ons-input style="width: 80%" modifier="material" id="username"
+                                                   name="fEmail"
+                                                   placeholder="Email"
+                                                   float required></ons-input>
+                                    </ons-list-item>
+                                    <ons-list-item class="input-items">
+                                        <div class="left">
+                                            <ons-icon icon="fa-key" class="list-item__icon"></ons-icon>
+                                        </div>
+                                        <ons-input style="width: 80%" id="password" modifier="material" name="fPass"
+                                                   type="password"
+                                                   placeholder="Senha" float required></ons-input>
+                                    </ons-list-item>
                                     <label class="checkbox checkbox--material" hidden>
                                         <input type="checkbox" class="checkbox__input checkbox--material__input"
                                                name="fRem">
@@ -85,6 +88,9 @@
                                     </label>
                                     <p style="margin-top: 20px;">
                                         <button type="submit" class="button">Login</button>
+                                    </p>
+                                    <p style="margin-top: 20px;">
+                                        <a href="#" id="forgot-password">Esqueceu sua senha? Clique aqui</a>
                                     </p>
                                 </div>
                             </ons-col>
@@ -111,6 +117,13 @@
                 </ons-card>
             </form>
         </div>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                $("#forgot-password").click(function () {
+                    $("#mainNavigator")[0].pushPage('recuperaSenha.html');
+                })
+            }
+        </script>
     </ons-page>
 </template>
 
@@ -388,6 +401,43 @@
 
             }
         </script>
+    </ons-page>
+</template>
+
+<template id="recuperaSenha.html">
+    <ons-page id="recuperaSenha">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Login</ons-back-button>
+            </div>
+            <div class="center">
+                Recuperar senha
+            </div>
+        </ons-toolbar>
+        <ons-card modifier="material">
+            <div class="content">
+                <ons-row>
+                    <ons-col width="100%">
+                        <form action="<?=$this->url('recupera')?>" method="post" enctype="multipart/form-data">
+                            <div style="text-align: center; margin-top: 30px;">
+                                <ons-list-item class="input-items">
+                                    <div class="left">
+                                        <ons-icon icon="fa-envelope" class="list-item__icon"></ons-icon>
+                                    </div>
+                                    <ons-input style="width: 80%" modifier="material" id="username"
+                                               name="fEmail"
+                                               placeholder="Email cadastrado"
+                                               float required></ons-input>
+                                </ons-list-item>
+                                <p style="margin-top: 20px;">
+                                    <button type="submit" class="button">Enviar</button>
+                                </p>
+                            </div>
+                        </form>
+                    </ons-col>
+                </ons-row>
+            </div>
+        </ons-card>
     </ons-page>
 </template>
 

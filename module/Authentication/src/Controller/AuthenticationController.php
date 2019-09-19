@@ -18,6 +18,7 @@ use Authentication\Service\UserManager;
 use Zend\Uri\Uri;
 use Zend\Validator\EmailAddress;
 use Zend\Validator\Hostname;
+use Zend\Validator\Regex;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 
@@ -187,5 +188,66 @@ class AuthenticationController extends AbstractActionController
             $this->redirect()->toRoute('home');
         }
         return $this->getResponse();
+    }
+
+    public function recuperaAction()
+    {
+        try {
+            if ($this->getRequest()->isPost()) {
+                $params = $this->params()->fromPost();
+                if ($this->userManager->generatePasswordResetToken($params)) {
+                    $this->mobileRepository->setMessage("A solicitação de redefinição de senha foi enviada para seu email", 1);
+                } else {
+                    $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
+                }
+                return $this->redirect()->toRoute('application_mobile_front');
+            }
+        } catch (Exception $e) {
+            $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
+            return $this->redirect()->toRoute('application_mobile_front');
+            UtilsFile::printvardie($e->getMessage());
+        }
+    }
+
+    public function resetaAction()
+    {
+        try {
+            if ($this->getRequest()->isPost()) {
+                $params = $this->params()->fromPost();
+                $matricValidator = new Regex(['pattern' => "/^{$params['fSenha']}$/"]);
+                if ($matricValidator->isValid($params['fSenhaConf'])) {
+                    //UtilsFile::printvardie($this->userManager->resetPasswordFromToken($params['fEm'], $params['fToken'], $params['fSenha']));;
+                    if ($this->userManager->resetPasswordFromToken($params['fEm'], $params['fToken'], $params['fSenha'])) {
+                        $this->mobileRepository->setMessage("Senha redefinida com sucesso", 1);
+                        return $this->redirect()->toRoute('application_mobile_front');
+                    }
+                    $this->mobileRepository->setMessage("Erro ao redefinir senha, tente novamente", 0);
+                    return $this->redirect()->toUrl("/reseta?token={$params['fToken']}&email={$params['fEm']}");
+                    //Mostrar Erro
+                    //throw new Exception("Erro ao alterar senha");
+                }
+                $this->mobileRepository->setMessage("As senhas não coicidem, tente novamente", 0);
+                return $this->redirect()->toUrl("/reseta?token={$params['token']}&email?={$params['email']}");
+            }
+            if ($this->getRequest()->isGet()) {
+                $params = $this->params()->fromQuery();
+                if ($params['token'] != null && (!is_string($params['token']) || strlen($params['token']) != 32)) {
+                    $this->mobileRepository->setMessage("Token inválido, solicite redefinição de senha novamente", 0);
+                    return $this->redirect()->toRoute('application_mobile_front');
+                }
+                if ($params['token'] === null || !$this->userManager->validatePasswordResetToken($params['email'], $params['token'])) {
+                    $this->mobileRepository->setMessage("Token inválido, solicite redefinição de senha novamente", 0);
+                    return $this->redirect()->toRoute('application_mobile_front');
+                }
+                return new ViewModel([
+                    'email' => $params['email'],
+                    'token' => $params['token']
+                ]);
+            }
+            return $this->getResponse()->setStatusCode(400);
+        } catch (Exception $e) {
+            UtilsFile::printvardie($e->getMessage());
+            return $this->getResponse();
+        }
     }
 }
