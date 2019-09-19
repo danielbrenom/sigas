@@ -11,6 +11,7 @@ use Application\Entity\Sis\ProfessionalAttendants;
 use Application\Entity\Sis\ProfessionalConselhos;
 use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\ProfessionalNotif;
+use Application\Entity\Sis\ProfessionalRatings;
 use Application\Entity\Sis\UserAppointment;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserExams;
@@ -68,7 +69,7 @@ class MobileRepository
                 case 1:
                     $results = $this->entityManager->getRepository(UserHistoric::class)
                         ->createQueryBuilder('h')
-                        ->select(['ap.solicited_for', 'ap.confirmed_for'])
+                        ->select(['ap.solicited_for', 'ap.confirmed_for', 'ap.id_status', 'ap.id'])
                         ->addSelect('proc.procedure_description')
                         ->addSelect('ip.user_name as prof_name')
                         ->addSelect('e.desc_especialidade')
@@ -148,9 +149,9 @@ class MobileRepository
         }
     }
 
-    public function getUsersAtendidosProfessional($prof_id)
+    public function getUsersAtendidosProfessional($params)
     {
-        return $this->entityManager->getRepository(UserAppointment::class)
+        $sql = $this->entityManager->getRepository(UserAppointment::class)
             ->createQueryBuilder('ua')
             ->distinct()
             ->select(['ui.user_name', 'ui.id', 'uhc.desc_healthcare'])
@@ -161,8 +162,26 @@ class MobileRepository
             ->leftJoin(UserHealthcare::class, 'uhc', 'WITH',
                 'uhc.id = ui.user_healthcare')
             ->where('uh.historic_type = 1 and ua.id_user_ps = :sId')
-            ->setParameter('sId', $prof_id)
-            ->getQuery()->getResult(3);
+            ->setParameter('sId', $params['pid']);
+        if ($params['search']) {
+            $sql->andWhere('ui.user_name LIKE :name')
+                ->setParameter('name', "%{$params['search']}%");
+        }
+        return $sql->getQuery()->getResult(3);
+    }
+
+    public function wasAtendidoProfessional($params)
+    {
+        return count(
+                $this->entityManager->getRepository(UserAppointment::class)
+                    ->createQueryBuilder('ua')
+                    ->leftJoin(UserHistoric::class, 'uh', 'WITH',
+                        'ua.id = uh.id_appointment_entry')
+                    ->where('uh.user_id = :sUi and ua.id_user_ps = :sPi')
+                    ->setParameter('sUi', $params['uid'])
+                    ->setParameter('sPi', $params['pid'])
+                    ->getQuery()->getResult(3)
+            ) > 0;
     }
 
     //Profissional
@@ -236,9 +255,9 @@ class MobileRepository
             ->getQuery()->getResult(2);
     }
 
-    public function getProfissinais()
+    public function getProfissinais($params)
     {
-        return $this->entityManager->getRepository(User::class)
+        $sql = $this->entityManager->getRepository(User::class)
             ->createQueryBuilder('u')
             ->addSelect('info')
             ->addSelect('ue')
@@ -248,10 +267,12 @@ class MobileRepository
             ->leftJoin(UserEspeciality::class, 'ue', 'WITH', 'ue.id = pi.id_especiality')
             ->leftJoin(ProfessionalConselhos::class, 'pc', 'WITH',
                 'pc.id = pi.cons_name')
-            ->where('u.id_user_type = 2')
-//            ->where('pi.id_especiality = :sId')
-//            ->setParameter('sId', $esp_id)
-            ->getQuery()->getResult(3);
+            ->where('u.id_user_type = 2');
+        if ($params['search']) {
+            $sql->andWhere('info.user_name LIKE :name')
+                ->setParameter('name', "%{$params['search']}%");
+        }
+        return $sql->getQuery()->getResult(3);
     }
 
     public function getProfissionalInfo($prof_id, $completeInfo = false)
@@ -382,6 +403,7 @@ class MobileRepository
             $profInfo->setEspecialitySolicited($info['fEspSoc']);
             $profInfo->setProfAddresses($end);
             $profInfo->setConsRegistry($info['fNumIns']);
+            $profInfo->setProfessionalAbout($info['fAbout']);
             $profInfo->setConfirmedIn(null);
             $profInfo->setSolicitedIn($date->format('Y-m-d H:i:s'));
             /** @var UserInfoPessoal $profInfoPes */
@@ -461,6 +483,18 @@ class MobileRepository
         }
     }
 
+    public function getRatings($params)
+    {
+        return $this->entityManager->getRepository(ProfessionalRatings::class)
+            ->createQueryBuilder('pr')
+            ->addSelect('ui.user_name')
+            ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
+                'ui.id = pr.id_user')
+            ->where('pr.id_professional = :sId')
+            ->setParameter('sId', $params['pid'])
+            ->getQuery()->getResult(3);
+    }
+
     //Atendente
     public function getAttendantProfessionals($params)
     {
@@ -494,11 +528,12 @@ class MobileRepository
     }
 
     //Buscas gerais
-    public function getPacientes(){
+    public function getPacientes()
+    {
         return $this->entityManager->getRepository(User::class)
             ->createQueryBuilder('u')
             ->select(['u.id', 'ui.user_name'])
-            ->leftJoin(UserInfoPessoal::class, 'ui','WITH',
+            ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
                 'ui.id = u.id')
             ->where('u.id_user_type = 1')
             ->getQuery()->getResult(3);
@@ -541,6 +576,19 @@ class MobileRepository
         return $this->entityManager->getRepository(Procedures::class)
             ->createQueryBuilder('p')
             ->getQuery()->getResult(3);
+    }
+
+    public function haveRated($params)
+    {
+        return !(count($this->entityManager->getRepository(ProfessionalRatings::class)
+                ->createQueryBuilder('pr')
+                ->addSelect('ui.user_name')
+                ->leftJoin(UserInfoPessoal::class, 'ui', 'WITH',
+                    'ui.id = pr.id_user')
+                ->where('pr.id_professional = :sId and pr.id_user = :sUi')
+                ->setParameter('sId', $params['pid'])
+                ->setParameter('sUi', $params['uid'])
+                ->getQuery()->getResult(3)) > 0);
     }
 
     //Operações no banco
@@ -639,13 +687,17 @@ class MobileRepository
         }
     }
 
-    public function cancelAppointment($params)
+    public function saveRating($params)
     {
         try {
             $this->entityManager->beginTransaction();
             /** @var UserAppointment $app */
-            $app = $this->entityManager->getRepository(UserAppointment::class)->find($params['ap_id']);
-            $app->setIdStatus(4);
+            $rating = new ProfessionalRatings();
+            $rating->setIdProfessional($params['profid']);
+            $rating->setIdUser($params['userid']);
+            $rating->setRatingComment($params['comment']);
+            $rating->setRatingStars($params['rating']);
+            $this->entityManager->persist($rating);
             $this->entityManager->flush();
             $this->entityManager->commit();
             return true;

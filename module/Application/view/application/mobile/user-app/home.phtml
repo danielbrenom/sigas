@@ -20,9 +20,12 @@
     <ons-page id="Tab1">
         <ons-list class="header-custom" style="background-color: #fafafa">
             <ons-list-item class="input-items">
-                <ons-search-input id="search-input" maxlength="20" placeholder="Buscar profissional"
-                                  style="width: 70%"></ons-search-input>
-                <ons-select id="select-input" style="width: 20%; margin-left: 10px">
+                <ons-search-input id="search-input" maxlength="20" placeholder="Buscar profissional por nome"
+                                  style="width: 80%;margin-right: 20px"></ons-search-input>
+                <button class="button button--light" id="search-button">
+                    <ons-icon icon="fa-search"></ons-icon>
+                </button>
+                <ons-select id="select-input" style="width: 20%; margin-left: 10px; display: none">
                     <option value="name">
                         Nome
                     </option>
@@ -47,6 +50,17 @@
         <script>
             ons.getScriptPage().onInit = function () {
                 profissionaisList();
+                $("#search-input").focusout(function () {
+                    profissionaisList($(this).val())
+                }).keypress(function (event) {
+                    let keycode = (event.keyCode ? event.keyCode : event.which);
+                    if (keycode === '13') {
+                        profissionaisList($(this).val())
+                    }
+                });
+                $("#search-button").click(function () {
+                    profissionaisList($("#search-input").val())
+                })
             }
         </script>
     </ons-page>
@@ -69,30 +83,29 @@
         <ons-row>
             <ons-carousel fullscreen id="carousel-historic" style="width: 100%">
                 <ons-carousel-item>
-                    <ons-card modifier="material">
-                        <div class="title">
-                            <h3 class="card__title" style="text-align: center;">Selecione um tipo de registro</h3>
-                        </div>
+                    <ons-list class="header-custom">
+                        <ons-list-item class="input-items">
+                            <div style="width: 60%">Filtrar resultados:</div>
+                            <ons-select id="history-filter" onchange="viewHistory()"
+                                        style="width: 30%; margin-left: 10px" readonly>
+                                <option value="1" selected>
+                                    Consulta
+                                </option>
+                                <!--                                <option value="2">-->
+                                <!--                                    Exame-->
+                                <!--                                </option>-->
+                            </ons-select>
+                        </ons-list-item>
+                    </ons-list>
+                    <ons-row>
+                        <ons-col width="100%">
+                            <ons-list style="width: 100%; margin: 0" modifier="inset material" id="historyList">
+                                <ons-lazy-repeat>
 
-                        <div class="content">
-                            <ons-row>
-                                <ons-col width="100%">
-                                    <ons-list style="width: 100%; margin: 0" modifier="inset material" id="fHist">
-                                        <ons-lazy-repeat>
-                                            <ons-list-item modifier="chevron longdivider"
-                                                           onclick="viewHistory(1)" tappable>
-                                                Consulta
-                                            </ons-list-item>
-                                            <ons-list-item modifier="chevron longdivider"
-                                                           onclick="viewHistory(2)" tappable>
-                                                Exame
-                                            </ons-list-item>
-                                        </ons-lazy-repeat>
-                                    </ons-list>
-                                </ons-col>
-                            </ons-row>
-                        </div>
-                    </ons-card>
+                                </ons-lazy-repeat>
+                            </ons-list>
+                        </ons-col>
+                    </ons-row>
                 </ons-carousel-item>
                 <ons-carousel-item>
                     <ons-row>
@@ -106,10 +119,10 @@
                     </ons-row>
                 </ons-carousel-item>
             </ons-carousel>
-
         </ons-row>
         <script>
             ons.getScriptPage().onInit = function () {
+                viewHistory();
                 loadPrescription();
             }
         </script>
@@ -130,7 +143,7 @@
                                 <div>
                                     <div><?= $this->user['info_user_name'] === null ?
                                             "Não informado" :
-                                            $this->user['info_user_name']  ?></div>
+                                            $this->user['info_user_name'] ?></div>
                                 </div>
                             </div>
                         </div>
@@ -224,7 +237,7 @@
         </ons-toolbar>
 
         <ons-card>
-            <form action="<?= $this->url('application_mobile_user', ["action" => "user-profile"]) ?>" method="post"
+            <form action="<?= $this->url('application_mobile_user', ["action" => "profile"]) ?>" method="post"
                   enctype="multipart/form-data">
                 <ons-row>
                     <ons-col width="100%">
@@ -300,17 +313,6 @@
                 </ons-row>
             </form>
         </ons-card>
-        <style>
-            .list-item__center, .list-item__right {
-                background-image: none;
-            }
-
-            .icon-spacer::before,
-            .icon-blank::before {
-                width: 1em;
-                content: ' ';
-            }
-        </style>
         <script>
             ons.getScriptPage().onInit = function () {
                 $.get('/mobile/user-profile', {json: true}, function (response) {
@@ -325,22 +327,9 @@
     </ons-page>
 </template>
 
-<template id="professionalsPage.html">
-    <ons-page id="professionalsPage">
-        <ons-toolbar modifier="noshadow">
-            <div class="left">
-                <ons-back-button>Busca</ons-back-button>
-            </div>
-            <div class="center">Resultados</div>
-        </ons-toolbar>
-        <ons-row id="fResultados">
-        </ons-row>
-    </ons-page>
-</template>
-
 <template id="detailsPage.html">
     <ons-page id="detailsPage">
-        <ons-toolbar modifier="noshadow" style="background-color: aliceblue !important;">
+        <ons-toolbar modifier="noshadow">
             <div class="left">
                 <ons-back-button>Busca</ons-back-button>
             </div>
@@ -353,7 +342,6 @@
                 <ons class="col"></ons>
                 <ons class="col" style="padding-top: 10px">SOLICITAR PROCEDIMENTO</ons>
                 <ons class="col"></ons>
-
             </ons-row>
         </ons-bottom-toolbar>
         <script>
@@ -396,7 +384,7 @@
                 <ons-card>
                     <div class="title">Preencha as informações para agendamento:</div>
                     <ons-list>
-                        <form action="<?= $this->url('application_mobile_user', ["action" => "save-appoint"]) ?>"
+                        <form action="<?= $this->url('application_mobile_user', ["action" => "appoint"]) ?>"
                               method="post" enctype="multipart/form-data" id="form-appoint">
                             <ons-list-header>Data desejada:</ons-list-header>
                             <ons-list-item class="input-items">
@@ -420,6 +408,7 @@
                             </ons-list-item>
                             <div class="form-params" style="display: none">
                                 <input type="text" id="idProf" name="fIdProf">
+                                <input type="text" name="mode" value="schedule">
                             </div>
                         </form>
                     </ons-list>
@@ -449,25 +438,51 @@
             </div>
             <div class="center"></div>
         </ons-toolbar>
-        <ons-row>
-            <ons-col>
-                <ons-card modifier="material">
-                    <div class="title">
-                        Registros existentes
-                    </div>
-                    <div class="content">
-                        <ons-row>
-                            <ons-col width="100%">
-                                <ons-list style="width: 100%; margin: 0" modifier="inset material" id="historyList">
-                                    <ons-lazy-repeat>
 
-                                    </ons-lazy-repeat>
-                                </ons-list>
-                            </ons-col>
-                        </ons-row>
-                    </div>
-                </ons-card>
-            </ons-col>
+    </ons-page>
+</template>
+
+<template id="postponeCustom.html">
+    <ons-page id="postponeCustom">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Solicitações</ons-back-button>
+            </div>
+            <div class="center">Adiar solicitação</div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-card style="width: 100%">
+                <div class="card-title">Informe para quando adiar a solicitação</div>
+                <form action="<?= $this->url('application_mobile_user', ['action' => 'appoint']) ?>"
+                      method="post" enctype="multipart/form-data" id="presForm">
+                    <ons-list-item class="input-items">
+                        <div class="left">
+                            <ons-icon icon="fa-calendar" class="list-item__icon"></ons-icon>
+                        </div>
+                        <ons-input style="width: 50%" id="" modifier="material"
+                                   name="fDate"
+                                   type="date"
+                                   float required validate></ons-input>
+                    </ons-list-item>
+                    <ons-list-item class="input-items">
+                        <div class="left">
+                            <ons-icon icon="fa-clock" class="list-item__icon"></ons-icon>
+                        </div>
+                        <ons-input style="width: 40%" id="" modifier="material"
+                                   name="fHour"
+                                   type="time"
+                                   float required validate></ons-input>
+                    </ons-list-item>
+                    <ons-list-item>
+                        <input type="text" name="origin" value="form" hidden>
+                        <input type="text" id="solic-id" name="ap_id" hidden>
+                        <input type="text" id="solic-op" name="mode" hidden>
+                        <div class="right right-label">
+                            <button type="submit" class="button">Salvar</button>
+                        </div>
+                    </ons-list-item>
+                </form>
+            </ons-card>
         </ons-row>
     </ons-page>
 </template>

@@ -7,7 +7,6 @@ use Application\Debug\UtilsFile;
 use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\UserEspeciality;
 use Application\Entity\Sis\UserInfoPessoal;
-use Auth\Entity\Seg\Usuario;
 use Authentication\Entity\Seg\User;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
@@ -117,6 +116,7 @@ class UserManager
      * Cria um usuário comum e salva a solicitação de perfil de profissional
      * @param array $data
      * @return bool
+     * @throws Exception
      */
     public function createProfessional($data)
     {
@@ -177,6 +177,7 @@ class UserManager
      * Criação de um usuário de atendente
      * @param array $data Informações do atendent
      * @return bool
+     * @throws Exception
      */
     public function createAttendant($data){
         $user = $this->entityManager->getRepository(User::class)->findOneByEmail($data['fEmail']);

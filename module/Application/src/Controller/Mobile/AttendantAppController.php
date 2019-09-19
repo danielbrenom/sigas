@@ -80,7 +80,7 @@ class AttendantAppController extends AbstractActionController
         $response = [];
         switch ($params['mode']) {
             case 'list':
-                $response = $this->mobileRepository->getUsersAtendidosProfessional($params['pid']);
+                $response = $this->mobileRepository->getUsersAtendidosProfessional($params);
                 break;
             case 'details':
                 $pacInfo = $this->mobileRepository->getUserInformation($params['pac_id'], 3)[0];
@@ -215,6 +215,20 @@ class AttendantAppController extends AbstractActionController
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    public function notifACtion()
+    {
+        if ($this->getRequest()->isPost()) {
+            $params = $this->params()->fromPost();
+            if ($this->mobileRepository->saveNotifis($params)) {
+                $this->mobileRepository->setMessage("Notificação salva. Os compromissos existentes no período foram cancelados.", 1);
+            } else {
+                $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde", 0);
+            }
+            return $this->redirect()->toRoute('application_mobile_attendant');
+        }
+        return $this->getResponse()->setStatusCode(400);
     }
 
     public function getLogMessagesAction()

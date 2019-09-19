@@ -32,6 +32,10 @@ class ProfessionalInfo
      * @ORM\Column(name="prof_addresses")
      */
     protected $prof_addresses;
+    /**
+     * @ORM\Column(name="professional_about")
+     */
+    protected $professional_about;
 
     /**
      * @ORM\Column(name="cons_name")
@@ -180,4 +184,21 @@ class ProfessionalInfo
     {
         $this->prof_addresses = $prof_addresses;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getProfessionalAbout()
+    {
+        return $this->professional_about;
+    }
+
+    /**
+     * @param mixed $professional_about
+     */
+    public function setProfessionalAbout($professional_about)
+    {
+        $this->professional_about = $professional_about;
+    }
+
 }

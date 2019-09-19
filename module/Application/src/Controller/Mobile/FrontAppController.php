@@ -22,11 +22,12 @@ class FrontAppController extends AbstractActionController
         $this->mobileManager = $mr;
     }
 
-    public function getProfissionaisAction()
+    public function profissionaisAction()
     {
         $params = $this->getRequest()->getQuery()->toArray();
-        $infos = $this->mobileManager->getProfissinais();
+        $infos = $this->mobileManager->getProfissinais($params);
 //        UtilsFile::printvardie($infos);
+        $results = [];
         foreach ($infos as $info) {
             $results[] = [
                 'u_id' => $info['u_id'],

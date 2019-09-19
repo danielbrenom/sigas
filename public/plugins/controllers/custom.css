@@ -27,6 +27,24 @@ ons-progress-circular {
     margin: 0 !important;
 }
 
+/*Ratings*/
+.rating {
+    direction: rtl;
+    unicode-bidi: bidi-override;
+    color: #ddd; /* Personal choice */
+}
+
+.rating input {
+    display: none;
+}
+
+.rating label:hover,
+.rating label:hover ~ label,
+.rating input:checked + label,
+.rating input:checked + label ~ label {
+    color: #ffc107; /* Personal color choice. Lifted from Bootstrap 4 */
+}
+
 /*Badge*/
 .badge {
     padding: 5px 12px;

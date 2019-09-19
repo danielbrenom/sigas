@@ -18,9 +18,12 @@
     <ons-page id="Tab1">
         <ons-list class="header-custom" style="background-color: #fafafa">
             <ons-list-item class="input-items">
-                <ons-search-input id="search-input" maxlength="20" placeholder="Buscar profissional"
-                                  style="width: 70%"></ons-search-input>
-                <ons-select id="select-input" style="width: 20%; margin-left: 10px">
+                <ons-search-input id="search-input" maxlength="20" placeholder="Buscar profissional por nome"
+                                  style="width: 80%;margin-right: 20px"></ons-search-input>
+                <button class="button button--light" id="search-button">
+                    <ons-icon icon="fa-search"></ons-icon>
+                </button>
+                <ons-select id="select-input" style="width: 20%; margin-left: 10px; display: none">
                     <option value="name">
                         Nome
                     </option>
@@ -45,6 +48,19 @@
         <script>
             ons.getScriptPage().onInit = function () {
                 profissionaisList();
+                // $("#search-input").submit(function () {
+                //     profissionaisList($(this).val())
+                // }).focusout(function () {
+                //     profissionaisList($(this).val())
+                // }).keypress(function(event){
+                //     let keycode = (event.keyCode ? event.keyCode : event.which);
+                //     if(keycode === '13'){
+                //         profissionaisList($(this).val())
+                //     }
+                // });
+                $("#search-button").click(function () {
+                    profissionaisList($("#search-input").val())
+                })
             }
         </script>
     </ons-page>

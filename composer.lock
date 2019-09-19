@@ -3534,8 +3534,8 @@
             "authors": [
                 {
                     "name": "Marco Pivetta",
-                    "role": "maintainer",
-                    "email": "ocramius@gmail.com"
+                  "email": "ocramius@gmail.com",
+                  "role": "maintainer"
                 }
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",

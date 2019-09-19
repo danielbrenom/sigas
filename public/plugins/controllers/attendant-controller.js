@@ -156,14 +156,19 @@ function initializeSolics() {
     })
 }
 
-function loadPacientes() {
-    $.get('/mobile/attendant/pacientes', {mode: 'list', pid: $("#prof-input").val()}, function (response) {
+function loadPacientes(query) {
+    query = query || null
+    $.get('/mobile/attendant/pacientes', {
+        mode: 'list',
+        search: query,
+        pid: $("#prof-input").val()
+    }, function (response) {
         let list = $("#fHistPac ons-lazy-repeat");
         list.empty();
+        if (response.length === 0) {
+            list.append('<ons-list-item>Não foram encontrados pacientes, tente buscar outro nome</ons-list-item>');
+        }
         $.each(response, function (key, value) {
-            // let item = '<ons-list-item modifier="chevron longdivider" tappable onclick="fn.loadPacienteInfo(' + value.id + ')">' +
-            //     value.user_name +
-            //     '</ons-list-item>';
             let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
                 '                        <div class="left">' +
                 '                            <img class="list-item__thumbnail" src="http://placekitten.com/g/40/40">' +
@@ -321,9 +326,9 @@ function handleNotifs(op) {
                         '                <ons-row class="option-buttons">' +
                         '                     <ons-col>Em: ' + start.toLocaleDateString() + ' ' + start.toLocaleTimeString() +
                         '                     </ons-col>' +
-                        '                     <ons-col>às ' + end.toLocaleDateString() + ' 18:00:00' +
-                        '                     </ons-col>' +
                         '                     <ons-col>' +
+                        '                     </ons-col>' +
+                        '                     <ons-col>até ' + end.toLocaleDateString() + ' 18:00:00' +
                         '                     </ons-col>' +
                         '                     <ons-col>' +
                         '                    </ons-col>' +

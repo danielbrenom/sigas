@@ -55,7 +55,7 @@ class UserAppController extends AbstractActionController
 //        UtilsFile::printvardie($this->mobileManager->getUserInformation($activeUser['user_id'],3));
         return new ViewModel([
             'userstate' => $this->authManager->userState(),
-            'user' => $this->mobileManager->getUserInformation($activeUser['user_id'],3)[0]
+            'user' => $this->mobileManager->getUserInformation($activeUser['user_id'], 3)[0]
         ]);
     }
 
@@ -72,6 +72,12 @@ class UserAppController extends AbstractActionController
         $infos[0]['pi_prof_addresses'] = Json::decode($infos[0]['pi_prof_addresses']);
         $infos[0]['esp_desc_especialidade'] = $infos[0]['pi_id_especiality'] == null ? "Aguardando verificação" : $infos[0]['esp_desc_especialidade'];
         $infos[0]['procedures'] = $this->mobileManager->getProceduresProfessional($params['id_user']);
+        $infos[0]['had_appoint'] = $this->mobileManager->wasAtendidoProfessional(
+                ['pid' => $params['id_user'],
+                    'uid' => $this->authManager->getActiveUser()['user_id']]) && $this->mobileManager->haveRated(
+                ['pid' => $params['id_user'],
+                    'uid' => $this->authManager->getActiveUser()['user_id']]);
+        $infos[0]['ratings'] = $this->mobileManager->getRatings(['pid' => $params['id_user']]);
         $view = new ViewModel([
             'prof' => $infos
         ]);
@@ -79,20 +85,24 @@ class UserAppController extends AbstractActionController
         return $view;
     }
 
-    public function getProfissionaisAction()
+    public function profissionaisAction()
     {
-        $params = $this->getRequest()->getQuery()->toArray();
-        $infos = $this->mobileManager->getProfissinais();
-        foreach ($infos as $info) {
-            $results[] = [
-                'u_id' => $info['u_id'],
-                'info_user_name' => $info['info_user_name'],
-                'info_user_addr' => Json::decode($info['pi_prof_addresses'])[0],
-                'ue_desc_especialidade' => $info['pi_id_especiality'] == null ? "Aguardando verificação" : $info['ue_desc_especialidade'],
-                'confirmed' => $info['pi_confirmed_in'] == null ? false : true
-            ];
+        if ($this->getRequest()->isGet()) {
+            $params = $this->getRequest()->getQuery()->toArray();
+            $infos = $this->mobileManager->getProfissinais($params);
+            $results = [];
+            foreach ($infos as $info) {
+                $results[] = [
+                    'u_id' => $info['u_id'],
+                    'info_user_name' => $info['info_user_name'],
+                    'info_user_addr' => Json::decode($info['pi_prof_addresses'])[0],
+                    'ue_desc_especialidade' => $info['pi_id_especiality'] == null ? "Aguardando verificação" : $info['ue_desc_especialidade'],
+                    'confirmed' => $info['pi_confirmed_in'] == null ? false : true
+                ];
+            }
+            return new JsonModel($results);
         }
-        return new JsonModel($results);
+        return $this->getResponse()->setStatusCode(400);
     }
 
     public function getEspecialidadesAction()
@@ -135,16 +145,16 @@ class UserAppController extends AbstractActionController
         return new JsonModel($results);
     }
 
-    public function userProfileAction()
+    public function profileAction()
     {
         $activeUser = $this->authManager->getActiveUser();
         if ($this->getRequest()->isPost()) {
-            if($this->mobileManager->updateUserInfo($this->params()->fromPost(), $activeUser['user_id'])){
+            if ($this->mobileManager->updateUserInfo($this->params()->fromPost(), $activeUser['user_id'])) {
                 $this->mobileManager->setMessage('Informações alteradas.', 1);
             }
             return $this->redirect()->toRoute('home');
         }
-        if ($this->params()->fromQuery('json')) {
+        if ($this->getRequest()->isGet()) {
             $data = $this->mobileManager->getUserInformation($activeUser['user_id'], 3)[0];
             $info = [
                 'info_user_name' => $data['info_user_name'],
@@ -157,34 +167,74 @@ class UserAppController extends AbstractActionController
             ];
             return new JsonModel($info);
         }
-        return new JsonModel(['Solicitação inválida']);
+        return $this->getResponse()->setStatusCode(400);
     }
 
-    public function saveAppointAction()
+    public function appointAction()
     {
-        $params = $this->params()->fromPost();
-        $vData = [
-            "datareq" => UtilsFile::formataDataToBdSemHora($params['fDataReq']),
-            "horareq" => $params['fHoraReq'],
-            "proc" => $params['fProcdReq'],
-            "user_req" => $this->authManager->getActiveUser()['user_id'],
-            "prof_req" => $params['fIdProf']
-        ];
-//        UtilsFile::printvar($vData);
         try {
-            if ($this->mobileManager->saveAppointment($vData)) {
-                $this->mobileManager->setMessage("Solicitação salva com sucesso", 1);
-                $this->redirect()->toRoute('application_mobile_user');
-            } else {
-                //Mostrar que ocorreu um erro
-                $this->mobileManager->setMessage("Ocorreu um erro ao realizar a solicitação. \n 
+            if ($this->getRequest()->isPost()) {
+                $params = $this->params()->fromPost();
+                $result = false;
+                $redirect = false;
+                switch ($params['mode']) {
+                    case 'schedule':
+                        $vData = [
+                            "datareq" => UtilsFile::formataDataToBdSemHora($params['fDataReq']),
+                            "horareq" => $params['fHoraReq'],
+                            "proc" => $params['fProcdReq'],
+                            "user_req" => $this->authManager->getActiveUser()['user_id'],
+                            "prof_req" => $params['fIdProf']
+                        ];
+                        $result = $this->mobileManager->saveAppointment($vData);
+                        $redirect = true;
+                        break;
+                    case 'reschedule':
+                        $params['status'] = 3;
+                        $result = $this->mobileManager->handleAppointment($params);
+                        $redirect = array_key_exists('origin', $params);
+                        break;
+                    case 'cancel':
+                        $params['status'] = 4;
+                        $result = $this->mobileManager->handleAppointment($params);
+                        $redirect = false;
+                        break;
+                }
+                if (!$redirect) {
+                    return new JsonModel([
+                        'code' => 1,
+                        'message' => 'A alteração da solicitação foi salva.'
+                    ]);
+                }
+                if ($result) {
+                    $this->mobileManager->setMessage("Solicitação salva com sucesso", 1);
+                } else {
+                    //Mostrar que ocorreu um erro
+                    $this->mobileManager->setMessage("Ocorreu um erro ao realizar a solicitação. \n 
                 Por favor tente novamente mais tarde", 0);
-                $this->redirect()->toRoute('application_mobile_user');
+                }
+                return $this->redirect()->toRoute('application_mobile_user');
             }
+            return $this->getResponse()->setStatusCode(400);
         } catch (Exception $e) {
             $this->mobileManager->setMessage($e->getMessage(), 0);
-            $this->redirect()->toRoute('home');
+            return $this->redirect()->toRoute('home');
         }
+    }
+
+    public function ratingAction()
+    {
+        if ($this->getRequest()->isPost()) {
+            $params = $this->params()->fromPost();
+            $params['userid'] = $this->authManager->getActiveUser()['user_id'];
+            if ($this->mobileManager->saveRating($params)) {
+                $this->mobileManager->setMessage("Avaliação salva!", 1);
+            } else {
+                $this->mobileManager->setMessage("Erro ao salvar avaliação, tente novamente", 0);
+            }
+            return $this->redirect()->toRoute('application_mobile_user');
+        }
+        return $this->getResponse()->setStatusCode(400);
     }
 
     public function getLogMessagesAction()

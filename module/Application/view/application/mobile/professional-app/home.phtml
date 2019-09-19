@@ -99,17 +99,20 @@
     <ons-page id="Tab2">
         <ons-list class="header-custom" style="background-color: #fafafa">
             <ons-list-item class="input-items">
-                <ons-search-input id="search-input" maxlength="20" placeholder="Buscar paciente"
-                                  style="width: 70%"></ons-search-input>
-                <ons-select id="select-input" style="width: 20%; margin-left: 10px">
+                <ons-search-input id="search-input" maxlength="20" placeholder="Buscar profissional por nome"
+                                  style="width: 80%;margin-right: 20px"></ons-search-input>
+                <button class="button button--light" id="search-button">
+                    <ons-icon icon="fa-search"></ons-icon>
+                </button>
+                <ons-select id="select-input" style="width: 20%; margin-left: 10px; display: none">
                     <option value="name">
                         Nome
                     </option>
                     <option value="React">
-                        React
+                        Especialidade
                     </option>
                     <option value="Angular">
-                        Angular
+                        Endereço
                     </option>
                 </ons-select>
             </ons-list-item>
@@ -142,6 +145,17 @@
         <script>
             ons.getScriptPage().onInit = function () {
                 loadPacientes();
+                $("#search-input").focusout(function () {
+                    loadPacientes($(this).val())
+                }).keypress(function (event) {
+                    let keycode = (event.keyCode ? event.keyCode : event.which);
+                    if (keycode === '13') {
+                        loadPacientes($(this).val())
+                    }
+                });
+                $("#search-button").click(function () {
+                    loadPacientes($("#search-input").val())
+                })
             }
         </script>
     </ons-page>
@@ -295,7 +309,8 @@
                                             <div class="profile_info_wrapper">
                                                 <div class="profile_info_numbers">
                                                     <div>
-                                                        <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(2)">
+                                                        <ons-toolbar-button style="float: right; padding: 0"
+                                                                            onclick="editInfo(2)">
                                                             <ons-icon icon="ion-edit"></ons-icon>
                                                         </ons-toolbar-button>
                                                         <div class="profile_info_text">Atendentes registrados</div>
@@ -306,7 +321,8 @@
                                                         <?php endforeach; ?>
                                                     </div>
                                                     <div style="margin-top: 20px">
-                                                        <ons-toolbar-button style="float: right; padding: 0" onclick="editInfo(3)">
+                                                        <ons-toolbar-button style="float: right; padding: 0"
+                                                                            onclick="editInfo(3)">
                                                             <ons-icon icon="ion-edit"></ons-icon>
                                                         </ons-toolbar-button>
                                                         <div class="profile_info_text">Procedimentos registrados</div>
@@ -347,7 +363,7 @@
         </ons-toolbar>
 
         <ons-card>
-            <form action="<?= $this->url('application_mobile_prof', ["action" => "get-profile"]) ?>" method="post"
+            <form action="<?= $this->url('application_mobile_prof', ["action" => "profile"]) ?>" method="post"
                   enctype="multipart/form-data">
                 <ons-row>
                     <ons-col width="100%">
@@ -415,7 +431,7 @@
         <ons-card>
             <ons-row>
                 <ons-col>
-                    <form action="<?= $this->url('application_mobile_prof', ['action' => 'get-profile']) ?>"
+                    <form action="<?= $this->url('application_mobile_prof', ['action' => 'profile']) ?>"
                           method="post" enctype="multipart/form-data">
                         <ons-list-item class="input-items">
                             <div class="left">
@@ -454,12 +470,24 @@
                             </div>
                             <ons-input style="width: 80%" id="info_user_addr" modifier="material" name="fEnd[]"
                                        type="text"
-                                       placeholder="Endereço Principal" float validate></ons-input>
+                                       placeholder="Endereço Principal"
+                                       value="<?= $this->user['pi_prof_addresses'][0] ?>" float validate></ons-input>
                             <button type="button" class="fab fab--mini" onclick="addAddress()"><i
                                         class="zmdi zmdi-plus"></i></button>
                         </ons-list-item>
                         <div class="addr-area">
-
+                            <?php foreach ($this->user['pi_prof_addresses'] as $key => $addr): if ($key > 0): ?>
+                                <ons-list-item class="input-items end">
+                                    <div class="left">
+                                        <ons-icon icon="fa-map-marker-alt" class="list-item__icon"></ons-icon>
+                                    </div>
+                                    <ons-input style="width: 80%" id="info_user_addr" modifier="material" name="fEnd[]"
+                                               type="text" value="<?= $addr ?>"
+                                               placeholder="Endereço Adicional" float validate></ons-input>
+                                    <button type="button" class="fab fab--mini" onclick="removeAddress()"><i
+                                                class="zmdi zmdi-minus"></i></button>
+                                </ons-list-item>
+                            <?php endif; endforeach; ?>
                         </div>
                         <ons-list-item class="input-items">
                             <div class="left">
@@ -476,6 +504,13 @@
                             <ons-input style="width: 100%" id="info_user_ctt_res" modifier="material"
                                        name="fTelRes" type="text"
                                        placeholder="Telefone Clinica" float validate></ons-input>
+                        </ons-list-item>
+                        <ons-list-item class="input-items">
+                            <div class="left">
+                                <ons-icon icon="fa-user" class="list-item__icon"></ons-icon>
+                            </div>
+                            <textarea id="pi_professional_about" class="textarea" style="width: 100%" rows="4"
+                                      name="fAbout" placeholder="Breve resumo de seu perfil"></textarea>
                         </ons-list-item>
                         <ons-list-item>
                             <div class="right right-label">

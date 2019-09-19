@@ -97,17 +97,20 @@
     <ons-page id="Tab2">
         <ons-list class="header-custom" style="background-color: #fafafa">
             <ons-list-item class="input-items">
-                <ons-search-input id="search-input" maxlength="20" placeholder="Buscar paciente"
-                                  style="width: 70%"></ons-search-input>
-                <ons-select id="select-input" style="width: 20%; margin-left: 10px">
+                <ons-search-input id="search-input" maxlength="20" placeholder="Buscar profissional por nome"
+                                  style="width: 80%;margin-right: 20px"></ons-search-input>
+                <button class="button button--light" id="search-button">
+                    <ons-icon icon="fa-search"></ons-icon>
+                </button>
+                <ons-select id="select-input" style="width: 20%; margin-left: 10px; display: none">
                     <option value="name">
                         Nome
                     </option>
                     <option value="React">
-                        React
+                        Especialidade
                     </option>
                     <option value="Angular">
-                        Angular
+                        Endereço
                     </option>
                 </ons-select>
             </ons-list-item>
@@ -140,6 +143,17 @@
         <script>
             ons.getScriptPage().onInit = function () {
                 loadPacientes();
+                $("#search-input").focusout(function () {
+                    loadPacientes($(this).val())
+                }).keypress(function (event) {
+                    let keycode = (event.keyCode ? event.keyCode : event.which);
+                    if (keycode === '13') {
+                        loadPacientes($(this).val())
+                    }
+                });
+                $("#search-button").click(function () {
+                    loadPacientes($("#search-input").val())
+                })
             }
         </script>
     </ons-page>
@@ -739,7 +753,7 @@
             </div>
         </ons-toolbar>
         <ons-card>
-            <form action="<?= $this->url('application_mobile_prof', ["action" => "save-historic"]) ?>" method="post"
+            <form action="<?= $this->url('application_mobile_attendant', ["action" => "notif"]) ?>" method="post"
                   enctype="multipart/form-data">
                 <ons-row>
                     <ons-col width="100%">
@@ -777,7 +791,7 @@
                         </ons-list-item>
                         <ons-list-item>
                             <div class="right right-label" style="background-image: none">
-                                <input type="text" name="op" value="notif" hidden>
+                                <input type="text" name="idprof" id="notfpid" value="" hidden>
                                 <button type="submit" class="button">Salvar</button>
                             </div>
                         </ons-list-item>
@@ -785,6 +799,11 @@
                 </ons-row>
             </form>
         </ons-card>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                $("#notfpid").val($("#prof-input").val());
+            }
+        </script>
     </ons-page>
 </template>
 

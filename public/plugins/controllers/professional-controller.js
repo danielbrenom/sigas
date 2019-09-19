@@ -142,10 +142,14 @@ function initializeSolics() {
     })
 }
 
-function loadPacientes() {
-    $.get('/mobile/prof/get-pacientes', {mode: 'list'}, function (response) {
+function loadPacientes(query) {
+    query = query || null
+    $.get('/mobile/prof/pacientes', {mode: 'list', search: query}, function (response) {
         let list = $("#fHistPac ons-lazy-repeat");
         list.empty();
+        if (response.length === 0) {
+            list.append('<ons-list-item>Não foram encontrados pacientes, tente buscar outro nome</ons-list-item>');
+        }
         $.each(response, function (key, value) {
             let item = '<ons-list-item class="item-custom" modifier="longdivider">' +
                 '                        <div class="left">' +
@@ -183,7 +187,7 @@ function loadPacienteInfo(id) {
         timeout: 1000,
     });
     window.pacId = id;
-    $.get('/mobile/prof/get-pacientes', {mode: 'details', pac_id: id}, function (response) {
+    $.get('/mobile/prof/pacientes', {mode: 'details', pac_id: id}, function (response) {
         $("#mainNavigator")[0].pushPage('pacProfile.html').then(() => {
             $.each(response, function (key, value) {
                 $("#" + key).empty().append(value);
@@ -201,7 +205,7 @@ function loadPacienteInfo(id) {
 }
 
 function loadProcedures(type) {
-    $.get('/mobile/prof/get-pacientes', {mode: 'procedure', ptype: type, user: window.pacId}, function (response) {
+    $.get('/mobile/prof/pacientes', {mode: 'procedure', ptype: type, user: window.pacId}, function (response) {
         $("#mainNavigator")[0].pushPage('historicViewPage.html').then(() => {
             let area = $("#regisList ons-lazy-repeat");
             area.empty();
@@ -392,11 +396,13 @@ function addRem() {
 function editInfo(type) {
     switch (type) {
         case 1:
-            $.get('/mobile/prof/get-profile', {type: 'prof'}, function (response) {
+            $.get('/mobile/prof/profile', {type: 'prof'}, function (response) {
                 $("#mainNavigator")[0].pushPage('editInfoProfForm.html').then(() => {
                     $.each(response, function (key, value) {
-                        $("#" + key).val(value);
-                    })
+                        if (key !== "info_user_addr") {
+                            $("#" + key).val(value);
+                        }
+                    });
                 });
             });
             break;
@@ -464,9 +470,9 @@ function handleNotifs(op) {
                         '                <ons-row class="option-buttons">' +
                         '                     <ons-col>Em: ' + start.toLocaleDateString() + ' ' + start.toLocaleTimeString() +
                         '                     </ons-col>' +
-                        '                     <ons-col>às ' + end.toLocaleDateString() + ' 18:00:00' +
-                        '                     </ons-col>' +
                         '                     <ons-col>' +
+                        '                     </ons-col>' +
+                        '                     <ons-col>até ' + end.toLocaleDateString() + ' 18:00:00' +
                         '                     </ons-col>' +
                         '                     <ons-col>' +
                         '                    </ons-col>' +

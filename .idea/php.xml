@@ -53,7 +53,6 @@
       <path value="$PROJECT_DIR$/vendor/zendframework/zend-crypt" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php73" />
       <path value="$PROJECT_DIR$/vendor/symfony/service-contracts" />
-      <path value="$PROJECT_DIR$/vendor/symfony/contracts" />
       <path value="$PROJECT_DIR$/vendor/true/punycode" />
       <path value="$PROJECT_DIR$/vendor/zendframework/zend-mime" />
       <path value="$PROJECT_DIR$/vendor/zendframework/zend-mail" />

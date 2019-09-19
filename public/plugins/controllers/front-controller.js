@@ -9,10 +9,14 @@ $().ready(function () {
     }
 });
 
-function profissionaisList() {
-    $.get("/mobile/front/get-profissionais", {}, function (response) {
+function profissionaisList(query) {
+    query = query || null;
+    $.get("/mobile/front/profissionais", {search: query}, function (response) {
         let area = $("#list-profs ons-lazy-repeat");
         area.empty();
+        if (response.length === 0) {
+            area.append('<ons-list-item>Não foram encontrados profissionais, tente buscar outro nome</ons-list-item>');
+        }
         $.each(response, function (key, value) {
             let badge = '';
             if(value.confirmed){
@@ -62,7 +66,7 @@ function singupForm(type) {
 
 function selectP(id) {
     let html;
-    $.get("/mobile/front/get-profissionais", {esp: id}, function (data) {
+    $.get("/mobile/front/profissionais", {esp: id}, function (data) {
         html = data;
     }).then(function () {
         $('#mainNavigator')[0].pushPage('professionalsPage.html').then(function () {
@@ -81,12 +85,11 @@ function viewDetails(id) {
             $('#fInformacoes').empty();
             $('#fInformacoes').append(html);
             let addr = formattAddr($("#addr_text").text());
-            if (addr === "") {
+            if (addr !== "") {
                 $.get('https://nominatim.openstreetmap.org/search.php', {
                     q: addr,
                     format: 'json'
                 }, function (response) {
-                    console.log(response);
                     let map = L.map("mapid", {
                         zoomControl: false,
                         dragging: false

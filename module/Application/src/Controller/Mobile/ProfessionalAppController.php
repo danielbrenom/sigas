@@ -83,13 +83,15 @@ class ProfessionalAppController extends AbstractActionController
         );
     }
 
-    public function getPacientesAction()
+    public function pacientesAction()
     {
         $params = $this->params()->fromQuery();
         $response = [];
         switch ($params['mode']) {
             case 'list':
-                $response = $this->mobileRepository->getUsersAtendidosProfessional($this->authManager->getActiveUser()['user_id']);
+                $response = $this->mobileRepository->getUsersAtendidosProfessional(
+                    ['prof_id' => $this->authManager->getActiveUser()['user_id'],
+                        'search' => $params['search']]);
                 break;
             case 'details':
                 $pacInfo = $this->mobileRepository->getUserInformation($params['pac_id'], 3)[0];
@@ -113,50 +115,48 @@ class ProfessionalAppController extends AbstractActionController
         return new JsonModel($response);
     }
 
-    public function getProfileAction()
+    public function profileAction()
     {
         $userId = $this->authManager->getActiveUser()['user_id'];
         if ($this->getRequest()->isPost()) {
             $params = $this->params()->fromPost();
-            if ($params['fOp'] == 'profp') {
-                if ($this->mobileRepository->updateProfissionalJobInfo($params, $userId)) {
-                    $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
-                } else {
-                    $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
-                }
-            } elseif ($params['fOp'] == 'pesp') {
-                if ($this->mobileRepository->updateProfissionalPesInfo($params, $userId)) {
-                    $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
-                } else {
-                    $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
-                }
+            $response = false;
+            if ($params['fOp'] === 'profp') {
+                $response = $this->mobileRepository->updateProfissionalJobInfo($params, $userId);
+            } elseif ($params['fOp'] === 'pesp') {
+                $response = $this->mobileRepository->updateProfissionalPesInfo($params, $userId);
+            }
+            if ($response) {
+                $this->mobileRepository->setMessage("Informações atualizadas, aguarde confirmação", 1);
+            } else {
+                $this->mobileRepository->setMessage("Ocorreu um erro, tente novamente mais tarde.", 0);
             }
             return $this->redirect()->toRoute('application_mobile_prof');
         }
-
-        $params = $this->params()->fromQuery();
-        switch ($params['type']) {
-            case 'pes':
-                break;
-            case 'prof':
-                $profInfo = $this->mobileRepository->getProfissionalInfo($userId, true)[0];
-                $response = [
-                    'info_user_addr' => $profInfo['info_user_addr'],
-                    'info_user_ctt_phone' => $profInfo['info_user_ctt_phone'],
-                    'info_user_ctt_res' => $profInfo['info_user_ctt_res'],
-                    'pi_cons_name' => $profInfo['pi_cons_name'],
-                    'pi_cons_registry' => $profInfo['pi_cons_registry'],
-                    'pi_especiality_solicited' => $profInfo['pi_especiality_solicited'],
-                ];
-                break;
-            default:
-                $response = [
-                    'code' => 0,
-                    'message' => 'Solicitação inválida'
-                ];
-                break;
+        if ($this->getRequest()->isGet()) {
+            $params = $this->params()->fromQuery();
+            switch ($params['type']) {
+                case 'pes':
+                    break;
+                case 'prof':
+                    $profInfo = $this->mobileRepository->getProfissionalInfo($userId, true)[0];
+                    $response = [
+                        'info_user_addr' => Json::decode($profInfo['pi_prof_addresses']),
+                        'pi_professional_about' => $profInfo['pi_professional_about'],
+                        'info_user_ctt_phone' => $profInfo['info_user_ctt_phone'],
+                        'info_user_ctt_res' => $profInfo['info_user_ctt_res'],
+                        'pi_cons_name' => $profInfo['pi_cons_name'],
+                        'pi_cons_registry' => $profInfo['pi_cons_registry'],
+                        'pi_especiality_solicited' => $profInfo['pi_especiality_solicited'],
+                    ];
+                    break;
+                default:
+                    return $this->getResponse()->setStatusCode(400);
+                    break;
+            }
+            return new JsonModel($response);
         }
-        return new JsonModel($response);
+        return $this->getResponse()->setStatusCode(400);
     }
 
     public function attendantAction()
