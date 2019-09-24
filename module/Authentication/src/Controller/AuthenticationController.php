@@ -120,7 +120,7 @@ class AuthenticationController extends AbstractActionController
                 if (!$emailValidator->isValid($data['fEmail'])) {
                     throw new Exception('Email inválido');
                 }
-                $this->userManager->createUser($data['fEmail'], $data['fPass']);
+                $this->userManager->createUser($data);
                 $this->mobileRepository->setMessage("Usuário criado com sucesso. \n Efetue login.", 1);
                 $this->redirect()->toRoute('home');
             } else {

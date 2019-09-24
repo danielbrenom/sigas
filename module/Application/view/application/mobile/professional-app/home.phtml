@@ -193,7 +193,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <ons-row class="profile_button_bar_profile">
                     <ons-col>
@@ -329,6 +328,18 @@
                                                         <?php foreach ($this->proceds as $proced) : ?>
                                                             <div>
                                                                 <?= $proced['procedure_description'] ?>
+                                                            </div>
+                                                        <?php endforeach; ?>
+                                                    </div>
+                                                    <div style="margin-top: 20px">
+                                                        <ons-toolbar-button style="float: right; padding: 0"
+                                                                            onclick="editInfo(4)">
+                                                            <ons-icon icon="ion-edit"></ons-icon>
+                                                        </ons-toolbar-button>
+                                                        <div class="profile_info_text">Planos de Saúde aceitos</div>
+                                                        <?php foreach ($this->healthcares as $hc) : ?>
+                                                            <div>
+                                                                <?= $hc['desc_healthcare'] ?>
                                                             </div>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -591,6 +602,39 @@
         <script>
             ons.getScriptPage().onInit = function () {
                 loadProcedureGer();
+            }
+        </script>
+    </ons-page>
+</template>
+
+<template id="manageHc.html">
+    <ons-page id="manageHc">
+        <ons-toolbar modifier="noshadow">
+            <div class="left">
+                <ons-back-button>Perfil</ons-back-button>
+            </div>
+            <div class="center"></div>
+        </ons-toolbar>
+        <ons-row>
+            <ons-col>
+                <ons-card>
+                    <div class="title">Gerenciamento de Procedimentos Realizados</div>
+                    <form action="/mobile/prof/healthcare" method="post">
+                        <div id="healthGArea" style="margin: 10px 0">
+                            <ons-list></ons-list>
+                        </div>
+                        <ons-list-item>
+                            <div class="right right-label">
+                                <button type="submit" class="button">Salvar</button>
+                            </div>
+                        </ons-list-item>
+                    </form>
+                </ons-card>
+            </ons-col>
+        </ons-row>
+        <script>
+            ons.getScriptPage().onInit = function () {
+                loadHealthcareGer();
             }
         </script>
     </ons-page>

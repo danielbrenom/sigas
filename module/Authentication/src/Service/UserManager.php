@@ -67,9 +67,9 @@ class UserManager
      * @return bool
      * @throws \Exception
      */
-    public function createUser($email, $password)
+    public function createUser($data)
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($email);
+        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($data['fEmail']);
         /**  @TODO: Criar usuário e também suas informações
          *   Inserir as informações na tabela de seg usuario e info usuario
          * */
@@ -78,10 +78,11 @@ class UserManager
             if ($user === null) {
                 $this->entityManager->beginTransaction();
                 $newUser = new User();
-                $newUser->setEmail($email);
+                $newUser->setEmail($data['fEmail']);
                 $bcrypt = new Bcrypt();
-                $newUser->setUserPassword($bcrypt->create($password));
+                $newUser->setUserPassword($bcrypt->create($data['fPass']));
                 $newUser->setCreationDate(date('Y-m-d H:i:s'));
+                $newUser->setIdUserType(1);
                 $this->entityManager->persist($newUser);
                 $this->entityManager->flush();
                 $lastId = $newUser->getIdUser();
@@ -89,7 +90,8 @@ class UserManager
                 $userEspec = $this->entityManager->getRepository(UserEspeciality::class)->find(1);
                 $userPersonalInfo = new UserInfoPessoal();
                 $userPersonalInfo->setId($lastId);
-                $userPersonalInfo->setUserEmail($email);
+                $userPersonalInfo->setUserName($data['fName']);
+                $userPersonalInfo->setUserEmail($data['fEmail']);
                 //$userPersonalInfo->setIdEspecialidade(1);
                 $userPersonalInfo->setUserEspeciality($userEspec);
                 $userPersonalInfo->setUserCpf(" ");

@@ -305,6 +305,25 @@ function loadProcedureGer() {
     });
 }
 
+function loadHealthcareGer() {
+    $.get('/mobile/prof/healthcare', {}, function (response) {
+        let area = $("#healthGArea ons-list");
+        area.empty();
+        $.each(response, function (key, value) {
+            let check = value.is_hc === true ? "checked" : "";
+            let item = '<ons-list-item tappable>' +
+                '       <label class="left">' +
+                '        <ons-checkbox name="fSelects[]" value="' + value.hc_id + '" ' + check + ' input-id="check-' + key + '"></ons-checkbox>' +
+                '      </label>' +
+                '      <label for="check-' + key + '" class="center">' +
+                value.hc_desc_healthcare +
+                '      </label>' +
+                '</ons-list-item>';
+            area.append(item);
+        });
+    });
+}
+
 function insertHistoric(type) {
     let areas = ['pres', 'rx', 'rem', 'note'];
     $("#mainNavigator")[0].pushPage('addHistoric.html').then(() => {
@@ -414,6 +433,9 @@ function editInfo(type) {
             break;
         case 3:
             $("#mainNavigator")[0].pushPage('manageProced.html');
+            break;
+            case 4:
+            $("#mainNavigator")[0].pushPage('manageHc.html');
             break;
     }
 }

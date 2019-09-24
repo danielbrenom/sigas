@@ -9,6 +9,7 @@ use Application\Entity\Seg\User;
 use Application\Entity\Sis\Procedures;
 use Application\Entity\Sis\ProfessionalAttendants;
 use Application\Entity\Sis\ProfessionalConselhos;
+use Application\Entity\Sis\ProfessionalHealthcares;
 use Application\Entity\Sis\ProfessionalInfo;
 use Application\Entity\Sis\ProfessionalNotif;
 use Application\Entity\Sis\ProfessionalRatings;
@@ -247,6 +248,16 @@ class MobileRepository
             ->getQuery()->getResult(3);
     }
 
+    public function getHealthcareProfessional($id_prof){
+        return $this->entityManager->getRepository(ProfessionalHealthcares::class)
+            ->createQueryBuilder('phc')
+            ->addSelect('uhc.desc_healthcare')
+            ->leftJoin(UserHealthcare::class, 'uhc', 'WITH', 'phc.id_healthcare = uhc.id')
+            ->where('phc.id_professional = :sId')
+            ->setParameter('sId', $id_prof)
+            ->getQuery()->getResult(3);
+    }
+
     public function getEspecialidade()
     {
         return $this->entityManager->getRepository(UserEspeciality::class)
@@ -386,6 +397,17 @@ class MobileRepository
                 ->createQueryBuilder('pp')
                 ->where('pp.id_procedure = :sIdP and pp.id_professional = :sId')
                 ->setParameter('sIdP', $params['idproc'])
+                ->setParameter('sId', $params['idprof'])
+                ->getQuery()->getResult(3))
+            > 0;
+    }
+
+    public function isProfessionalHealthcare($params)
+    {
+        return count($this->entityManager->getRepository(ProfessionalHealthcares::class)
+                ->createQueryBuilder('ph')
+                ->where('ph.id_healthcare = :sIdH and ph.id_professional = :sId')
+                ->setParameter('sIdH', $params['idhc'])
                 ->setParameter('sId', $params['idprof'])
                 ->getQuery()->getResult(3))
             > 0;
@@ -578,6 +600,12 @@ class MobileRepository
             ->getQuery()->getResult(3);
     }
 
+    public function getHealthCare(){
+        return $this->entityManager->getRepository(UserHealthcare::class)
+            ->createQueryBuilder('hc')
+            ->getQuery()->getResult(3);
+    }
+
     public function haveRated($params)
     {
         return !(count($this->entityManager->getRepository(ProfessionalRatings::class)
@@ -758,6 +786,34 @@ class MobileRepository
             $this->entityManager->rollback();
             return false;
             UtilsFile::printvardie($e->getMessage());
+        }
+    }
+
+    public function saveProfessionalHealthcare($params){
+        try {
+            $this->entityManager->beginTransaction();
+            $healthcares = $this->entityManager->getRepository(ProfessionalHealthcares::class)
+                ->createQueryBuilder('pp')
+                ->where('pp.id_professional = :sId')
+                ->setParameter('sId', $params['id_professional'])
+                ->getQuery()->getResult();
+            foreach ($healthcares as $hc) {
+                $this->entityManager->remove($hc);
+            }
+            $this->entityManager->flush();
+            foreach ($params['fSelects'] as $hc) {
+                $thc = new ProfessionalHealthcares();
+                $thc->setIdProfessional($params['id_professional']);
+                $thc->setIdHealthcare($hc);
+                $this->entityManager->persist($thc);
+            }
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->entityManager->rollback();
+            return false;
+            throw $e;
         }
     }
 

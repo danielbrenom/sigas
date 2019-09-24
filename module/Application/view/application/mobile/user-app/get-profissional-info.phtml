@@ -56,6 +56,16 @@ $infos = $this->prof[0];
                     </div>
                 </ons-card>
                 <ons-card>
+                    <div class="title">Planos de Saúde aceitos</div>
+                    <div class="content">
+                        <ons-list modifier="nodivider">
+                            <?php foreach ($infos['healthcare'] as $hc): ?>
+                                <ons-list-item><?= $hc['desc_healthcare'] ?></ons-list-item>
+                            <?php endforeach; ?>
+                        </ons-list>
+                    </div>
+                </ons-card>
+                <ons-card>
                     <div class="title">Procedimentos disponíveis</div>
                     <div class="content">
                         <ons-list modifier="nodivider">
@@ -83,47 +93,6 @@ $infos = $this->prof[0];
                 </ons-card>
             </ons-carousel-item>
             <ons-carousel-item>
-                <?php if ($infos['had_appoint']): ?>
-                    <form action="<?= $this->url('application_mobile_user', ['action' => 'rating']) ?>" method="post"
-                          enctype="multipart/form-data">
-                        <ons-list class="header-custom" style="background-color: #fafafa">
-                            <ons-list-item class="input-items">
-                                Deixe sua avaliação deste profissional
-                            </ons-list-item>
-                            <li class="list-item">
-                                <div class="list-item__left">Classificação</div>
-                                <div class="list-item__right">
-                                    <div class="rating" style="width: 20rem">
-                                        <input id="rating-5" type="radio" name="rating" value="5"/><label
-                                                for="rating-5"><i
-                                                    class="fas fa-fw fa-star"></i></label>
-                                        <input id="rating-4" type="radio" name="rating" value="4"/><label
-                                                for="rating-4"><i
-                                                    class="fas fa-fw fa-star"></i></label>
-                                        <input id="rating-3" type="radio" name="rating" value="3"/><label
-                                                for="rating-3"><i
-                                                    class="fas fa-fw fa-star"></i></label>
-                                        <input id="rating-2" type="radio" name="rating" value="2"/><label
-                                                for="rating-2"><i
-                                                    class="fas fa-fw fa-star"></i></label>
-                                        <input id="rating-1" type="radio" name="rating" value="1"/><label
-                                                for="rating-1"><i
-                                                    class="fas fa-fw fa-star"></i></label>
-                                    </div>
-                                </div>
-                            </li>
-                            <ons-list-item class="input-items">
-                                <textarea required class="textarea" rows="3" style="width: 100%" name="comment"
-                                          placeholder="Deixe sua avaliação desse profissional"></textarea>
-                            </ons-list-item>
-                            <input type="text" readonly name="profid" value="<?= $infos['u_id'] ?>" hidden>
-                            <ons-list-item class="input-items">
-                                <button class="button button--large--quiet" style="padding: 0" type="submit"><i
-                                            class="fas fa-2x fa-paper-plane"></i></button>
-                            </ons-list-item>
-                        </ons-list>
-                    </form>
-                <?php endif; ?>
                 <ons-list>
                     <?php if (count($infos['ratings']) === 0): ?>
                         <ons-list-item class="item-custom" modifier="longdivider">

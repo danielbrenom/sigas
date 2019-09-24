@@ -72,6 +72,7 @@ class UserAppController extends AbstractActionController
         $infos[0]['pi_prof_addresses'] = Json::decode($infos[0]['pi_prof_addresses']);
         $infos[0]['esp_desc_especialidade'] = $infos[0]['pi_id_especiality'] == null ? "Aguardando verificação" : $infos[0]['esp_desc_especialidade'];
         $infos[0]['procedures'] = $this->mobileManager->getProceduresProfessional($params['id_user']);
+        $infos[0]['healthcare'] = $this->mobileManager->getHealthcareProfessional($params['id_user']);
         $infos[0]['had_appoint'] = $this->mobileManager->wasAtendidoProfessional(
                 ['pid' => $params['id_user'],
                     'uid' => $this->authManager->getActiveUser()['user_id']]) && $this->mobileManager->haveRated(
